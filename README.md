@@ -1,8 +1,10 @@
-# AirBnB
+# Airpnp
 
 ## Database Schema Design
 
-![Database Schema](/Database%20Schema.png)
+![db-schema]
+
+[db-schema]: ./images/database-schema.png
 
 ## API Documentation
 
