@@ -39,6 +39,7 @@ router.post("/", async(req, res, next) => {
   });
 });
 
+//logout
 router.delete('/', (req, res) => {
     res.clearCookie('token');
     return res.json({message: 'success'});
