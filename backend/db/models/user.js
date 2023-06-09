@@ -12,6 +12,32 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   User.init({
+    firstName: {
+      type: DataTypes.STRING(30),
+      allowNull: false,
+      validate: {
+        len: [1, 30],
+        isAlpha: true,
+        isCapitalized(value) {
+          if (value[0].toUpperCase() + value.slice(1).toLowerCase() !== value) {
+            throw new Error("First name must be capitalized")
+          }
+        }
+      }
+    },
+    lastName: {
+      type: DataTypes.STRING(30),
+      allowNull: false,
+      validate: {
+        len: [1, 30],
+        isAlpha: true,
+        isCapitalized(value) {
+          if (value[0].toUpperCase() + value.slice(1).toLowerCase() !== value) {
+            throw new Error("Last name must be capitalized")
+          }
+        }
+      }
+    },
     username: {
       type: DataTypes.STRING(30),
       allowNull: false,
