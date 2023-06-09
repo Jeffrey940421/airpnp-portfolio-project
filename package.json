@@ -1,5 +1,32 @@
 {
+  "name": "airpnp-portfolio-project",
+  "version": "1.0.0",
+  "description": "## Database Schema Design",
+  "main": "index.js",
   "dependencies": {
-    "express-validator": "^7.0.1"
-  }
+    "express-validator": "^7.0.1",
+    "lodash": "^4.17.21",
+    "validator": "^13.9.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "npm --prefix backend install backend",
+    "dev:backend": "npm install --prefix backend start",
+    "sequelize": "npm run --prefix backend sequelize",
+    "sequelize-cli": "npm run --prefix backend sequelize-cli",
+    "start": "npm start --prefix backend",
+    "build": "npm run --prefix backend build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jeffrey940421/airpnp-portfolio-project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jeffrey940421/airpnp-portfolio-project/issues"
+  },
+  "homepage": "https://github.com/Jeffrey940421/airpnp-portfolio-project#readme"
 }
