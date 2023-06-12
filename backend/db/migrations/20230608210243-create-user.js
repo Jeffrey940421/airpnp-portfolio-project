@@ -1,6 +1,6 @@
 'use strict';
 
-const { query } = require('express');
+// const { query } = require('express');
 
 let options = {};
 if (process.env.NODE_ENV === 'production') {
@@ -53,6 +53,6 @@ module.exports = {
   },
   async down(queryInterface, Sequelize) {
     options.tableName = "Users";
-    queryInterface.dropTable(options);
+    await queryInterface.dropTable(options);
   }
 };
