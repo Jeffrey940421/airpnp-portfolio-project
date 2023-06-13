@@ -1,7 +1,5 @@
 'use strict';
 
-// const { query } = require('express');
-
 let options = {};
 if (process.env.NODE_ENV === 'production') {
   options.schema = process.env.SCHEMA;
