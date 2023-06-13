@@ -24,7 +24,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: true,
       validate: {
-        isUrl: true
+        isUrl: {
+          args: true,
+          msg: "Please provide a valid image URL"
+        }
       }
     }
   }, {

@@ -49,7 +49,7 @@ module.exports = {
         defaultValue: Sequelize.literal("CURRENT_STAMP")
       }
     }, options);
-    options.tableName = "Reviews"
+    options.tableName = "Reviews";
     await queryInterface.addIndex(options, {
       fields: ["userId", "spotId"],
       unique: true,
@@ -57,8 +57,8 @@ module.exports = {
     })
   },
   async down(queryInterface, Sequelize) {
-    options.tableName = "Reviews"
-    await queryInterface.dropTable(options);
+    options.tableName = "Reviews";
     await queryInterface.removeIndex(options, "idx_reviews_userId_spotId");
+    await queryInterface.dropTable(options);
   }
 };

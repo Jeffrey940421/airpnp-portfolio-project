@@ -27,11 +27,17 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(30),
       allowNull: false,
       validate: {
-        len: [1, 30],
-        isAlpha: true,
+        len: {
+          args: [1, 30],
+          msg: "Please provide a first name with at least 1 character and no more than 30 characters"
+        },
+        isAlpha: {
+          args: true,
+          msg: "First name must be alphabetic"
+        },
         isCapitalized(value) {
           if (value[0].toUpperCase() + value.slice(1).toLowerCase() !== value) {
-            throw new Error("First name must be capitalized")
+            throw new Error("Please provide a capitalized first name")
           }
         }
       }
@@ -40,11 +46,17 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(30),
       allowNull: false,
       validate: {
-        len: [1, 30],
-        isAlpha: true,
+        len: {
+          args: [1, 30],
+          msg: "Please provide a last name with at least 1 character and no more than 30 characters"
+        },
+        isAlpha: {
+          args: true,
+          msg: "Last name must be alphabetic"
+        },
         isCapitalized(value) {
           if (value[0].toUpperCase() + value.slice(1).toLowerCase() !== value) {
-            throw new Error("Last name must be capitalized")
+            throw new Error("Please provide a capitalized last name")
           }
         }
       }
@@ -54,10 +66,13 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: true,
       validate: {
-        len: [4, 30],
+        len: {
+          args: [4, 30],
+          msg: "Please provide a username with at least 4 characters and no more than 30 characters"
+        },
         isNotEmail(value) {
           if (Validator.isEmail(value)) {
-            throw new Error("Cannot be an email.");
+            throw new Error("Username cannot be an email");
           }
         }
       }
@@ -67,8 +82,14 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: true,
       validate: {
-        len: [3, 256],
-        isEmail: true
+        len: {
+          args: [3, 256],
+          msg: "Please provide an email with at least 3 characters and no more than 256 characters"
+        },
+        isEmail: {
+          args: true,
+          msg: "Please provide a valid email"
+        }
       }
     },
     hashedPassword: {

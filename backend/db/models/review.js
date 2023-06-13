@@ -39,10 +39,22 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER(1),
       allowNull: false,
       validate: {
-        len: [1, 1],
-        isInt: true,
-        max: 5,
-        min: 1
+        len: {
+          args: [1, 1],
+          msg: "Please provide a integer rating between 1 and 5"
+        },
+        isInt: {
+          args: true,
+          msg: "Rating must be an integer"
+        },
+        max: {
+          args: 5,
+          msg: "Please provide a rating no greater than 5"
+        },
+        min: {
+          args: 1,
+          msg: "Please provide a rating no less than 1"
+        }
       }
     },
   }, {
