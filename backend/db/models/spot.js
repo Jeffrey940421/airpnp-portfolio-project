@@ -1,7 +1,7 @@
 'use strict';
 const { Model } = require('sequelize');
 const { countryNames, getStatesByCountryName, getCitiesByCountryStateNames } = require("../../utils/address-validation");
-// const { SpotImage } = require("../models");
+
 
 module.exports = (sequelize, DataTypes) => {
   class Spot extends Model {
@@ -23,10 +23,10 @@ module.exports = (sequelize, DataTypes) => {
       //   foreignKey: "spotId",
       //   onDelete: "cascade"
       // });
-      // Spot.hasMany(models.SpotImage, {
-      //   foreignKey: "spotId",
-      //   onDelete: "cascade"
-      // });
+      Spot.hasMany(models.SpotImage, {
+        foreignKey: "spotId",
+        onDelete: "cascade"
+      });
     }
   }
   Spot.init({
@@ -46,7 +46,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       validate: {
         len: [1, 70],
-        isIn: [getCitiesByCountryStateNames(this.country, this.state)]
+        validCity(value) {
+          if (!getCitiesByCountryStateNames(this.country, this.state).find(city => city === value)) {
+            throw new Error("City is invalid");
+          }
+        }
       }
     },
     state: {
@@ -54,7 +58,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       validate: {
         len: [2, 70],
-        isIn: [getStatesByCountryName(this.country)]
+        validState(value) {
+          if (!getStatesByCountryName(this.country).find(state => state === value)) {
+            throw new Error("State is invalid");
+          }
+        }
       }
     },
     country: {
@@ -62,7 +70,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       validate: {
         len: [4, 50],
-        isIn: [countryNames]
+        isIn: {
+          args: [countryNames],
+          msg: "Country is invalid"
+        }
       }
     },
     lat: {
@@ -72,17 +83,17 @@ module.exports = (sequelize, DataTypes) => {
         isNumeric: true,
         max: 90,
         min: -90,
-        len: [8, 9]
+        len: [9, 10]
       }
     },
     lng: {
-      type: DataTypes.DECIMAL,
+      type: DataTypes.DECIMAL(10, 7),
       allowNull: false,
       validate: {
         isNumeric: false,
         max: 180,
         min: -180,
-        len: [8, 10]
+        len: [9, 11]
       }
     },
     name: {
@@ -102,23 +113,13 @@ module.exports = (sequelize, DataTypes) => {
     },
     previewImage: {
       type: DataTypes.STRING,
-      allowNull: false,
       validate: {
-        isUrl: true,
-        imageAvailability(value) {
-          if (!SpotImage.findOne({
-            where: {
-              spotId: value
-            }
-          })) {
-            throw new Error("Preview image is not available");
-          }
-        }
+        isUrl: true
       }
     }
   }, {
     sequelize,
-    modelName: 'Spot',
+    modelName: 'Spot'
   });
   return Spot;
 };

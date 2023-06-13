@@ -1,5 +1,7 @@
 'use strict';
 
+const { Spot } = require("../models");
+
 let options = {};
 if (process.env.NODE_ENV === 'production') {
   options.schema = process.env.SCHEMA;
@@ -8,8 +10,7 @@ if (process.env.NODE_ENV === 'production') {
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    options.tableName = 'Spots';
-    queryInterface.bulkInsert(options, [
+    await Spot.bulkCreate([
       {
         ownerId: "2",
         address: "5240 S Tuscony St",
@@ -39,23 +40,23 @@ module.exports = {
       {
         ownerId: "2",
         address: "Strada Alexandru Ioan Cuza 69B",
-        city: "Vișeu de Sus",
-        state: "Maramureș",
+        city: "Vişeu De Sus",
+        state: "Maramureș County",
         country: "Romania",
         lat: 47.7190062,
         lng: 24.4506043,
         name: "Valea Vinului Dome - a glamping experience",
-        description: "Valea Vinului Dome is a geodesic dome located in an idyllic setting with a superb view of the Wine Valley and Rodnei Mountains. It's a dream place, perfect for relaxing and recharging batteries .",
+        description: "Valea Vinului Dome is a geodesic dome located in an idyllic setting with a superb view of the Wine Valley and Rodnei Mountains. It's a dream place, perfect for relaxing and recharging batteries.",
         price: 70,
         previewImage: "https://www.airpnp.com/spotimage3.jpg"
       }
-    ], {});
+    ], {validate: true});
   },
 
   async down (queryInterface, Sequelize) {
     options.tableName = 'Spots';
     const {Op} = require("sequelize");
-    queryInterface.bulkDelete(options, {
+    await queryInterface.bulkDelete(options, {
       address: {[Op.in]: ["5240 S Tuscony S", "Eje Central Lázaro Cárdenas 422", "Strada Alexandru Ioan Cuza 69B"]}
     }, {});
   }
