@@ -21,7 +21,7 @@ module.exports = {
         userId: 3,
         spotId: 1,
         review: 'An expensive stay for a couple but as three friends it was reasonable. This place is peaceful, beautiful, big enough for a family, south facing and the hot tub was a delight. Bright, spacious and has everything you could possibly need for a perfect stay. Surroundings are wonderful. Not far from some beautiful areas for walking and bathing etc. Would definitely recommend or stay again.',
-        stars: 4
+        stars: 5
       },
       {
         userId: 2,

@@ -12,47 +12,47 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     await SpotImage.bulkCreate([
       {
-        spotId: "1",
+        spotId: 1,
         url: "https://www.airpnp.com/spotimage1.jpg",
         preview: true
       },
       {
-        spotId: "1",
+        spotId: 1,
         url: "https://www.airpnp.com/spotimage4.jpg",
         preview: false
       },
       {
-        spotId: "1",
+        spotId: 1,
         url: "https://www.airpnp.com/spotimage5.jpg",
         preview: false
       },
       {
-        spotId: "2",
+        spotId: 2,
         url: "https://www.airpnp.com/spotimage2.jpg",
-        preview: true
-      },
-      {
-        spotId: "2",
-        url: "https://www.airpnp.com/spotimage6.jpg",
         preview: false
       },
       {
-        spotId: "2",
+        spotId: 2,
+        url: "https://www.airpnp.com/spotimage6.jpg",
+        preview: true
+      },
+      {
+        spotId: 2,
         url: "https://www.airpnp.com/spotimage7.jpg",
         preview: false
       },
       {
-        spotId: "3",
+        spotId: 3,
         url: "https://www.airpnp.com/spotimage3.jpg",
         preview: true
       },
       {
-        spotId: "3",
+        spotId: 3,
         url: "https://www.airpnp.com/spotimage8.jpg",
         preview: false
       },
       {
-        spotId: "3",
+        spotId: 3,
         url: "https://www.airpnp.com/spotimage9.jpg",
         preview: false
       },

@@ -1,6 +1,6 @@
 'use strict';
 const { Model } = require('sequelize');
-const { countryNames, getStatesByCountryName, getCitiesByCountryStateNames } = require("../../utils/address-validation");
+const { countryNames, getCountryCodeByName, getStatesByCountryName, getStateCodeByNames, getCitiesByCountryStateNames } = require("../../utils/address-validation");
 
 
 module.exports = (sequelize, DataTypes) => {
@@ -13,7 +13,8 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Spot.belongsTo(models.User, {
         foreignKey: "ownerId",
-        onDelete: "cascade"
+        onDelete: "cascade",
+        as: "Owner"
       });
       Spot.hasMany(models.Booking, {
         foreignKey: "spotId",
@@ -53,6 +54,12 @@ module.exports = (sequelize, DataTypes) => {
           msg: "Please provide a city with at least 1 character and no more than 70 characters"
         },
         validCity(value) {
+          if (!getCountryCodeByName(this.country)) {
+            throw new Error("Cannot validate city with invalid country");
+          }
+          if (!getStateCodeByNames(this.country, this.state)) {
+            throw new Error("Cannot validate city with invalid state");
+          }
           if (!getCitiesByCountryStateNames(this.country, this.state).find(city => city === value)) {
             throw new Error("Please provide a valid city");
           }
@@ -68,6 +75,9 @@ module.exports = (sequelize, DataTypes) => {
           msg: "Please provide a state with at least 2 characters and no more than 70 characters"
         },
         validState(value) {
+          if (!getCountryCodeByName(this.country)) {
+            throw new Error("Cannot validate state with invalid country");
+          }
           if (!getStatesByCountryName(this.country).find(state => state === value)) {
             throw new Error("Please provide a valid state");
           }
@@ -92,9 +102,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DECIMAL(9, 7),
       allowNull: false,
       validate: {
-        isNumeric: {
-          args: true,
-          msg: "Latitude must be a number"
+        isNumber(value) {
+          if (value !== +value) {
+            throw new Error("Latitude must be a number")
+          }
         },
         max: {
           args: 90,
@@ -104,9 +115,10 @@ module.exports = (sequelize, DataTypes) => {
           args: -90,
           msg: "Please provide a latitude no less than -90"
         },
-        len: {
-          args: [9, 10],
-          msg: "Please provide a latitude with a scale of 7"
+        checkPrecision(value) {
+          if (+value.toFixed(7) !== value) {
+            throw new Error("Please provide a latitude with a scale of 7")
+          }
         }
       }
     },
@@ -114,9 +126,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DECIMAL(10, 7),
       allowNull: false,
       validate: {
-        isNumeric: {
-          args: false,
-          msg: "Longitude must be a number"
+        isNumber(value) {
+          if (value !== +value) {
+            throw new Error("Longitude must be a number")
+          }
         },
         max: {
           args: 180,
@@ -126,9 +139,10 @@ module.exports = (sequelize, DataTypes) => {
           args: -180,
           msg: "Please provide a longitude no less than -180"
         },
-        len: {
-          args: [9, 11],
-          msg: "Please provide a longitude with a scale of 7"
+        checkPrecision(value) {
+          if (value !== +value || +value.toFixed(7) !== value) {
+            throw new Error("Please provide a latitude with a scale of 7")
+          }
         }
       }
     },
@@ -150,15 +164,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    previewImage: {
-      type: DataTypes.STRING,
-      validate: {
-        isUrl: {
-          args: true,
-          msg: "Please provide a valid image URL"
-        }
-      }
-    }
   }, {
     sequelize,
     modelName: 'Spot'

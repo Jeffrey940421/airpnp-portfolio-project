@@ -12,7 +12,7 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     await Spot.bulkCreate([
       {
-        ownerId: "2",
+        ownerId: 2,
         address: "5240 S Tuscony St",
         city: "Derby",
         state: "Kansas",
@@ -21,11 +21,10 @@ module.exports = {
         lng: -97.254128,
         name: "Newly Built w/ Secret Master Suite",
         description: "Brand new finishing and a curated collection of vintage and high end furnishings create a modern and relaxing retreat inside. The house features top of the line Grohe shower systems, luxurious Bidet toilet seat, and color-changing LED ceiling lights. Unique and conversation provoking books and games. Inside, you will find a hidden bookshelf door leading to the Master suite.",
-        price: 200,
-        previewImage: "https://www.airpnp.com/spotimage1.jpg"
+        price: 200
       },
       {
-        ownerId: "1",
+        ownerId: 1,
         address: "Eje Central Lázaro Cárdenas 422",
         city: "Benito Juarez",
         state: "Ciudad de México",
@@ -35,10 +34,9 @@ module.exports = {
         name: "Acogedor departamento en buena zona de Iztapalapa",
         description: "Departamento de dos habitaciones, muy luminoso  en zona de Iztapalapa aledaña a Coyoacán.",
         price: 50,
-        previewImage: "https://www.airpnp.com/spotimage2.jpg"
       },
       {
-        ownerId: "2",
+        ownerId: 2,
         address: "Strada Alexandru Ioan Cuza 69B",
         city: "Vişeu De Sus",
         state: "Maramureș County",
@@ -47,8 +45,7 @@ module.exports = {
         lng: 24.4506043,
         name: "Valea Vinului Dome - a glamping experience",
         description: "Valea Vinului Dome is a geodesic dome located in an idyllic setting with a superb view of the Wine Valley and Rodnei Mountains. It's a dream place, perfect for relaxing and recharging batteries.",
-        price: 70,
-        previewImage: "https://www.airpnp.com/spotimage3.jpg"
+        price: 70
       }
     ], {validate: true});
   },
