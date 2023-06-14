@@ -153,7 +153,7 @@ router.get("/", async (req, res) => {
         required: false
       }
     ],
-    group: ["Spot.id", "SpotImage.id"]
+    group: ["Spot.id", "SpotImages.id"]
   });
   spots = spots.map(spot => {
     spot = spot.toJSON();
@@ -191,7 +191,7 @@ router.get("/current", requireAuth, async (req, res) => {
         required: false
       }
     ],
-    group: ["Spot.id"]
+    group: ["Spot.id", "SpotImages.id"]
   });
   spots = spots.map(spot => {
     spot = spot.toJSON();
