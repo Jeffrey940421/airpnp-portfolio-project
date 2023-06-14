@@ -38,20 +38,20 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'SpotImage',
-    // hooks: {
-    //   beforeBulkCreate: async (spotImages) => {
-    //     const spots = new Set([]);
-    //     for (let spotImage of spotImages) {
-    //       if (spotImage.dataValues.preview) {
-    //         if (!spots.has(spotImage.dataValues.spotId)) {
-    //           spots.add(spotImage.dataValues.spotId);
-    //         } else {
-    //           throw new Error("Please set only one image as preview for each spot")
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
+    hooks: {
+      beforeBulkCreate: async (spotImages) => {
+        const spots = new Set([]);
+        for (let spotImage of spotImages) {
+          if (spotImage.dataValues.preview) {
+            if (!spots.has(spotImage.dataValues.spotId)) {
+              spots.add(spotImage.dataValues.spotId);
+            } else {
+              throw new Error("Please set only one image as preview for each spot")
+            }
+          }
+        }
+      }
+    }
   });
   return SpotImage;
 };
