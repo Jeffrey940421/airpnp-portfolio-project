@@ -421,6 +421,13 @@ router.post("/:spotId/reviews", requireAuth, validateReviewInfo, async (req, res
     error.message = "User already has a review for this spot";
     return next(error);
   }
+  if (spot.ownerId === userId) {
+    const error = {};
+    error.title = "Forbidden";
+    error.status = 403;
+    error.message = "Cannot create a review for the spot that belongs to the current user";
+    return next(error);
+  }
   const {review, stars} = req.body;
   const newReview = await spot.createReview({userId, review, stars});
   res.status(201);
