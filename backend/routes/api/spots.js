@@ -135,15 +135,10 @@ const validateSpotInfo = [
 // get all spots
 router.get("/", async (req, res) => {
   let spots = await Spot.findAll({
-    attributes: {
-      include: [
-        [sequelize.fn("ROUND", sequelize.fn("AVG", sequelize.col("Reviews.stars")), 2), "avgRating"]
-      ]
-    },
     include: [
       {
         model: Review,
-        attributes: []
+        attributes: ["stars"]
       },
       {
         model: SpotImage,
@@ -152,8 +147,7 @@ router.get("/", async (req, res) => {
         },
         required: false
       }
-    ],
-    group: ["Spot.id", "SpotImages.id"]
+    ]
   });
   spots = spots.map(spot => {
     spot = spot.toJSON();
@@ -162,7 +156,13 @@ router.get("/", async (req, res) => {
     } else {
       spot.previewImage = null;
     }
+    if (spot.Reviews.length) {
+      spot.avgRating = +(spot.Reviews.reduce((sum, review) => sum += review.stars, 0) / spot.Reviews.length).toFixed(2);
+    } else {
+      spot.avgRating = null;
+    }
     delete spot.SpotImages;
+    delete spot.Reviews;
     return spot;
   });
   res.json({Spots: spots});
@@ -173,15 +173,10 @@ router.get("/current", requireAuth, async (req, res) => {
   const ownerId = req.user.id;
   let spots = await Spot.findAll({
     where: {ownerId},
-    attributes: {
-      include: [
-        [sequelize.fn("ROUND", sequelize.fn("AVG", sequelize.col("Reviews.stars")), 2), "avgRating"]
-      ]
-    },
     include: [
       {
         model: Review,
-        attributes: []
+        attributes: ["stars"]
       },
       {
         model: SpotImage,
@@ -190,8 +185,7 @@ router.get("/current", requireAuth, async (req, res) => {
         },
         required: false
       }
-    ],
-    group: ["Spot.id", "SpotImages.id"]
+    ]
   });
   spots = spots.map(spot => {
     spot = spot.toJSON();
@@ -200,7 +194,13 @@ router.get("/current", requireAuth, async (req, res) => {
     } else {
       spot.previewImage = null;
     }
+    if (spot.Reviews.length) {
+      spot.avgRating = +(spot.Reviews.reduce((sum, review) => sum += review.stars, 0) / spot.Reviews.length).toFixed(2);
+    } else {
+      spot.avgRating = null;
+    }
     delete spot.SpotImages;
+    delete spot.Reviews;
     return spot;
   });
   res.json({Spots: spots});
