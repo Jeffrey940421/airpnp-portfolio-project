@@ -1,11 +1,30 @@
 const express = require('express');
 const { requireAuth } = require('../../utils/auth');
-const { Spot, Review, SpotImage, User } = require('../../db/models');
+const { Spot, Review, SpotImage, User, ReviewImage } = require('../../db/models');
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 const router = express.Router();
 const sequelize = require("sequelize");
 const { countryNames, getCountryCodeByName, getStatesByCountryName, getStateCodeByNames, getCitiesByCountryStateNames } = require("../../utils/address-validation");
+const spot = require('../../db/models/spot');
+
+const validateReviewInfo = [
+  check('review')
+    .exists({checkNull: true})
+    .withMessage("Please provide review text"),
+  check('stars')
+    .exists({checkFalsy: true})
+    .isInt()
+    .withMessage("Stars must be an integer")
+    .custom((value) => {
+      if (value >= 1 && value <= 5) {
+        return true;
+      }
+      return false;
+    })
+    .withMessage("Stars must be an integer from 1 to 5"),
+  handleValidationErrors
+]
 
 const validateSpotImageInfo = [
   check('url')
@@ -233,7 +252,7 @@ router.get("/:spotId", async (req, res, next) => {
   });
   if (!spotDetail) {
     const error = {};
-    error.title = "Bad Request";
+    error.title = "Not Found";
     error.status = 404;
     error.message = "Spot couldn't be found";
     return next(error);
@@ -268,14 +287,14 @@ router.post("/:spotId/images", requireAuth, validateSpotImageInfo, async (req, r
   const spot = await Spot.findByPk(spotId);
   if (!spot) {
     const error = {};
-    error.title = "Bad Request";
+    error.title = "Not Found";
     error.status = 404;
     error.message = "Spot couldn't be found";
     return next(error);
   }
   if (spot.ownerId !== ownerId) {
     const error = {};
-    error.title = "Authorization Required";
+    error.title = "Forbidden";
     error.status = 403;
     error.message = "Cannot edit the spot that does not belong to the current user";
     return next(error);
@@ -308,14 +327,14 @@ router.put("/:spotId", requireAuth, validateSpotInfo, async (req, res, next) => 
   const spot = await Spot.findByPk(spotId);
   if (!spot) {
     const error = {};
-    error.title = "Bad Request";
+    error.title = "Not Found";
     error.status = 404;
     error.message = "Spot couldn't be found";
     return next(error);
   }
   if (spot.ownerId !== ownerId) {
     const error = {};
-    error.title = "Authorization Required";
+    error.title = "Forbidden";
     error.status = 403;
     error.message = "Cannot edit the spot that does not belong to the current user";
     return next(error);
@@ -332,14 +351,14 @@ router.delete("/:spotId", requireAuth, async (req, res, next) => {
   const spot = await Spot.findByPk(spotId);
   if (!spot) {
     const error = {};
-    error.title = "Bad Request";
+    error.title = "Not Found";
     error.status = 404;
     error.message = "Spot couldn't be found";
     return next(error);
   }
   if (spot.ownerId !== ownerId) {
     const error = {};
-    error.title = "Authorization Required";
+    error.title = "Forbidden";
     error.status = 403;
     error.message = "Cannot edit the spot that does not belong to the current user";
     return next(error);
@@ -349,5 +368,64 @@ router.delete("/:spotId", requireAuth, async (req, res, next) => {
     message: "Successfully deleted"
   });
 })
+
+// get reviews by spot id
+router.get("/:spotId/reviews", async (req, res, next) => {
+  const {spotId} = req.params;
+  const spot = await Spot.findByPk(spotId, {
+    include: {
+      model: Review,
+      include: [
+        {
+          model: User,
+          attributes: ["id", "firstName", "lastName"]
+        },
+        {
+          model: ReviewImage,
+          attributes: ["id", "url"]
+        }
+      ]
+    }
+  })
+  if (!spot) {
+    const error = {};
+    error.title = "Not Found";
+    error.status = 404;
+    error.message = "Spot couldn't be found";
+    return next(error);
+  }
+  res.json({Reviews: spot.Reviews});
+})
+
+// create a review for a spot based on spot id
+router.post("/:spotId/reviews", requireAuth, validateReviewInfo, async (req, res, next) => {
+  const {spotId} = req.params;
+  const userId = req.user.id;
+  const spot = await Spot.findByPk(spotId, {
+    include: {
+      model: Review,
+      attributes: ["userId"]
+    }
+  });
+  if (!spot) {
+    const error = {};
+    error.title = "Not Found";
+    error.status = 404;
+    error.message = "Spot couldn't be found";
+    return next(error);
+  }
+  if (spot.Reviews.find(review => review.userId === userId)) {
+    const error = {};
+    error.title = "Internal Server Error";
+    error.status = 500;
+    error.message = "User already has a review for this spot";
+    return next(error);
+  }
+  const {review, stars} = req.body;
+  const newReview = await spot.createReview({userId, review, stars});
+  res.status(201);
+  res.json(newReview);
+})
+
 
 module.exports = router;

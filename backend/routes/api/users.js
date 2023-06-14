@@ -23,7 +23,7 @@ const checkUserExistence = async (req, res, next) => {
     errors.username = userByUsername ? "User with that username already exists" : undefined;
     errors.email = userByEmail ? "User with that email already exists" : undefined;
     err.errors = errors;
-    err.title = "Bad Request";
+    err.title = "Internal Server Error";
     next(err);
   }
 
