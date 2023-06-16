@@ -6,6 +6,8 @@ const { handleValidationErrors } = require('../../utils/validation');
 const router = express.Router();
 const sequelize = require("sequelize");
 
+
+// delete a spot image
 router.delete("/:imageId", requireAuth, async (req, res, next) => {
   const {imageId} = req.params;
   const ownerId = req.user.id;

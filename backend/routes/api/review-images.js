@@ -6,6 +6,7 @@ const { handleValidationErrors } = require('../../utils/validation');
 const router = express.Router();
 const sequelize = require("sequelize");
 
+// delete a review image
 router.delete("/:imageId", requireAuth, async (req, res, next) => {
   const {imageId} = req.params;
   const userId = req.user.id;
