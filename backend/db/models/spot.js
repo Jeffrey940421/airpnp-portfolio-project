@@ -117,7 +117,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         checkPrecision(value) {
           if (+value.toFixed(7) !== value) {
-            throw new Error("Please provide a latitude with a scale of 7")
+            throw new Error("Please provide a latitude expressed to 7 decimal places")
           }
         }
       }
@@ -140,8 +140,8 @@ module.exports = (sequelize, DataTypes) => {
           msg: "Please provide a longitude no less than -180"
         },
         checkPrecision(value) {
-          if (value !== +value || +value.toFixed(7) !== value) {
-            throw new Error("Please provide a latitude with a scale of 7")
+          if (+value.toFixed(7) !== value) {
+            throw new Error("Please provide a latitude expressed to 7 decimal places")
           }
         }
       }
@@ -161,8 +161,22 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     price: {
-      type: DataTypes.INTEGER,
-      allowNull: false
+      type: DataTypes.DECIMAL(undefined, 2),
+      allowNull: false,
+      isNumber(value) {
+        if (value !== +value) {
+          throw new Error("Price must be a number")
+        }
+      },
+      min: {
+        args: 0,
+        msg: "Please provide a price no less than 0"
+      },
+      checkPrecision(value) {
+        if (+value.toFixed(2) !== value) {
+          throw new Error("Please provide a price expressed to 2 decimal places")
+        }
+      }
     },
   }, {
     sequelize,

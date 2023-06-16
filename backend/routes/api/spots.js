@@ -257,7 +257,7 @@ const validateSpotInfo = [
       }
       return true
     })
-    .withMessage("Please provide a latitude with a scale of 7"),
+    .withMessage("Please provide a latitude expressed to 7 decimal places"),
   check('lng')
     .exists({checkFalsy: true})
     .custom((value) => {
@@ -282,7 +282,7 @@ const validateSpotInfo = [
       }
       return true
     })
-    .withMessage("Please provide a longitude with a scale of 7"),
+    .withMessage("Please provide a longitude expressed to 7 decimal places"),
   check('name')
     .exists({checkFalsy: true})
     .isLength({min: 1, max: 50})
@@ -307,6 +307,14 @@ const validateSpotInfo = [
       return false
     })
     .withMessage("Please provide a price greater than 0"),
+  check('price')
+    .custom((value) => {
+      if (+value.toFixed(2) !== value) {
+        return false
+      }
+      return true
+    })
+    .withMessage("Please provide a price expressed to 2 decimal places"),
   handleValidationErrors
 ];
 
