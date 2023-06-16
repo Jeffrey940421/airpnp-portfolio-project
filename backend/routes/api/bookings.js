@@ -19,9 +19,11 @@ const validateBookingInfo = [
     .custom(async (value, {req}) => {
       const {bookingId} = req.params;
       const booking = await Booking.findByPk(bookingId);
-      const originalStartDate = booking.startDate;
-      if (new Date(originalStartDate).getTime() >= new Date().setHours(-7, 0, 0, 0) && new Date(value).getTime() < new Date().setHours(-7, 0, 0, 0)) {
-        return Promise.reject()
+      if (booking) {
+        const originalStartDate = booking.startDate;
+        if (new Date(originalStartDate).getTime() >= new Date().setHours(-7, 0, 0, 0) && new Date(value).getTime() < new Date().setHours(-7, 0, 0, 0)) {
+          return Promise.reject()
+        }
       }
       return Promise.resolve()
     })
@@ -143,10 +145,11 @@ router.put("/:bookingId", requireAuth, validateBookingInfo, async (req, res, nex
           error.errors.startDate = "Start date conflicts with an existing booking"
         }
         if (new Date(endDate) > new Date(booking.startDate) && new Date(endDate) <= new Date(booking.endDate)) {
-          error.errors.startDate = "End date conflicts with an existing booking"
+          error.errors.endDate = "End date conflicts with an existing booking"
         }
         if (new Date(startDate) < new Date(booking.startDate) && new Date(endDate) > new Date(booking.endDate)) {
-          error.errors.bothDates = "Both start and end dates conflict with an existing booking"
+          error.errors.startDate = "Start date conflicts with an existing booking"
+          error.errors.endDate = "End date conflicts with an existing booking"
         }
       }
     });
