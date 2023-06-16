@@ -107,8 +107,7 @@ router.put("/:bookingId", requireAuth, bookingExist, bookingAuthorization, pastB
           error.errors.endDate = "End date conflicts with an existing booking"
         }
         if (new Date(startDate) < new Date(booking.startDate) && new Date(endDate) > new Date(booking.endDate)) {
-          error.errors.startDate = "Start date conflicts with an existing booking"
-          error.errors.endDate = "End date conflicts with an existing booking"
+          error.errors.eitherDate = "Either start date or end date conflicts with an existing booking"
         }
       }
     });
