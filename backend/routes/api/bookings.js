@@ -91,9 +91,6 @@ router.put("/:bookingId", requireAuth, bookingExist, bookingAuthorization, pastB
   const {bookingId} = req.params;
   let {startDate, endDate} = req.body;
   const originalStartDate = booking.startDate;
-  if (startDate === originalStartDate) {
-    startDate = undefined;
-  }
   const bookings = booking.Spot.Bookings;
   if (bookings.length) {
     const error = {};
@@ -118,6 +115,9 @@ router.put("/:bookingId", requireAuth, bookingExist, bookingAuthorization, pastB
     if (Object.keys(error.errors).length) {
       return next(error);
     }
+  }
+  if (startDate === originalStartDate) {
+    startDate = undefined;
   }
   let updatedBooking = await booking.update({startDate, endDate});
   updatedBooking = updatedBooking.toJSON();

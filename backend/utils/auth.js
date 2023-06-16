@@ -259,17 +259,14 @@ const bookingDeleteAuthorization = async function (req, res, next) {
   const booking = req.booking;
   const userId = req.user.id;
   const startDate = booking.startDate;
+  const error = {};
+  error.title = "Forbidden";
+  error.status = 403;
   if (booking.userId !== userId && booking.Spot.ownerId !== userId) {
-    const error = {};
-    error.title = "Forbidden";
-    error.status = 403;
     error.message = "Cannot delete a booking that does not belong to the current user or is not associated with a spot the current user owns";
     return next(error);
   }
   if (new Date(startDate).getTime() <= new Date().setHours(-7, 0, 0, 0)) {
-    const error = {};
-    error.title = "Forbidden";
-    error.status = 403;
     error.message = "Cannot delete an ongoing or completed booking";
     return next(error);
   }
@@ -281,19 +278,14 @@ const pastBooking = async function (req, res, next) {
   const originalStartDate = booking.startDate;
   const originalEndDate = booking.endDate;
   let {startDate} = req.body;
-  if (new Date(originalStartDate).getTime() < new Date().setHours(-7, 0, 0, 0)) {
-    if (startDate && startDate !== originalStartDate) {
-      const error = {};
-      error.title = "Forbidden";
-      error.status = 403;
-      error.message = "Cannot edit a past start date. Only end date can be edited";
-      return next(error);
-    }
+  const error = {};
+  error.title = "Forbidden";
+  error.status = 403;
+  if (new Date(originalStartDate).getTime() < new Date().setHours(-7, 0, 0, 0) && startDate && startDate !== originalStartDate) {
+    error.message = "Cannot edit a past start date. Only end date can be edited";
+    return next(error);
   }
   if (new Date(originalEndDate).getTime() < new Date().setHours(-7, 0, 0, 0)) {
-    const error = {};
-    error.title = "Forbidden";
-    error.status = 403;
     error.message = "Cannot edit a past booking";
     return next(error);
   }
