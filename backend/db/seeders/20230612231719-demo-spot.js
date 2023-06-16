@@ -16,7 +16,7 @@ module.exports = {
         address: "5240 S Tuscony St",
         city: "Derby",
         state: "Kansas",
-        country: "United States",
+        country: "United States of America",
         lat: 37.5987288,
         lng: -97.254128,
         name: "Newly Built w/ Secret Master Suite",

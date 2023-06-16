@@ -1,9 +1,15 @@
 const database = require('country-state-city')
 
 const countryNames = database.Country.getAllCountries().map(country => country.name);
+const index = countryNames.indexOf("United States");
+countryNames[index] = "United States of America";
 
 const getCountryCodeByName = (countryName) => {
-  return database.Country.getAllCountries().find(country => country.name === countryName);
+  if (countryName === "United States of America") {
+    return database.Country.getAllCountries().find(country => country.name === "United States");
+  } else {
+    return database.Country.getAllCountries().find(country => country.name === countryName);
+  }
 }
 
 const getStatesByCountryName = (countryName) => {

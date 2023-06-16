@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { jwtConfig } = require('../config');
-const { User } = require('../db/models');
+const { Spot, Review, SpotImage, User, ReviewImage, Booking } = require('../db/models');
 
 const { secret, expiresIn } = jwtConfig;
 
@@ -76,8 +76,244 @@ const requireAuth = function (req, res, next) {
   return next(err);
 }
 
+// check if the spot exists and return 404 error if not
+const spotExist = async function (req, res, next) {
+  const {spotId} = req.params;
+  const spot = await Spot.findByPk(spotId, {
+    include: [
+      {
+        model: Review,
+        include: [
+          {
+            model: User,
+            attributes: ["id", "firstName", "lastName"]
+          },
+          {
+            model: ReviewImage,
+            attributes: ["id", "url"]
+          }
+        ]
+      },
+      {
+        model: SpotImage,
+        attributes: {
+          exclude: ["spotId", "createdAt", "updatedAt"]
+        }
+      },
+      {
+        model: User,
+        attributes: ["id", "firstName", "lastName"],
+        as: "Owner"
+      },
+      {
+        model: Booking,
+        include: {
+          model: User,
+          attributes: ["id", "firstName", "lastName"]
+        }
+      }
+    ]
+  });
+  if (!spot) {
+    const error = {};
+    error.title = "Not Found";
+    error.status = 404;
+    error.message = "Spot couldn't be found";
+    return next(error);
+  }
+  req.spot = spot;
+  return next();
+}
+
+// check if the user has the authorization (user must be the owner) to edit the spot and return 403 if not
+const spotAuthorization = async function (req, res, next) {
+  const spot = req.spot;
+  const ownerId = req.user.id;
+  if (spot.ownerId !== ownerId) {
+    const error = {};
+    error.title = "Forbidden";
+    error.status = 403;
+    error.message = "Cannot edit or delete the spot that does not belong to the current user";
+    return next(error);
+  }
+  return next();
+}
+
+// check if the user has the authorization (user must not be the owner) to edit the spot and return 403 if not
+const spotReviewAuthorization = async function (req, res, next) {
+  const spot = req.spot;
+  const userId = req.user.id;
+  if (spot.ownerId == userId) {
+    const error = {};
+    error.title = "Forbidden";
+    error.status = 403;
+    error.message = "Cannot create a review for the spot that belongs to the current user";
+    return next(error);
+  }
+  return next();
+}
+
+// check if the user has the authorization (user must not be the owner) to create the booking and return 403 if not
+const spotBookingAuthorization = async function (req, res, next) {
+  const spot = req.spot;
+  const userId = req.user.id;
+  if (spot.ownerId == userId) {
+    const error = {};
+    error.title = "Forbidden";
+    error.status = 403;
+    error.message = "Cannot create a booking for the spot that belongs to the current user";
+    return next(error);
+  }
+  return next();
+}
+
+// check if the user already has a review for the spot and return 500 if does
+const duplicateReview = async function (req, res, next) {
+  const spot = req.spot;
+  const userId = req.user.id;
+  if (spot.Reviews.find(review => review.userId === userId)) {
+    const error = {};
+    error.title = "Internal Server Error";
+    error.status = 500;
+    error.message = "User already has a review for this spot";
+    return next(error);
+  }
+  return next();
+}
+
+// check if the review exists and return 404 if not
+const reviewExist = async function (req, res, next) {
+  const {reviewId} = req.params;
+  const review = await Review.findByPk(reviewId, {
+    include: ReviewImage
+  });
+  if (!review) {
+    const error = {};
+    error.title = "Not Found";
+    error.status = 404;
+    error.message = "Review couldn't be found";
+    return next(error);
+  }
+  req.review = review;
+  return next();
+}
+
+const reviewAuthorization = async function (req, res, next) {
+  const review = req.review;
+  const userId = req.user.id;
+  if (review.userId !== userId) {
+    const error = {};
+    error.title = "Forbidden";
+    error.status = 403;
+    error.message = "Cannot edit or delete the review that does not belong to the current user";
+    return next(error);
+  }
+  return next();
+}
+
+const reviewLimit = async function (req, res, next) {
+  const review = req.review;
+  if (review.ReviewImages.length >= 10) {
+    const error = {};
+    error.title = "Forbidden";
+    error.status = 403;
+    error.message = "Maximum number of images for this resource was reached";
+    return next(error);
+  }
+  return next();
+}
+
+const bookingExist = async function (req, res, next) {
+  const {bookingId} = req.params;
+  const booking = await Booking.findByPk(bookingId, {
+    include: {
+      model: Spot,
+      include: Booking
+    }
+  });
+  if (!booking) {
+    const error = {};
+    error.title = "Not Found";
+    error.status = 404;
+    error.message = "Booking couldn't be found";
+    return next(error);
+  }
+  req.booking = booking;
+  return next();
+}
+
+const bookingAuthorization = async function (req, res, next) {
+  const booking = req.booking;
+  const userId = req.user.id;
+  if (booking.userId !== userId) {
+    const error = {};
+    error.title = "Forbidden";
+    error.status = 403;
+    error.message = "Cannot edit a booking that does not belong to the current user";
+    return next(error);
+  }
+  return next();
+}
+
+const bookingDeleteAuthorization = async function (req, res, next) {
+  const booking = req.booking;
+  const userId = req.user.id;
+  const startDate = booking.startDate;
+  if (booking.userId !== userId && booking.Spot.ownerId !== userId) {
+    const error = {};
+    error.title = "Forbidden";
+    error.status = 403;
+    error.message = "Cannot delete a booking that does not belong to the current user or is not associated with a spot the current user owns";
+    return next(error);
+  }
+  if (new Date(startDate).getTime() <= new Date().setHours(-7, 0, 0, 0)) {
+    const error = {};
+    error.title = "Forbidden";
+    error.status = 403;
+    error.message = "Cannot delete an ongoing or completed booking";
+    return next(error);
+  }
+  return next();
+}
+
+const pastBooking = async function (req, res, next) {
+  const booking = req.booking;
+  const originalStartDate = booking.startDate;
+  const originalEndDate = booking.endDate;
+  let {startDate} = req.body;
+  if (new Date(originalStartDate).getTime() < new Date().setHours(-7, 0, 0, 0)) {
+    if (startDate && startDate !== originalStartDate) {
+      const error = {};
+      error.title = "Forbidden";
+      error.status = 403;
+      error.message = "Cannot edit a past start date. Only end date can be edited";
+      return next(error);
+    }
+  }
+  if (new Date(originalEndDate).getTime() < new Date().setHours(-7, 0, 0, 0)) {
+    const error = {};
+    error.title = "Forbidden";
+    error.status = 403;
+    error.message = "Cannot edit a past booking";
+    return next(error);
+  }
+  return next();
+}
+
 module.exports = {
   setTokenCookie,
   restoreUser,
-  requireAuth
+  requireAuth,
+  spotExist,
+  spotAuthorization,
+  spotReviewAuthorization,
+  spotBookingAuthorization,
+  duplicateReview,
+  reviewExist,
+  reviewAuthorization,
+  reviewLimit,
+  bookingExist,
+  bookingAuthorization,
+  bookingDeleteAuthorization,
+  pastBooking
 };

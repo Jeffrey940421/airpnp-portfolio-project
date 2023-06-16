@@ -1,11 +1,9 @@
 const express = require('express');
-const { requireAuth } = require('../../utils/auth');
+const { requireAuth, bookingExist, bookingAuthorization, pastBooking, bookingDeleteAuthorization } = require('../../utils/auth');
 const { Spot, Review, ReviewImage, SpotImage, User, Booking } = require('../../db/models');
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 const router = express.Router();
-const sequelize = require("sequelize");
-const { up } = require('../../db/seeders/20230613032607-demo-review');
 
 const validateBookingInfo = [
   check("startDate")
@@ -34,7 +32,7 @@ const validateBookingInfo = [
       format: "YYYY-MM-DD",
       delimiters: ["-"]
     })
-    .withMessage("Start date must be a date in YYYY-MM-DD format"),
+    .withMessage("End date must be a date in YYYY-MM-DD format"),
   check("endDate")
     .custom((value, {req}) => {
       if (new Date(value).getTime() <= new Date(req.body.startDate).getTime()) {
@@ -88,49 +86,13 @@ router.get("/current", requireAuth, async (req, res, next) => {
 })
 
 // edit a booking
-router.put("/:bookingId", requireAuth, validateBookingInfo, async (req, res, next) => {
+router.put("/:bookingId", requireAuth, bookingExist, bookingAuthorization, pastBooking, validateBookingInfo, async (req, res, next) => {
+  const booking = req.booking
   const {bookingId} = req.params;
-  const userId = req.user.id;
-  const booking = await Booking.findByPk(bookingId, {
-    include: {
-      model: Spot,
-      include: Booking
-    }
-  });
-  if (!booking) {
-    const error = {};
-    error.title = "Not Found";
-    error.status = 404;
-    error.message = "Booking couldn't be found";
-    return next(error);
-  }
-  if (booking.userId !== userId) {
-    const error = {};
-    error.title = "Forbidden";
-    error.status = 403;
-    error.message = "Cannot edit a booking that does not belong to the current user";
-    return next(error);
-  }
   let {startDate, endDate} = req.body;
   const originalStartDate = booking.startDate;
-  const originalEndDate = booking.endDate;
-  if (new Date(originalStartDate).getTime() < new Date().setHours(-7, 0, 0, 0)) {
-    if (startDate === originalStartDate) {
-      startDate = undefined;
-    } else {
-      const error = {};
-      error.title = "Forbidden";
-      error.status = 403;
-      error.message = "Cannot edit a past start date";
-      return next(error);
-    }
-  }
-  if (new Date(originalEndDate).getTime() < new Date().setHours(-7, 0, 0, 0)) {
-    const error = {};
-    error.title = "Forbidden";
-    error.status = 403;
-    error.message = "Cannot edit a past booking";
-    return next(error);
+  if (startDate === originalStartDate) {
+    startDate = undefined;
   }
   const bookings = booking.Spot.Bookings;
   if (bookings.length) {
@@ -164,34 +126,8 @@ router.put("/:bookingId", requireAuth, validateBookingInfo, async (req, res, nex
 })
 
 // delete a booking
-router.delete("/:bookingId", requireAuth, async (req, res, next) => {
-  const {bookingId} = req.params;
-  const userId = req.user.id;
-  const booking = await Booking.findByPk(bookingId, {
-    include: Spot
-  });
-  if (!booking) {
-    const error = {};
-    error.title = "Not Found";
-    error.status = 404;
-    error.message = "Booking couldn't be found";
-    return next(error);
-  }
-  if (booking.userId !== userId && booking.Spot.ownerId !== userId) {
-    const error = {};
-    error.title = "Forbidden";
-    error.status = 403;
-    error.message = "Cannot delete a booking that does not belong to the current user or is not associated with a spot the current user owns";
-    return next(error);
-  }
-  const startDate = booking.startDate;
-  if (new Date(startDate).getTime() <= new Date().setHours(-7, 0, 0, 0)) {
-    const error = {};
-    error.title = "Forbidden";
-    error.status = 403;
-    error.message = "Cannot delete a booking that has been started";
-    return next(error);
-  }
+router.delete("/:bookingId", requireAuth, bookingExist, bookingDeleteAuthorization, async (req, res, next) => {
+  const booking = req.booking;
   await booking.destroy();
   res.json({
     message: "Successfully deleted"

@@ -1,10 +1,9 @@
 const express = require('express');
-const { requireAuth } = require('../../utils/auth');
+const { requireAuth, reviewExist, reviewAuthorization, reviewLimit } = require('../../utils/auth');
 const { Spot, Review, ReviewImage, SpotImage, User } = require('../../db/models');
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 const router = express.Router();
-const sequelize = require("sequelize");
 
 const validateReviewImageInfo = [
   check('url')
@@ -76,33 +75,8 @@ router.get("/current", requireAuth, async (req, res) => {
 })
 
 // add an image to a review based on review id
-router.post("/:reviewId/images", requireAuth, validateReviewImageInfo, async (req, res, next) => {
-  const {reviewId} = req.params;
-  const review = await Review.findByPk(reviewId, {
-    include: ReviewImage
-  });
-  const userId = req.user.id;
-  if (!review) {
-    const error = {};
-    error.title = "Not Found";
-    error.status = 404;
-    error.message = "Review couldn't be found";
-    return next(error);
-  }
-  if (review.ReviewImages.length >= 10) {
-    const error = {};
-    error.title = "Forbidden";
-    error.status = 403;
-    error.message = "Maximum number of images for this resource was reached";
-    return next(error);
-  }
-  if (review.userId !== userId) {
-    const error = {};
-    error.title = "Forbidden";
-    error.status = 403;
-    error.message = "Cannot edit the review that does not belong to the current user";
-    return next(error);
-  }
+router.post("/:reviewId/images", requireAuth, reviewExist, reviewAuthorization, reviewLimit, validateReviewImageInfo, async (req, res, next) => {
+  const review = req.review;
   const {url} = req.body;
   const newReviewImage = await review.createReviewImage({url});
   res.json({
@@ -112,50 +86,20 @@ router.post("/:reviewId/images", requireAuth, validateReviewImageInfo, async (re
 })
 
 // edit a review
-router.put("/:reviewId", requireAuth, validateReviewInfo, async (req, res, next) => {
-  const {reviewId} = req.params;
-  const review = await Review.findByPk(reviewId);
-  const userId = req.user.id;
-  if (!review) {
-    const error = {};
-    error.title = "Not Found";
-    error.status = 404;
-    error.message = "Review couldn't be found";
-    return next(error);
-  }
-  if (review.userId !== userId) {
-    const error = {};
-    error.title = "Forbidden";
-    error.status = 403;
-    error.message = "Cannot edit the review that does not belong to the current user";
-    return next(error);
-  }
-  const updatedReview = await review.update({
+router.put("/:reviewId", requireAuth, reviewExist, reviewAuthorization, validateReviewInfo, async (req, res, next) => {
+  const review = req.review;
+  let updatedReview = await review.update({
     review: req.body.review,
     stars: req.body.stars
   });
+  updatedReview = updatedReview.toJSON();
+  delete updatedReview.ReviewImages;
   res.json(updatedReview);
 })
 
 // delete a review
-router.delete("/:reviewId", requireAuth, async (req, res, next) => {
-  const {reviewId} = req.params;
-  const userId = req.user.id;
-  const review = await Review.findByPk(reviewId);
-  if (!review) {
-    const error = {};
-    error.title = "Not Found";
-    error.status = 404;
-    error.message = "Review couldn't be found";
-    return next(error);
-  }
-  if (review.userId !== userId) {
-    const error = {};
-    error.title = "Forbidden";
-    error.status = 403;
-    error.message = "Cannot edit the review that does not belong to the current user";
-    return next(error);
-  }
+router.delete("/:reviewId", requireAuth, reviewExist, reviewAuthorization, async (req, res, next) => {
+  const review = req.review;
   await review.destroy();
   res.json({
     message: "Successfully deleted"
