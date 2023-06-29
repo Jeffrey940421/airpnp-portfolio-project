@@ -292,6 +292,42 @@ const pastBooking = async function (req, res, next) {
   return next();
 }
 
+const spotImageExist = async function (req, res, next) {
+  const {imageId} = req.params;
+
+  const spotImage = await SpotImage.findByPk(imageId, {
+    include: {
+      model: Spot,
+      include: {
+        model: SpotImage,
+        order: [['id']]
+      }
+    }
+  })
+  if (!spotImage) {
+    const error = {};
+    error.title = "Not Found";
+    error.status = 404;
+    error.message = "Spot image couldn't be found";
+    return next(error);
+  }
+  req.spotImage = spotImage;
+  return next();
+}
+
+const spotImageAuthorization = async function (req, res, next) {
+  const ownerId = req.user.id;
+  const spotImage = req.spotImage;
+  if (spotImage.Spot.ownerId !== ownerId) {
+    const error = {};
+    error.title = "Forbidden";
+    error.status = 403;
+    error.message = "Cannot edit the spot that does not belong to the current user";
+    return next(error);
+  }
+  return next();
+}
+
 module.exports = {
   setTokenCookie,
   restoreUser,
@@ -307,5 +343,7 @@ module.exports = {
   bookingExist,
   bookingAuthorization,
   bookingDeleteAuthorization,
-  pastBooking
+  pastBooking,
+  spotImageExist,
+  spotImageAuthorization
 };
