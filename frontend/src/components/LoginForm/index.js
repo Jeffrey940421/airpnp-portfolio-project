@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import * as sessionActions from "../../store/session";
 import { useDispatch, useSelector } from "react-redux";
-import { Redirect } from "react-router-dom";
 import "./LoginForm.css";
+import { useModal } from "../../context/Modal";
 
 export function LoginForm() {
   const [credential, setCredential] = useState("");
@@ -12,10 +12,7 @@ export function LoginForm() {
   const [serverErrors, setServerErrors] = useState({});
   const user = useSelector(state => state.session.user);
   const dispatch = useDispatch();
-
-  if (user) {
-    return <Redirect to="/" />
-  }
+  const { closeModal } = useModal();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,14 +27,16 @@ export function LoginForm() {
     if (Object.values(errors).length) {
       setAvailabilityErrors(errors);
     } else {
-      return dispatch(sessionActions.login({ credential, password })).catch(
-        async (res) => {
-          const data = await res.json();
-          if (data && data.errors) {
-            setServerErrors(data.errors);
+      return dispatch(sessionActions.login({ credential, password }))
+        .then(closeModal)
+        .catch(
+          async (res) => {
+            const data = await res.json();
+            if (data && data.errors) {
+              setServerErrors(data.errors);
+            }
           }
-        }
-      );
+        );
     }
   }
 
@@ -50,7 +49,16 @@ export function LoginForm() {
     e.preventDefault();
     const credential = "loui798";
     const password = "password1";
-    await dispatch(sessionActions.login({ credential, password }));
+    return dispatch(sessionActions.login({ credential, password }))
+        .then(closeModal)
+        .catch(
+          async (res) => {
+            const data = await res.json();
+            if (data && data.errors) {
+              setServerErrors(data.errors);
+            }
+          }
+        );
   }
 
   return (

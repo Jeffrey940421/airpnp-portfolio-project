@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import * as sessionActions from "../../store/session";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from "react-router-dom";
+import { useModal } from "../../context/Modal";
 import "./SignupForm.css";
 
 export function SignupForm() {
@@ -24,6 +25,7 @@ export function SignupForm() {
   const [serverErrors, setServerErrors] = useState({});
   const user = useSelector(state => state.session.user);
   const dispatch = useDispatch();
+  const { closeModal } = useModal();
 
   const capitalize = (str) => {
     return str[0].toUpperCase() + str.slice(1).toLowerCase();
@@ -32,7 +34,6 @@ export function SignupForm() {
   useEffect(() => {
     const errors = { email: [], username: [], firstName: [], lastName: [], password: [] }
 
-    if (email && email.length < 3) errors.email.push("Email must be at least 3 characters long");
     if (email && email.length > 256) errors.email.push("Email must be at most 256 characters long");
     if (email && !email.toLowerCase().match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) errors.email.push("Email is invalid");
 
@@ -124,14 +125,16 @@ export function SignupForm() {
           firstName: capitalize(firstName),
           lastName: capitalize(lastName),
           password
-        })).catch(
-          async (res) => {
-            const data = await res.json();
-            if (data && data.errors) {
-              setServerErrors(data.errors);
+        }))
+          .then(closeModal)
+          .catch(
+            async (res) => {
+              const data = await res.json();
+              if (data && data.errors) {
+                setServerErrors(data.errors);
+              }
             }
-          }
-        );
+          );
       }
     }
   }
