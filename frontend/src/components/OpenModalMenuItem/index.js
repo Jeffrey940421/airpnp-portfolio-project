@@ -9,7 +9,7 @@ export function OpenModalMenuItem({
   const { setModalContent, setOnModalClose } = useModal();
 
   const onClick = () => {
-    if (typeof onButtonClick === "function") onItemClick();
+    if (typeof onItemClick === "function") onItemClick();
     if (typeof onModalClose === "function") setOnModalClose(onModalClose);
     setModalContent(modalComponent);
   };
