@@ -13,39 +13,51 @@ module.exports = {
     await Spot.bulkCreate([
       {
         ownerId: 2,
-        address: "5240 S Tuscony St",
-        city: "Derby",
-        state: "Kansas",
+        address: "25186 Gail Dr",
+        city: "Idyllwild-Pine Cove",
+        state: "California",
         country: "United States of America",
-        lat: 37.5987288,
-        lng: -97.254128,
-        name: "Newly Built w/ Secret Master Suite",
-        description: "Brand new finishing and a curated collection of vintage and high end furnishings create a modern and relaxing retreat inside. The house features top of the line Grohe shower systems, luxurious Bidet toilet seat, and color-changing LED ceiling lights. Unique and conversation provoking books and games. Inside, you will find a hidden bookshelf door leading to the Master suite.",
-        price: 200
+        lat: 33.7566337,
+        lng: -116.7334091,
+        name: "Idyllwild Cozy Lakeview Lodge",
+        description: "Cozy Lakeview Lodge is tucked in the trees and only 5 minutes from town! The space is cozy and private with beautiful views out of every window. Our property is unique as we have easy access parking, and a killer mountain view. You will feel like you’re in a hidden hideaway. The streets are plowed from highway 243 straight to the cabin during the winter. We have 3 parking spots in front of the cabin. Only 1 might be available during peak snow season!",
+        price: 211
       },
       {
         ownerId: 1,
-        address: "Eje Central Lázaro Cárdenas 422",
-        city: "Benito Juarez",
-        state: "Ciudad de México",
-        country: "Mexico",
-        lat: 19.3686310,
-        lng: -99.1503544,
-        name: "Acogedor departamento en buena zona de Iztapalapa",
-        description: "Departamento de dos habitaciones, muy luminoso  en zona de Iztapalapa aledaña a Coyoacán.",
-        price: 50,
+        address: "Rua Do Campo De Jogos",
+        city: "Vila Nova de Milfontes",
+        state: "Beja",
+        country: "Portugal",
+        lat: 37.7287698,
+        lng: -8.7831108,
+        name: "Lazy Days | Adults Only by Duna Parque Group",
+        description: "Duna Parque Group está situado em Vila Nova de Milfontes, a 650 metros da Praia da Franquia. O alojamento é composto por 6 quartos, todos com casa de banho privativa. Os hóspedes partilharão uma sala de estar com televisão, zona de refeições e alguns utensílios básicos de cozinha. No terraço com vista mar, poderão desfrutar da piscina! Todas as manhãs é servido um pequeno-almoço continental na pastelaria Lazy Days/Lazy Nights localizada no piso térreo do edifício.",
+        price: 152,
       },
       {
         ownerId: 2,
-        address: "Strada Alexandru Ioan Cuza 69B",
-        city: "Vişeu De Sus",
-        state: "Maramureș County",
-        country: "Romania",
-        lat: 47.7190062,
-        lng: 24.4506043,
-        name: "Valea Vinului Dome - a glamping experience",
-        description: "Valea Vinului Dome is a geodesic dome located in an idyllic setting with a superb view of the Wine Valley and Rodnei Mountains. It's a dream place, perfect for relaxing and recharging batteries.",
-        price: 70
+        address: "Jl. Sawah Indah, Peliatan",
+        city: "Ubud",
+        state: "Bali",
+        country: "Indonesia",
+        lat: -8.5166951,
+        lng: 115.2741690,
+        name: "Bali Bamboo House | Rescape Ubud - Resound Villa",
+        description: "Rescape Ubud is an uniquely designed villa built by bamboo, allowing guests to unwind and escape from all the daily hassle. This stay is perfect for couples, young families, artists, musicians and everyone who loves to fully embrace the nature. The place feels secluded and yet only 5 minutes away by bike from central Ubud!",
+        price: 180
+      },
+      {
+        ownerId: 1,
+        address: "Rural",
+        city: "Villamaría",
+        state: "Caldas",
+        country: "Colombia",
+        lat: 5.0330706,
+        lng: -75.5148855,
+        name: "Habitación privada/NazcaGlamping",
+        description: "Rescape Ubud is an uniquely designed villa built by bamboo, allowing guests to unwind and escape from all the daily hassle. This stay is perfect for couples, young families, artists, musicians and everyone who loves to fully embrace the nature. The place feels secluded and yet only 5 minutes away by bike from central Ubud!",
+        price: 107
       }
     ], {validate: true});
   },
@@ -54,7 +66,7 @@ module.exports = {
     options.tableName = 'Spots';
     const {Op} = require("sequelize");
     await queryInterface.bulkDelete(options, {
-      address: {[Op.in]: ["5240 S Tuscony S", "Eje Central Lázaro Cárdenas 422", "Strada Alexandru Ioan Cuza 69B"]}
+      address: {[Op.in]: ["25186 Gail Dr", "Rua Do Campo De Jogos", "Jl. Sawah Indah, Peliatan", "Rural"]}
     }, {});
   }
 };

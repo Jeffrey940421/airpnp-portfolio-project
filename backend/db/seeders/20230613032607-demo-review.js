@@ -14,26 +14,32 @@ module.exports = {
       {
         userId: 3,
         spotId: 3,
-        review: 'We had a really nice experience at the Dome, the view is incredible and the hosts were also very nice ( they served us with eggs and cheese for breakfast). I might recommend to come in the summertime because at night it can be really chilly ( the chimney is small so the fire can last for about 2-3 hours during the night). Other than that, it was perfect!',
-        stars: 5
+        review: 'people who look after are good and Responsive.. Whayu came quick to help .. place is surrounded by green field.. Only go there if u dont mind living with bugs and Lizards and frogs… ants and other bugs always present.',
+        stars: 2
       },
       {
         userId: 3,
         spotId: 1,
-        review: 'An expensive stay for a couple but as three friends it was reasonable. This place is peaceful, beautiful, big enough for a family, south facing and the hot tub was a delight. Bright, spacious and has everything you could possibly need for a perfect stay. Surroundings are wonderful. Not far from some beautiful areas for walking and bathing etc. Would definitely recommend or stay again.',
+        review: 'This was such a wonderful space for a best friend weekend. We were looking for a place to relax and recharge, and that is exactly what we got. Beautiful cabin feel, with an outstanding view for coffee in the morning, and drinks while the sun sets. Very close to town, but far enough a way to feel tucked away in our own little bubble. We will be back!',
         stars: 5
       },
       {
         userId: 2,
         spotId: 2,
-        review: 'This place is overpriced and noisy. Will never come back again',
-        stars: 1
+        review: 'War alle sehr schön, noch schöner wäre es wenn die anderen Gäste auch die Türklinke benutzten und nicht einfach ihre Zimmertür zuknallen. Bei mehreren Bewohnern eines Zimmers, die zur Küche gehen etc. ist das nervig und vielleicht kann man die Gäste ausdrücklich darum bitten?',
+        stars: 3
       },
       {
         userId: 1,
         spotId: 1,
-        review: "Ok let me start with positive, host was charming and friendly. Unfortunately beside the host nothing was good, room was a complete dump, ceiling was so low couldn't even stand there, it was a 90 years old property, which was not maintained, or remodelled, there were holes in the walls all over the room, that's a perfect place for spider and scorpions to hide.",
-        stars: 2
+        review: "We loved this cottage in the forest! It was a quiet and peaceful getaway–a wonderful location amidst the trees. The decorations around the place were so special! It was exactly what we imagined. Definitely felt right at home. My family enjoyed our stay, and wished we stayed a little longer. Our host was amazing–super responsive and welcoming.",
+        stars: 4
+      },
+      {
+        userId: 2,
+        spotId: 4,
+        review: 'Excelente lugar para compartir en pareja. Su entorno rodeado de naturales lo hace tranquilo y ameno. Total privacidad que es lo importante. Muy amable las personas que atienden.',
+        stars: 5
       }
     ], {validate: true});
   },

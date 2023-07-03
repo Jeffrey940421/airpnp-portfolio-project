@@ -1,0 +1,54 @@
+.spotList {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) ;
+  gap: 50px;
+  margin-top: 50px;
+  font-size: 14px;
+}
+
+.spot {
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.previewImage {
+  width: 100%;
+  aspect-ratio: 1.4 / 1;
+  border-radius: 20px;
+  object-fit: cover;
+  margin-bottom: 20px;
+}
+
+.spotLocation {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.address {
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.starts {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 5px
+}
+
+.spotName {
+  color: #717171;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spotPrice > span {
+  font-weight: bold;
+}
