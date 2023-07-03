@@ -42,39 +42,47 @@ export function ProfileButton({ user }) {
   if (user) {
     content = (
       <>
-        <li>{user.username}</li>
-        <li>{user.firstName} {user.lastName}</li>
-        <li>{user.email}</li>
-        <li onClick={handleLogout}>Log Out</li>
+        <li className="textList">
+          <div>Hello, {user.firstName}!</div>
+          <div>{user.email}</div>
+        </li>
+        <li className="clickableList">Manage Account</li>
+        <li className="clickableList">Manage Spots</li>
+        <li className="clickableList">Manage Reviews</li>
+        <li className="clickableList" onClick={handleLogout}>Log Out</li>
       </>
     )
   } else {
     content = (
       <>
-        <li>
-          <OpenModalMenuItem
-            itemText="Log In"
-            modalComponent={<LoginForm />}
-            onItemClick={closeMenu}
-          />
-        </li>
-        <li>
-          <OpenModalMenuItem
-            itemText="Sign Up"
-            modalComponent={<SignupForm />}
-            onItemClick={closeMenu}
-          />
-        </li>
+        <OpenModalMenuItem
+          itemText="Log In"
+          modalComponent={<LoginForm />}
+          onItemClick={closeMenu}
+        />
+        <OpenModalMenuItem
+          itemText="Sign Up"
+          modalComponent={<SignupForm />}
+          onItemClick={closeMenu}
+        />
       </>
     )
   }
 
   return (
     <>
-      <button onClick={openMenu}>
-        <i className="fa-solid fa-user fa-bounce" />
+      {user && <li>Airpnp your house</li>}
+      <button className="profile" onClick={openMenu}>
+        <div className="barsIcon">
+          <i className="fa-solid fa-bars" />
+        </div>
+        <div className="userIcon">
+          <div className="iconBackground">
+            <i className="fa-solid fa-user" />
+          </div>
+        </div>
       </button>
-      <ul className={"profile-dropdown" + (showMenu ? "" : " hidden")} ref={ref}>
+      <ul className={"profileDropdown" + (showMenu ? "" : " hidden")} ref={ref}>
         {content}
       </ul>
     </>

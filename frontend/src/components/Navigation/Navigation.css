@@ -1,3 +1,100 @@
+.navigationBar {
+  list-style-type: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  padding: 0px;
+  border-bottom: 1px solid lightgray;
+  padding-bottom: 20px;
+  padding-top: 20px;
+}
+
+.profileDropdown {
+  list-style-type: none;
+  position: absolute;
+  background-color: white;
+  box-shadow: 0 0 5px 1px #DDDDDD;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px 0px;
+  width: 200px;
+  right: 0px;
+  top: 50px;
+  border-radius: 10px;
+  box-sizing: border-box;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.profileDropdown > li {
+  width: 200px;
+  box-sizing: border-box;
+  padding: 10px 15px 10px 15px;
+}
+
+.profileDropdown > li.textList {
+  border-bottom: 1px solid lightgray;
+}
+
+.profileDropdown > li.clickableList {
+  cursor: pointer;
+}
+
+.profileDropdown > li.clickableList:hover {
+  background-color: #F7F7F7;
+}
+
 .hidden {
   display: none;
+}
+
+.logo {
+  width: 100px;
+}
+
+.profile {
+  width: 80px;
+  height: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  border: 1px solid #DDDDDD;
+  border-radius: 20px;
+  padding: 0px 6px 0px 15px;
+  cursor: pointer;
+}
+
+.profile:hover {
+  box-shadow: 0 0 5px 1px #DDDDDD;
+}
+
+.barsIcon {
+  font-size: 16px;
+  color: #717171;
+}
+
+.userIcon {
+  color: white;
+  font-size: 18px;
+}
+
+.iconBackground {
+  background-color: #717171;
+  padding: 3px;
+  height: 23px;
+  width: 23px;
+  border-radius: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profileSection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
 }

@@ -15,11 +15,11 @@ function App() {
 
   return (
     isLoaded && (
-      <>
+      <main>
         <Navigation isLoaded={isLoaded} />
         <Switch>
         </Switch>
-      </>
+      </main>
     )
   );
 }

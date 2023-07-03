@@ -14,5 +14,5 @@ export function OpenModalMenuItem({
     setModalContent(modalComponent);
   };
 
-  return <li onClick={onClick}>{itemText}</li>;
+  return <li className="clickableList" onClick={onClick}>{itemText}</li>;
 }
