@@ -7,12 +7,15 @@ const reviewsRouter = require('./reviews.js');
 const spotImagesRouter = require('./spot-images.js');
 const reviewImagesRouter = require('./review-images.js');
 const bookingsRouter = require('./bookings.js');
+const mapsRouter = require('./maps.js');
 const { setTokenCookie } = require('../../utils/auth.js');
 const { User } = require('../../db/models');
 const { restoreUser } = require('../../utils/auth.js');
 const { requireAuth } = require('../../utils/auth.js');
 
 router.use(restoreUser);
+
+router.use('/maps', mapsRouter);
 
 router.use('/session', sessionRouter);
 

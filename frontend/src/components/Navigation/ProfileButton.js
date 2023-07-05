@@ -4,11 +4,13 @@ import * as sessionActions from '../../store/session';
 import { OpenModalMenuItem } from "../OpenModalMenuItem";
 import { LoginForm } from '../LoginForm';
 import { SignupForm } from '../SignupForm';
+import { useHistory } from "react-router-dom";
 
 export function ProfileButton({ user }) {
   const dispatch = useDispatch();
   const [showMenu, setShowMenu] = useState(false);
   const ref = useRef();
+  const history = useHistory();
 
   useEffect(() => {
     const closeMenu = (e) => {
@@ -71,7 +73,12 @@ export function ProfileButton({ user }) {
 
   return (
     <>
-      {user && <li>Airpnp your house</li>}
+      {
+        user &&
+          <li>
+            <button className="createSpotButton" onClick={() => history.push("/spots/new")}>Airpnp your house</button>
+          </li>
+      }
       <button className="profile" onClick={openMenu}>
         <div className="barsIcon">
           <i className="fa-solid fa-bars" />

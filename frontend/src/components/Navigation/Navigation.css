@@ -26,6 +26,7 @@
   box-sizing: border-box;
   font-size: 14px;
   font-weight: 400;
+  z-index: 10;
 }
 
 .profileDropdown > li {
@@ -97,4 +98,19 @@
   justify-content: center;
   align-items: center;
   gap: 20px;
+}
+
+.createSpotButton {
+  cursor: pointer;
+  background-color: white;
+  border: none;
+  padding: 10px 20px;
+  font-family: 'Manrope', sans-serif;
+  border-radius: 40px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.createSpotButton:hover {
+  background-color: #F7F7F7;
 }
