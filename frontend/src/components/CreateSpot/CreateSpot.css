@@ -1,17 +1,28 @@
-.createSpotForm {
+div.createSpotForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: center;
+  max-width: 800px;
+  min-width: 500px;
+  margin: auto;
+}
+
+form.createSpotForm {
   display: flex;
   flex-direction: column;
   gap: 5px;
+  width: 100%;
 }
 
-.createSpotForm h2 {
+form.createSpotForm h2 {
   margin: 0px;
   padding: 0px;
 }
 
-.createSpotForm p {
+form.createSpotForm > p {
   margin: 0px;
-  padding: 10px 0px;
+  padding: 5px 0px 15px 0px;
 }
 
 .selectMenu {
@@ -30,36 +41,54 @@
 }
 
 .selectOptions {
-  width: 80%;
-  float: right;
+  width: 100%;
   font-size: 14px;
-  [class$="ValueContainer"] {
-    min-height: 60px !important;
-    max-height: 60px;
-    padding-top: 17px;
-    position: relative;
-    display: flex;
-    background-color: transparent;
+}
+
+p.warningMessage {
+  color: darkorange;
+  font-size: 14px;
+}
+
+.googleMap {
+  width: 100%;
+  border-radius: 10px;
+  align-self: center;
+}
+
+.locationSection {
+  border-bottom: 1px solid lightgray;
+  padding-bottom: 30px;
+}
+
+p.availabilityError {
+  margin: 0px;
+  padding-top: 5px;
+}
+
+.error .selectOptions {
+  [class$="-Svg"] {
+    color: red;
   }
-  [class$="singleValue"] {
-    padding-top: 17px;
-    background-color: transparent;
+  [class$="-indicatorSeparator"] {
+    background-color: red;
   }
-  [class$="IndicatorsContainer"] {
-    min-height: 60px !important;
-    max-height: 60px;
-    background-color: transparent;
-  }
-  [class$="-Input"] {
-    min-height: 60px !important;
-    max-height: 60px;
-    padding-top: 17px;
-    background-color: transparent;
-  }
-  [class$="-control"] {
-    min-height: 60px !important;
-    max-height: 60px;
-    background-color: transparent;
-    border-radius: 10px;
-  }
+
+}
+
+.error .unfocusedSelect {
+  border: 1px solid red;
+}
+
+.error .unfocusedSelect:hover {
+  border: 1.5px solid red;
+}
+
+.error .focusedSelect {
+  outline: 1.5px solid red;
+  border: 1.5px solid red;
+}
+
+.error .focusedSelect:hover {
+  border: 1.5px solid red;
 }

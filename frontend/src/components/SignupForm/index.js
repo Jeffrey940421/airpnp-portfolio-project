@@ -51,7 +51,7 @@ export function SignupForm() {
   useEffect(() => {
     const errors = { email: [], username: [], firstName: [], lastName: [], password: [] };
 
-    if (email && email.length > 256) errors.email.push("Email must be at most 256 characters long");
+    if (email && email.length > 255) errors.email.push("Email must be at most 255 characters long");
     if (email && !email.toLowerCase().match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) errors.email.push("Email is invalid");
 
     if (username && username.length < 4) errors.username.push("Username must be at least 4 characters long");

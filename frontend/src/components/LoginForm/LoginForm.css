@@ -49,6 +49,10 @@
   border: 1px solid #DDDDDD;
 }
 
+.inputBox input:hover {
+  border-color: black;
+}
+
 .inputBox input:-webkit-autofill {
   -webkit-background-clip: text;
 }
