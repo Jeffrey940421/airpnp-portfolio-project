@@ -76,7 +76,7 @@ export function ProfileButton({ user }) {
       {
         user &&
           <li>
-            <button className="createSpotButton" onClick={() => history.push("/spots/new")}>Airpnp your house</button>
+            <button className="createSpotButton" onClick={() => history.push("/spots/new")}>Airpnp your place</button>
           </li>
       }
       <button className="profile" onClick={openMenu}>

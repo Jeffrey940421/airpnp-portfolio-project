@@ -1,7 +1,7 @@
 'use strict';
 const { Model } = require('sequelize');
-const { countryNames, getCountryCodeByName, getStatesByCountryName, getStateCodeByNames, getCitiesByCountryStateNames } = require("../../utils/address-validation");
-
+const fs = require("fs");
+const geolocation =  JSON.parse(fs.readFileSync(require.resolve("../../utils/geolocation.json")).toString());
 
 module.exports = (sequelize, DataTypes) => {
   class Spot extends Model {
@@ -54,13 +54,13 @@ module.exports = (sequelize, DataTypes) => {
           msg: "Please provide a city with at least 1 character and no more than 70 characters"
         },
         validCity(value) {
-          if (!getCountryCodeByName(this.country)) {
+          if (!geolocation[this.country]) {
             throw new Error("Cannot validate city with invalid country");
           }
-          if (!getStateCodeByNames(this.country, this.state)) {
+          if (!geolocation[this.country][this.state]) {
             throw new Error("Cannot validate city with invalid state");
           }
-          if (!getCitiesByCountryStateNames(this.country, this.state).find(city => city === value)) {
+          if (!geolocation[this.country][this.state].find(city => city === value)) {
             throw new Error("Please provide a valid city");
           }
         }
@@ -75,10 +75,10 @@ module.exports = (sequelize, DataTypes) => {
           msg: "Please provide a state with at least 2 characters and no more than 70 characters"
         },
         validState(value) {
-          if (!getCountryCodeByName(this.country)) {
+          if (!geolocation[this.country]) {
             throw new Error("Cannot validate state with invalid country");
           }
-          if (!getStatesByCountryName(this.country).find(state => state === value)) {
+          if (!geolocation[this.country][this.state]) {
             throw new Error("Please provide a valid state");
           }
         }
@@ -92,9 +92,10 @@ module.exports = (sequelize, DataTypes) => {
           args: [4, 50],
           msg: "Please provide a state with at least 4 characters and no more than 50 characters"
         },
-        isIn: {
-          args: [countryNames],
-          msg: "Please provide a valid country"
+        validState(value) {
+          if (!geolocation[this.country]) {
+            throw new Error("Please provide a valid country");
+          }
         }
       }
     },

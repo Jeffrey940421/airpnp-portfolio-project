@@ -4,8 +4,10 @@ const { Spot, Review, SpotImage, User, ReviewImage, Booking } = require('../../d
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 const router = express.Router();
-const { countryNames, getCountryCodeByName, getStatesByCountryName, getStateCodeByNames, getCitiesByCountryStateNames } = require("../../utils/address-validation");
 const { Op } = require("sequelize");
+const fs = require("fs");
+
+const geolocation =  JSON.parse(fs.readFileSync(require.resolve("../../utils/geolocation.json")).toString());
 
 const validateBookingInfo = [
   check("startDate")
@@ -201,10 +203,10 @@ const validateSpotInfo = [
     .withMessage('Please provide a city with at least 1 character and no more than 70 characters'),
   check('city')
     .if((value, {req}) => {
-      return getCountryCodeByName(req.body.country) && getStateCodeByNames(req.body.country, req.body.state)
+      return geolocation[req.body.country] && geolocation[req.body.country][req.body.state]
     })
     .custom((value, {req}) => {
-      if (!getCitiesByCountryStateNames(req.body.country, req.body.state).find(city => city === value)) {
+      if (!geolocation[req.body.country][req.body.state].find(city => city === value)) {
         return false;
       }
       return true;
@@ -216,10 +218,10 @@ const validateSpotInfo = [
     .withMessage('Please provide a state with at least 2 characters and no more than 70 characters'),
   check('state')
     .if((value, {req}) => {
-      return getCountryCodeByName(req.body.country)
+      return geolocation[req.body.country]
     })
     .custom((value, {req}) => {
-      if (!getStatesByCountryName(req.body.country).find(state => state === value)) {
+      if (!geolocation[req.body.country][req.body.state]) {
         return false;
       }
       return true;
@@ -230,7 +232,7 @@ const validateSpotInfo = [
     .isLength({min: 4, max: 50})
     .withMessage('Please provide a state with at least 4 characters and no more than 50 characters'),
   check('country')
-    .isIn(countryNames)
+    .isIn(Object.keys(geolocation))
     .withMessage("Please provide a valid country. State and city are not validated with invalid country"),
   check('lat')
     .exists({checkFalsy: true})

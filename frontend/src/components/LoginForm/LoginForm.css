@@ -76,8 +76,13 @@
   border: 1px solid red;
 }
 
+.error input:hover {
+  border: 1px solid red;
+}
+
 .error input:focus{
   outline: 1.5px solid red;
+  border: 1px solid red;
 }
 
 .errorMessage {

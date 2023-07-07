@@ -54,11 +54,30 @@ p.warningMessage {
   width: 100%;
   border-radius: 10px;
   align-self: center;
+  margin-top: 15px;
 }
 
 .locationSection {
   border-bottom: 1px solid lightgray;
   padding-bottom: 30px;
+}
+
+.descriptionSection {
+  border-bottom: 1px solid lightgray;
+  padding-bottom: 30px;
+  padding-top: 10px;
+}
+
+.nameSection {
+  border-bottom: 1px solid lightgray;
+  padding-bottom: 30px;
+  padding-top: 10px;
+}
+
+.priceSection {
+  border-bottom: 1px solid lightgray;
+  padding-bottom: 30px;
+  padding-top: 10px;
 }
 
 p.availabilityError {
@@ -73,7 +92,6 @@ p.availabilityError {
   [class$="-indicatorSeparator"] {
     background-color: red;
   }
-
 }
 
 .error .unfocusedSelect {
@@ -91,4 +109,71 @@ p.availabilityError {
 
 .error .focusedSelect:hover {
   border: 1.5px solid red;
+}
+
+.inputArea {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 200px;
+  margin-top: 15px;
+  border-radius: 8px;
+  border: 1px solid #DDDDDD;
+}
+
+.inputArea label {
+  position: absolute;
+  left: 10px;
+  top: 5px;
+  font-size: 12px;
+}
+
+.inputArea textarea {
+  position: absolute;
+  bottom: 0px;
+  top: 25px;
+  height: 83%;
+  width: 100%;
+  background-color: transparent;
+  box-sizing: border-box;
+  padding: 0px 0px 7px 9px;
+  font-size: 14px;
+  border: transparent;
+  font-family: 'Manrope', sans-serif;
+  resize: none;
+}
+
+.inputArea textarea:focus {
+  outline: none;
+}
+
+.inputArea:focus-within {
+  outline: 1.5px solid black;
+  border-color: black;
+}
+
+.inputArea:hover {
+  border-color: black;
+}
+
+.inputArea textarea:-webkit-autofill {
+  -webkit-background-clip: text;
+}
+
+.errorTextarea {
+  border: 1px solid red;
+}
+
+.errorTextarea:hover {
+  border-color: red;
+  outline: 1.5px solid red;
+}
+
+.errorTextarea:focus-within {
+  outline: 1.5px solid red;
+  border-color: red;
+}
+
+.errorTextarea label {
+  color: red;
 }

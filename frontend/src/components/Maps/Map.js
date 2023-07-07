@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
-import { getGeocode } from '../../store/maps';
-import { useDispatch } from 'react-redux';
+import { GoogleMap, useJsApiLoader, Marker, OverlayView } from '@react-google-maps/api';
+import { getGeocode, updateGeocode } from '../../store/maps';
+import { useDispatch, useSelector } from 'react-redux';
 
 const containerStyle = {
   width: '100%',
   height: '400px',
 };
 
-const Maps = ({ apiKey, address, city, state, country, latitude, longitude }) => {
-  const [lat, setLat] = useState("");
-  const [lng, setLng] = useState("");
-  const dispatch = useDispatch();
+const Maps = ({ apiKey, address, city, state, country, exactLocation }) => {
+  const geocode = useSelector((state) => state.maps.geocode);
+  const lat = geocode ? geocode.coord.lat : "";
+  const lng = geocode ? geocode.coord.lng : "";
 
-  console.log(address, city, state, country, latitude, longitude)
+  const [position, setPosition] = useState({});
+  const dispatch = useDispatch();
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
@@ -21,45 +22,54 @@ const Maps = ({ apiKey, address, city, state, country, latitude, longitude }) =>
   });
 
   useEffect(() => {
-    (async () => {
-      if (address && city && state && country) {
-        const result = await dispatch(getGeocode(address, city, state, country, apiKey));
-        const geometry = result.geocode.geometry.location;
-        setLat(geometry.lat);
-        setLng(geometry.lng);
-      }
-    })()
-  }, [address, city, state, country]);
-
+    setPosition({ lat, lng })
+  }, [lat, lng]);
 
   useEffect(() => {
-    if (latitude && longitude) {
-      setLat(+latitude);
-      setLng(+longitude);
-    }
-  }, [latitude, longitude]);
+    dispatch(getGeocode(address, city, state, country, apiKey));
+  }, [address, city, state, country]);
 
   return (
     <>
-      {isLoaded && lng && lat && (
+      {exactLocation ? null : (
+        <p className='warningMessage'><i className="fa-sharp fa-solid fa-circle-exclamation" /> Cannot find the exact location of your place. Please check the address or locate your place on map </p>
+      )}
+      {isLoaded && lat && lng && (
         <GoogleMap
           mapContainerClassName='googleMap'
           mapContainerStyle={containerStyle}
-          center={{ lat, lng }}
+          center={position}
           zoom={17}
         >
           <Marker
-            position={{ lat, lng }}
-            draggable={true}
-            onDragEnd={(coord, index) => {
-              const {latLng} = coord;
-              const lat = latLng.lat;
-              const lng = latLng.lng;
-              setLat(lat);
-              setLng(lng);
-              console.log(coord);
+            position={position}
+            draggable={!exactLocation}
+            onDragEnd={async (coord) => {
+              const { latLng } = coord;
+              const newLat = latLng.lat();
+              const newLng = latLng.lng();
+              setPosition({ lat: newLat, lng: newLng });
+              await dispatch(updateGeocode(newLat, newLng, apiKey));
             }}
           />
+          <OverlayView
+            position={position}
+            mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+            getPixelPositionOffset={(x, y) => {return {x: -70, y: -100}}} >
+            <div
+              style={{
+                background: `white`,
+                fontSize: '11px',
+                color: `black`,
+                borderRadius: '4px',
+                padding: "10px"
+              }}
+            >
+             Latitude: {lat.toFixed(7)}
+             <br></br>
+             Longitude: {lng.toFixed(7)}
+            </div>
+          </OverlayView>
         </GoogleMap>
       )}
     </>
