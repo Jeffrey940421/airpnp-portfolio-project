@@ -4,7 +4,7 @@ import * as sessionActions from '../../store/session';
 import { OpenModalMenuItem } from "../OpenModalMenuItem";
 import { LoginForm } from '../LoginForm';
 import { SignupForm } from '../SignupForm';
-import { useHistory } from "react-router-dom";
+import { useHistory, Redirect } from "react-router-dom";
 
 export function ProfileButton({ user }) {
   const dispatch = useDispatch();
@@ -38,6 +38,7 @@ export function ProfileButton({ user }) {
     e.preventDefault();
     dispatch(sessionActions.logout());
     closeMenu();
+    history.replace("/");
   };
 
   let content;

@@ -6,12 +6,13 @@ const { handleValidationErrors } = require('../../utils/validation');
 const router = express.Router();
 const { Op } = require("sequelize");
 const fs = require("fs");
+const { multipleFilesUpload, multipleMulterUpload, retrievePrivateFile } = require("../../awsS3");
 
-const geolocation =  JSON.parse(fs.readFileSync(require.resolve("../../utils/geolocation.json")).toString());
+const geolocation = JSON.parse(fs.readFileSync(require.resolve("../../utils/geolocation.json")).toString());
 
 const validateBookingInfo = [
   check("startDate")
-    .exists({checkNull: true})
+    .exists({ checkNull: true })
     .isDate({
       format: "YYYY-MM-DD",
       delimiters: ["-"]
@@ -26,14 +27,14 @@ const validateBookingInfo = [
     })
     .withMessage("Start date must be after today's date"),
   check("endDate")
-    .exists({checkNull: true})
+    .exists({ checkNull: true })
     .isDate({
       format: "YYYY-MM-DD",
       delimiters: ["-"]
     })
     .withMessage("Start date must be a date in YYYY-MM-DD format"),
   check("endDate")
-    .custom((value, {req}) => {
+    .custom((value, { req }) => {
       if (new Date(value).getTime() <= new Date(req.body.startDate).getTime()) {
         return false
       }
@@ -45,10 +46,10 @@ const validateBookingInfo = [
 
 const validateReviewInfo = [
   check('review')
-    .exists({checkNull: true})
+    .exists({ checkNull: true })
     .withMessage("Please provide review text"),
   check('stars')
-    .exists({checkFalsy: true})
+    .exists({ checkFalsy: true })
     .isInt()
     .withMessage("Stars must be an integer")
     .custom((value) => {
@@ -62,19 +63,17 @@ const validateReviewInfo = [
 ]
 
 const validateSpotImageInfo = [
-  check('url')
-    .exists({checkFalsy: true})
-    .isURL()
-    .withMessage("Image URL is required"),
   check('preview')
-    .exists({checkNull: true})
+    .if((value) => {
+      return value !== undefined;
+    })
     .custom((value) => {
-      if (value === true || value === false) {
+      if (Number.isInteger(+value) && +value >= 0) {
         return true;
       }
       return false;
     })
-    .withMessage("Preview must be boolean"),
+    .withMessage("Preview image index must be an integer no less than 0"),
   handleValidationErrors
 ]
 
@@ -126,7 +125,7 @@ const validateSpotQuery = [
     .optional({
       values: "falsy"
     })
-    .custom((value, {req}) => {
+    .custom((value, { req }) => {
       if (req.query.minLat && +req.query.minLat > +value) {
         return false
       }
@@ -154,7 +153,7 @@ const validateSpotQuery = [
     .optional({
       values: "falsy"
     })
-    .custom((value, {req}) => {
+    .custom((value, { req }) => {
       if (req.query.minLng && +req.query.minLng > +value) {
         return false
       }
@@ -182,7 +181,7 @@ const validateSpotQuery = [
     .optional({
       values: "falsy"
     })
-    .custom((value, {req}) => {
+    .custom((value, { req }) => {
       if (req.query.minPrice && +req.query.minPrice > +value) {
         return false
       }
@@ -194,18 +193,18 @@ const validateSpotQuery = [
 
 const validateSpotInfo = [
   check('address')
-    .exists({checkFalsy: true})
-    .isLength({min: 1, max: 255})
+    .exists({ checkFalsy: true })
+    .isLength({ min: 1, max: 255 })
     .withMessage('Please provide an address with at least 1 character and no more than 255 characters'),
   check('city')
-    .exists({checkFalsy: true})
-    .isLength({min: 1, max: 70})
+    .exists({ checkFalsy: true })
+    .isLength({ min: 1, max: 70 })
     .withMessage('Please provide a city with at least 1 character and no more than 70 characters'),
   check('city')
-    .if((value, {req}) => {
+    .if((value, { req }) => {
       return geolocation[req.body.country] && geolocation[req.body.country][req.body.state]
     })
-    .custom((value, {req}) => {
+    .custom((value, { req }) => {
       if (!geolocation[req.body.country][req.body.state].find(city => city === value)) {
         return false;
       }
@@ -213,14 +212,14 @@ const validateSpotInfo = [
     })
     .withMessage('Please provide a valid city'),
   check('state')
-    .exists({checkFalsy: true})
-    .isLength({min: 2, max: 70})
+    .exists({ checkFalsy: true })
+    .isLength({ min: 2, max: 70 })
     .withMessage('Please provide a state with at least 2 characters and no more than 70 characters'),
   check('state')
-    .if((value, {req}) => {
+    .if((value, { req }) => {
       return geolocation[req.body.country]
     })
-    .custom((value, {req}) => {
+    .custom((value, { req }) => {
       if (!geolocation[req.body.country][req.body.state]) {
         return false;
       }
@@ -228,14 +227,14 @@ const validateSpotInfo = [
     })
     .withMessage('Please provide a valid state. City is not validated with invalid state'),
   check('country')
-    .exists({checkFalsy: true})
-    .isLength({min: 4, max: 50})
+    .exists({ checkFalsy: true })
+    .isLength({ min: 4, max: 50 })
     .withMessage('Please provide a state with at least 4 characters and no more than 50 characters'),
   check('country')
     .isIn(Object.keys(geolocation))
     .withMessage("Please provide a valid country. State and city are not validated with invalid country"),
   check('lat')
-    .exists({checkFalsy: true})
+    .exists({ checkFalsy: true })
     .custom((value) => {
       if (value !== +value) {
         return false;
@@ -260,7 +259,7 @@ const validateSpotInfo = [
     })
     .withMessage("Please provide a latitude expressed to 7 decimal places"),
   check('lng')
-    .exists({checkFalsy: true})
+    .exists({ checkFalsy: true })
     .custom((value) => {
       if (value !== +value) {
         return false;
@@ -285,14 +284,14 @@ const validateSpotInfo = [
     })
     .withMessage("Please provide a longitude expressed to 7 decimal places"),
   check('name')
-    .exists({checkFalsy: true})
-    .isLength({min: 1, max: 50})
+    .exists({ checkFalsy: true })
+    .isLength({ min: 1, max: 50 })
     .withMessage("Please provide a name with at least 1 characters and no more than 50 characters"),
   check('description')
-    .exists({checkFalsy: true})
+    .exists({ checkFalsy: true })
     .withMessage("Description is required"),
   check('price')
-    .exists({checkFalsy: true})
+    .exists({ checkFalsy: true })
     .custom((value) => {
       if (value !== +value) {
         return false;
@@ -321,7 +320,7 @@ const validateSpotInfo = [
 
 // get all spots
 router.get("/", validateSpotQuery, async (req, res) => {
-  let {page, size, maxLat, minLat, maxLng, minLng, maxPrice, minPrice} = req.query
+  let { page, size, maxLat, minLat, maxLng, minLng, maxPrice, minPrice } = req.query
   page = +page || 1;
   size = +size || 20;
   maxLat = +maxLat || 90;
@@ -381,14 +380,14 @@ router.get("/", validateSpotQuery, async (req, res) => {
     delete spot.Reviews;
     return spot;
   });
-  res.json({Spots: spots, page, size});
+  res.json({ Spots: spots, page, size });
 });
 
 // get all spots owned by the current user
 router.get("/current", requireAuth, async (req, res) => {
   const ownerId = req.user.id;
   let spots = await Spot.findAll({
-    where: {ownerId},
+    where: { ownerId },
     include: [
       {
         model: Review,
@@ -419,7 +418,7 @@ router.get("/current", requireAuth, async (req, res) => {
     delete spot.Reviews;
     return spot;
   });
-  res.json({Spots: spots});
+  res.json({ Spots: spots });
 })
 
 // get details of a spot from an id
@@ -442,18 +441,35 @@ router.get("/:spotId", spotExist, async (req, res, next) => {
 
 // create a spot
 router.post("/", requireAuth, validateSpotInfo, async (req, res) => {
-  const {address, city, state, country, lat, lng, name, description, price} = req.body;
+  const { address, city, state, country, lat, lng, name, description, price } = req.body;
   const ownerId = req.user.id;
-  const newSpot = await Spot.create({ownerId, address, city, state, country, lat, lng, name, description, price});
+  const newSpot = await Spot.create({ ownerId, address, city, state, country, lat, lng, name, description, price });
   res.status(201);
   res.json(newSpot);
 });
 
-// add a spot image based on spot id
-router.post("/:spotId/images", requireAuth, spotExist, spotAuthorization, validateSpotImageInfo, async (req, res, next) => {
+// add spot images based on spot id
+router.post("/:spotId/images", multipleMulterUpload("images"), requireAuth, spotExist, spotAuthorization, validateSpotImageInfo, async (req, res, next) => {
+  const err = Error("Bad request.");
+  err.status = 400;
+  err.errors = {}
+  err.title = "Bad Request";
+  if (!req.files.length) {
+    err.errors.images = "Please provide spot images";
+    return next(err);
+  } else if (req.files.find(file => !file.mimetype.startsWith("image"))) {
+    err.errors.images = "Please upload images only";
+    return next(err);
+  }
   const spot = req.spot;
-  const {spotId} = req.params;
-  const {url, preview} = req.body;
+  const { spotId } = req.params;
+  const urls = req.files ?
+    await multipleFilesUpload({ files: req.files, public: true }) :
+    null;
+  const { preview } = req.body;
+  const images = urls.map((url, i) => {
+    return { spotId, url, preview: preview ? i === +preview : false }
+  })
   if (preview) {
     const previewImage = spot.SpotImages.find(spotImage => spotImage.preview === true)
     if (previewImage) {
@@ -461,19 +477,17 @@ router.post("/:spotId/images", requireAuth, spotExist, spotAuthorization, valida
       await previewImage.save();
     }
   }
-  const newSpotImage = await SpotImage.create({spotId, url, preview});
-  res.json({
-    id: newSpotImage.id,
-    url,
-    preview
-  })
+  const newSpotImages = await Promise.all(
+    images.map(image => SpotImage.create(image))
+  )
+  res.json(newSpotImages)
 })
 
 // edit a spot
 router.put("/:spotId", requireAuth, spotExist, spotAuthorization, validateSpotInfo, async (req, res, next) => {
   const spot = req.spot;
-  const {address, city, state, country, lat, lng, name, description, price} = req.body;
-  let updatedSpot = await spot.update({address, city, state, country, lat, lng, name, description, price});
+  const { address, city, state, country, lat, lng, name, description, price } = req.body;
+  let updatedSpot = await spot.update({ address, city, state, country, lat, lng, name, description, price });
   updatedSpot = updatedSpot.toJSON();
   delete updatedSpot.Reviews;
   delete updatedSpot.SpotImages;
@@ -494,15 +508,15 @@ router.delete("/:spotId", requireAuth, spotExist, spotAuthorization, async (req,
 // get reviews by spot id
 router.get("/:spotId/reviews", spotExist, async (req, res, next) => {
   const spot = req.spot;
-  res.json({Reviews: spot.Reviews});
+  res.json({ Reviews: spot.Reviews });
 })
 
 // create a review for a spot based on spot id
 router.post("/:spotId/reviews", requireAuth, spotExist, spotReviewAuthorization, duplicateReview, validateReviewInfo, async (req, res, next) => {
   const spot = req.spot;
   const userId = req.user.id;
-  const {review, stars} = req.body;
-  const newReview = await spot.createReview({userId, review, stars});
+  const { review, stars } = req.body;
+  const newReview = await spot.createReview({ userId, review, stars });
   res.status(201);
   res.json(newReview);
 })
@@ -510,7 +524,7 @@ router.post("/:spotId/reviews", requireAuth, spotExist, spotReviewAuthorization,
 // get bookings for a spot based on spot id
 router.get("/:spotId/bookings", requireAuth, spotExist, async (req, res, next) => {
   const spot = req.spot;
-  const {spotId} = req.params;
+  const { spotId } = req.params;
   const userId = req.user.id;
   if (spot.ownerId !== userId) {
     let bookings = spot.Bookings.map(booking => {
@@ -520,9 +534,9 @@ router.get("/:spotId/bookings", requireAuth, spotExist, async (req, res, next) =
         endDate: booking.endDate
       }
     })
-    return res.json({Bookings: bookings});
+    return res.json({ Bookings: bookings });
   } else {
-    return res.json({Bookings: spot.Bookings});
+    return res.json({ Bookings: spot.Bookings });
   }
 })
 
@@ -530,7 +544,7 @@ router.get("/:spotId/bookings", requireAuth, spotExist, async (req, res, next) =
 router.post("/:spotId/bookings", requireAuth, spotExist, spotBookingAuthorization, validateBookingInfo, async (req, res, next) => {
   const spot = req.spot;
   const userId = req.user.id;
-  const {startDate, endDate} = req.body;
+  const { startDate, endDate } = req.body;
   const bookings = spot.Bookings;
   if (bookings.length) {
     const error = {};
@@ -553,7 +567,7 @@ router.post("/:spotId/bookings", requireAuth, spotExist, spotBookingAuthorizatio
       return next(error);
     }
   }
-  const newBooking = await spot.createBooking({userId, startDate, endDate});
+  const newBooking = await spot.createBooking({ userId, startDate, endDate });
   res.json(newBooking);
 })
 

@@ -31,7 +31,17 @@ export const getKey = () => async (dispatch) => {
   dispatch(loadApiKey(data.googleMapsAPIKey));
 };
 
+const isPlusCode = (address) => {
+  if (address.split("+").length === 2 && address.split("+")[0].length === 4 && address.split("+")[1].length <= 3) {
+    return true;
+  }
+  return false;
+}
+
 export const getGeocode = (address, city, state, country, key) => async (dispatch) => {
+  if (isPlusCode(address)) {
+    address = address.split("+").join("%2B")
+  }
   const query = `${address.split(" ").join("+")},+${city.split(" ").join("+")},+${state.split(" ").join("+")},+${country.split(" ").join("+")}`
   const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${query}&key=${key}`);
   const data = await res.json();
@@ -44,6 +54,7 @@ export const updateGeocode = (lat, lng, key) => async (dispatch) => {
   const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${query}&key=${key}`);
   const data = await res.json();
   const geocode = data.results[0];
+  console.log(geocode)
   dispatch(editGeocode(geocode.address_components, { lat, lng }, geocode.types));
 }
 

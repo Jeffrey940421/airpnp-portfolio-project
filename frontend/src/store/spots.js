@@ -1,7 +1,9 @@
 import { csrfFetch } from "./csrf";
 
 const GET_SPOTS = "spots/GET_SPOTS";
-const CREATE_SPOT = "spots/CREATE-SPOT";
+const CREATE_SPOT = "spots/CREATE_SPOT";
+const ADD_IMAGES = "spots/ADD_IMAGES";
+const DELETE_NEW_SPOT = "spots/DELETE_NEW_SPOT"
 
 const getSpots = (spots) => {
   return {
@@ -12,8 +14,21 @@ const getSpots = (spots) => {
 
 const createSpot = (spot) => {
   return {
-    type: GET_SPOTS,
+    type: CREATE_SPOT,
     spot
+  }
+}
+
+const addImages = (images) => {
+  return {
+    type: ADD_IMAGES,
+    images
+  }
+}
+
+const deleteNewSpot = () => {
+  return {
+    type: DELETE_NEW_SPOT
   }
 }
 
@@ -32,26 +47,51 @@ export const listSpots = (filter) => async (dispatch) => {
   return response;
 };
 
-export const addSpot = (spot) => async (dispatch) => {
-  const response = await csrfFetch("/api/spots", {
+export const addSpot = (spot, images, preview) => async (dispatch) => {
+  const spotResponse = await csrfFetch("/api/spots", {
     method: "POST",
     body: JSON.stringify(spot)
   });
-  const data = await response.json();
-  dispatch(createSpot(data));
+  const newSpot = await spotResponse.json();
+  dispatch(createSpot(newSpot));
+  if (!spotResponse.ok) {
+    return spotResponse;
+  }
+  const spotId = newSpot.id;
+  const formData = new FormData();
+  Array.from(images).forEach(image => formData.append("images", image));
+  formData.append("preview", preview);
+  const imagesResponse = await csrfFetch(`/api/spots/${spotId}/images`, {
+    method: "POST",
+    body: formData
+  });
+  const newImages = await imagesResponse.json();
+  dispatch(addImages(newImages));
+  return {res: imagesResponse, spotId};
+}
+
+export const removeNewSpot = (spotId) => async (dispatch) => {
+  const response = await csrfFetch(`/api/spots/${spotId}`, {
+    method: "DELETE"
+  });
+  dispatch(deleteNewSpot());
   return response;
 }
 
-const initialState = {};
+const initialState = {spotList: {}, singleSpot: {}};
 
 const spotsReducer = (state = initialState, action) => {
   switch (action.type) {
     case GET_SPOTS:
-      const newState = {};
-      action.spots.forEach(spot => newState[spot.id] = spot);
-      return newState;
+      const spotList = {};
+      action.spots.forEach(spot => spotList[spot.id] = spot);
+      return {...state, spotList: {...state.spotList, ...spotList}};
     case CREATE_SPOT:
-      return {...state, [action.spot.id]: action.spot};
+      return {...state, singleSpot: action.spot};
+    case ADD_IMAGES:
+      return {...state, singleSpot: {...state.singleSpot, SpotImages: action.images}};
+    case DELETE_NEW_SPOT:
+      return {...state, singleSpot: {}};
     default:
       return state;
   }

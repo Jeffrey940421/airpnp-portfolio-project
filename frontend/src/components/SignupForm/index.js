@@ -125,6 +125,7 @@ export function SignupForm() {
               setEmail(e.target.value);
               setEmailEdited(true);
             }}
+            autoComplete="one-time-code"
           />
         </div>
         <div className="errorMessage">
@@ -148,6 +149,7 @@ export function SignupForm() {
               setUsername(e.target.value);
               setUsernameEdited(true);
             }}
+            autoComplete="one-time-code"
           />
         </div>
         <div className="errorMessage">
@@ -170,6 +172,7 @@ export function SignupForm() {
               setFirstName(e.target.value);
               setFirstNameEdited(true);
             }}
+            autoComplete="one-time-code"
           />
         </div>
         <div className="errorMessage">
@@ -192,6 +195,7 @@ export function SignupForm() {
               setLastName(e.target.value);
               setLastNameEdited(true);
             }}
+            autoComplete="one-time-code"
           />
         </div>
         <div className="errorMessage">
@@ -214,6 +218,7 @@ export function SignupForm() {
               setPassword(e.target.value);
               setPasswordEdited(true);
             }}
+            autoComplete="one-time-code"
           />
           <button onClick={handleHidePassword}>{hidePassword ? "Show" : "Hide"}</button>
         </div>
@@ -237,6 +242,7 @@ export function SignupForm() {
               setConfirmPassword(e.target.value);
               setConfirmPasswordEdited(true);
             }}
+            autoComplete="one-time-code"
           />
           <button onClick={handleHideConfirmPassword}>{hideConfirmPassword ? "Show" : "Hide"}</button>
         </div>
@@ -247,7 +253,7 @@ export function SignupForm() {
         <div className="submitButtons">
           <button
             type="submit"
-            disabled={Object.values(availabilityErrors).length || Object.values(validationErrors).flat().length || !emailEdited || !usernameEdited || !firstNameEdited || !lastNameEdited || !passwordEdited || !confirmPasswordEdited}
+            disabled={Object.values(availabilityErrors).length || Object.values(validationErrors).flat().length || (!emailEdited && !email) || (!usernameEdited && !username) || (!firstNameEdited && !firstName) || (!lastNameEdited && !lastName) || (!passwordEdited && !password) || (!confirmPasswordEdited && !confirmPassword) }
           >
             Sign Up
           </button>

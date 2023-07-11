@@ -85,7 +85,7 @@
   border: 1px solid red;
 }
 
-.errorMessage {
+.errorMessage p{
   font-size: 12px;
   color: red;
 }

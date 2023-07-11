@@ -16,7 +16,7 @@ module.exports = {
         address: "25186 Gail Dr",
         city: "Idyllwild-Pine Cove",
         state: "California",
-        country: "United States of America",
+        country: "United States",
         lat: 33.7566337,
         lng: -116.7334091,
         name: "Idyllwild Cozy Lakeview Lodge",

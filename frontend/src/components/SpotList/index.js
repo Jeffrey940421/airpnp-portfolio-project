@@ -7,7 +7,7 @@ import "./SpotList.css";
 export function SpotList() {
   const dispatch = useDispatch();
   const history = useHistory();
-  const spots = useSelector(state => state.spots);
+  const spots = useSelector(state => state.spots.spotList);
 
   useEffect(() => {
     dispatch(listSpots({}));

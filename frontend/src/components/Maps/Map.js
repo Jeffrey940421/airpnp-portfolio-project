@@ -29,6 +29,12 @@ const Maps = ({ apiKey, address, city, state, country, exactLocation }) => {
     dispatch(getGeocode(address, city, state, country, apiKey));
   }, [address, city, state, country]);
 
+  useEffect(() => {
+    if (lat && lng) {
+      dispatch(updateGeocode(lat, lng, apiKey))
+    }
+  }, [lat, lng])
+
   return (
     <>
       {exactLocation ? null : (
@@ -55,7 +61,7 @@ const Maps = ({ apiKey, address, city, state, country, exactLocation }) => {
           <OverlayView
             position={position}
             mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-            getPixelPositionOffset={(x, y) => {return {x: -70, y: -100}}} >
+            getPixelPositionOffset={(x, y) => { return { x: -70, y: -100 } }} >
             <div
               style={{
                 background: `white`,
@@ -65,9 +71,9 @@ const Maps = ({ apiKey, address, city, state, country, exactLocation }) => {
                 padding: "10px"
               }}
             >
-             Latitude: {lat.toFixed(7)}
-             <br></br>
-             Longitude: {lng.toFixed(7)}
+              Latitude: {lat.toFixed(7)}
+              <br></br>
+              Longitude: {lng.toFixed(7)}
             </div>
           </OverlayView>
         </GoogleMap>

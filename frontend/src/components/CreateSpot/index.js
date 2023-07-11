@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
-import * as sessionActions from "../../store/session";
+import React, { useState, useEffect, useRef } from "react";
+import * as spotActions from "../../store/spots";
 import { useDispatch, useSelector } from "react-redux";
 import Select from 'react-select';
 import geolocation from '../../utils/geolocation.json'
 import "./CreateSpot.css";
 import MapContainer from "../Maps";
-import { Redirect } from "react-router-dom";
 
 export function CreateSpot() {
 
@@ -29,14 +28,29 @@ export function CreateSpot() {
   const [oldPrice, setOldPrice] = useState("");
   const [onchangePrice, setOnchangePrice] = useState("");
   const [priceEdited, setPriceEdited] = useState(false);
+  const [images, setImages] = useState([]);
+  const [imagesEdited, setImagesEdited] = useState(false);
+  const [preview, setPreview] = useState(0);
+  const [dragActive, setDragActive] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
   const [availabilityErrors, setAvailabilityErrors] = useState({});
   const [serverErrors, setServerErrors] = useState({});
+  const dispatch = useDispatch();
+  const ref = React.useRef(null);
 
   const user = useSelector(state => state.session.user);
   const geocode = useSelector((state) => state.maps.geocode);
   const lat = geocode ? geocode.coord.lat : "";
   const lng = geocode ? geocode.coord.lng : "";
+  const suggestedStreetNumber = geocode ? geocode.address_components.find(el => el.types.includes("street_number")) ? geocode.address_components.find(el => el.types.includes("street_number")).long_name : "" : "";
+  const suggestedStreet = geocode ? geocode.address_components.find(el => el.types.includes("route")) ? geocode.address_components.find(el => el.types.includes("route")).long_name : "" : ""
+  const suggestedPlusCode = geocode ? geocode.address_components.find(el => el.types.includes("plus_code")) ? geocode.address_components.find(el => el.types.includes("plus_code")).long_name : "" : "";
+  const suggestedCity = geocode ? geocode.address_components.find(el => el.types.includes("locality")) ? geocode.address_components.find(el => el.types.includes("locality")).long_name : "" : "";
+  const suggestedState = geocode ? geocode.address_components.find(el => el.types.includes("administrative_area_level_1")) ? geocode.address_components.find(el => el.types.includes("administrative_area_level_1")).long_name : "" : "";
+  const suggestedCountry = geocode ? geocode.address_components.find(el => el.types.includes("country")) ? geocode.address_components.find(el => el.types.includes("country")).long_name : "" : "";
+  const suggestedStreetAddress = (suggestedStreetNumber && suggestedStreet && suggestedCity && suggestedState && suggestedCountry) ? `${suggestedStreetNumber} ${suggestedStreet}, ${suggestedCity}, ${suggestedState}, ${suggestedCountry}` : "";
+  const suggestedPlusCodeAddress = (suggestedPlusCode && suggestedCity && suggestedState && suggestedCountry) ? `${suggestedPlusCode}, ${suggestedCity}, ${suggestedState}, ${suggestedCountry}` : "";
+  const suggestedAddress = suggestedStreetAddress || suggestedPlusCodeAddress;
 
   const selectMenuStyle = {
     control: (base, state) => ({
@@ -48,7 +62,6 @@ export function CreateSpot() {
       boxShadow: "none",
       borderColor: state.isFocused ? "black" : "#DDDDDD",
       outline: state.isFocused ? "1.5px solid " : "none",
-      boxShadow: "none",
       '&:hover': {
         borderColor: "black",
         borderWidth: "1.5px"
@@ -91,6 +104,30 @@ export function CreateSpot() {
     })
   }
 
+  const handleDrag = function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+      setImagesEdited(true)
+    }
+  };
+
+  const handleDrop = function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    const dataTransfer = new DataTransfer();
+    Array.from(images).forEach(image => dataTransfer.items.add(image));
+    Array.from(e.dataTransfer.files).forEach(image => dataTransfer.items.add(image));
+    const input = document.querySelector(".dropBox input");
+    input.files = dataTransfer.files;
+    setImages(dataTransfer.files);
+  };
+
   const preventSymbols = (e) => {
     setOldPrice(onchangePrice);
     const number = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -101,6 +138,36 @@ export function CreateSpot() {
       e.preventDefault();
     }
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setServerErrors({});
+
+    const spot = {
+      address,
+      city,
+      state,
+      country,
+      lat,
+      lng,
+      name,
+      description,
+      price: +price
+    };
+
+    if (!Object.values(availabilityErrors).length && !Object.values(validationErrors).flat().length) {
+      return dispatch(spotActions.addSpot(spot, images, preview))
+        .catch(
+          async (res) => {
+            const data = await res.json();
+            if (data && data.errors) {
+              setServerErrors(data.errors);
+              await dispatch(spotActions.removeNewSpot(res.url.split("/")[5]));
+            }
+          }
+        );
+    }
+  }
 
   useEffect(() => {
     if (onchangePrice.includes(".") && onchangePrice.split(".")[1].length > 2) {
@@ -123,7 +190,9 @@ export function CreateSpot() {
   }, [onchangePrice, price])
 
   useEffect(() => {
-    if (geocode && (!geocode.address_types.includes("street_address") && !geocode.address_types.includes("premise"))) {
+    const validTypes = ["street_address", "premise", "subpremise", "establishment", "plus_code", "natural_feature", "airport", "park", "point_of_interest", "floor", "landmark", "parking", "room"];
+    if ((geocode && !geocode.address_types.find(type => validTypes.includes(type))) || (suggestedAddress && suggestedAddress.toLowerCase() !== `${address}, ${city}, ${state}, ${country}`.toLowerCase())) {
+      console.log(suggestedAddress, `${address}, ${city}, ${state}, ${country}`)
       setExactLocation(false);
     } else {
       setExactLocation(true);
@@ -132,6 +201,7 @@ export function CreateSpot() {
 
   useEffect(() => {
     const errors = {};
+    const imagesNum = Array.from(images).filter(file => file.type.startsWith("image")).length;
 
     if (countryEdited && !country) errors.country = "Country is required";
     if (stateEdited && !state) errors.state = "State is required";
@@ -140,12 +210,14 @@ export function CreateSpot() {
     if (descriptionEdited && !description) errors.description = "Description is required";
     if (nameEdited && !name) errors.name = "Name is required";
     if (priceEdited && !price) errors.price = "Price is required";
+    if (imagesEdited && !imagesNum) errors.images = "At least 5 photos are required";
+    if (imagesNum && imagesNum < 5) errors.images = (`At least ${5 - imagesNum} more ${imagesNum === 4 ? "photo is" : "photos are"} required`);
 
     setAvailabilityErrors(errors);
-  }, [country, countryEdited, state, stateEdited, city, cityEdited, address, addressEdited, description, descriptionEdited, name, nameEdited, price, priceEdited]);
+  }, [country, countryEdited, state, stateEdited, city, cityEdited, address, addressEdited, description, descriptionEdited, name, nameEdited, price, priceEdited, images, imagesEdited]);
 
   useEffect(() => {
-    const errors = { address: [], description: [], name: [], price: [] };
+    const errors = { address: [], description: [], name: [], price: [], images: [] };
 
     if (address && address.length > 255) errors.address.push("Address must be at most 255 characters long");
 
@@ -155,17 +227,15 @@ export function CreateSpot() {
 
     if (price && price === "0") errors.price.push("Price must be greater than 0");
 
-    setValidationErrors(errors);
-  }, [address, description, name, price])
+    if (images && Array.from(images).find(image => !image.type.startsWith("image"))) errors.images.push("Only image files are accepted")
 
-  if (!user) {
-    return <Redirect to="/" />
-  }
+    setValidationErrors(errors);
+  }, [address, description, name, price, images])
 
   return (
     <div className="createSpotForm">
-      <h1>Create a New Spot</h1>
-      <form className="createSpotForm">
+      <h1>Create a New Place</h1>
+      <form className="createSpotForm" onSubmit={handleSubmit}>
         <div className="locationSection">
           <h2>Where's your place located</h2>
           <p>Guests will only get your exact address once they booked a reservation</p>
@@ -192,11 +262,11 @@ export function CreateSpot() {
                 return { value: country, label: country }
               })}
               styles={selectMenuStyle}
+              autoComplete="one-time-code"
             />
           </div>
           <div className="errorMessage">
-            {serverErrors.country && <p className="serverError"><i className="fa-sharp fa-solid fa-circle-exclamation" />
-              {serverErrors.country}</p>}
+            {serverErrors.country && <p className="serverError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {serverErrors.country}</p>}
             {availabilityErrors.country && <p className="availabilityError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {availabilityErrors.country}</p>}
           </div>
           <div className={`selectMenu ${availabilityErrors.state || serverErrors.state ? "error" : ""}`}>
@@ -221,11 +291,11 @@ export function CreateSpot() {
                   state.isFocused ? "focusedSelect" : "unfocusedSelect"
                 )
               }}
+              autoComplete="one-time-code"
             />
           </div>
           <div className="errorMessage">
-            {serverErrors.state && <p className="serverError"><i className="fa-sharp fa-solid fa-circle-exclamation" />
-              {serverErrors.state}</p>}
+            {serverErrors.state && <p className="serverError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {serverErrors.state}</p>}
             {availabilityErrors.state && <p className="availabilityError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {availabilityErrors.state}</p>}
           </div>
           <div className={`selectMenu ${availabilityErrors.city || serverErrors.city ? "error" : ""}`}>
@@ -249,15 +319,15 @@ export function CreateSpot() {
                   state.isFocused ? "focusedSelect" : "unfocusedSelect"
                 )
               }}
+              autoComplete="one-time-code"
             />
           </div>
           <div className="errorMessage">
-            {serverErrors.city && <p className="serverError"><i className="fa-sharp fa-solid fa-circle-exclamation" />
-              {serverErrors.city}</p>}
+            {serverErrors.city && <p className="serverError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {serverErrors.city}</p>}
             {availabilityErrors.city && <p className="availabilityError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {availabilityErrors.city}</p>}
           </div>
           <div className={`inputBox ${availabilityErrors.address || (validationErrors.address && validationErrors.address.length) || serverErrors.address ? "error" : ""}`}>
-            <label htmlFor="address">Address</label>
+            <label htmlFor="address">Street Address</label>
             <input
               name="address"
               type="text"
@@ -269,16 +339,32 @@ export function CreateSpot() {
                 setAddressEdited(true);
                 setAddress(e.target.value);
               }}
+              autoComplete="one-time-code"
             />
           </div>
           <div className="errorMessage">
-            {serverErrors.address && <p className="serverError"><i className="fa-sharp fa-solid fa-circle-exclamation" />
-              {serverErrors.address}</p>}
+            {serverErrors.address && <p className="serverError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {serverErrors.address}</p>}
             {availabilityErrors.address && <p className="availabilityError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {availabilityErrors.address}</p>}
             {validationErrors.address && validationErrors.address.length > 0 && validationErrors.address.map(error => (
               <p className="validationError"><i className="fa-solid fa-circle-xmark" /> {error} </p>
             ))}
           </div>
+          {address && city && state && country && suggestedAddress && !exactLocation ?
+            <div className="addressSuggestion">
+              <span>Suggested Address: {suggestedAddress}</span>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  setAddress(suggestedPlusCode ? suggestedPlusCode : `${suggestedStreetNumber} ${suggestedStreet}`);
+                  setOnchangeAddress(suggestedPlusCode ? suggestedPlusCode : `${suggestedStreetNumber} ${suggestedStreet}`);
+                  setCity(suggestedCity);
+                  setState(suggestedState);
+                  setCountry(suggestedCountry);
+                }}
+              >Use Suggested Address</button>
+            </div>
+            : null
+          }
           {address && city && state && country && <MapContainer address={address} city={city} state={state} country={country} exactLocation={exactLocation} />}
         </div>
         <div className="descriptionSection">
@@ -296,11 +382,11 @@ export function CreateSpot() {
                 setDescriptionEdited(true);
                 setDescription(e.target.value);
               }}
+              autoComplete="one-time-code"
             />
           </div>
           <div className="errorMessage">
-            {serverErrors.description && <p className="serverError"><i className="fa-sharp fa-solid fa-circle-exclamation" />
-              {serverErrors.description}</p>}
+            {serverErrors.description && <p className="serverError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {serverErrors.description}</p>}
             {availabilityErrors.description && <p className="availabilityError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {availabilityErrors.description}</p>}
             {validationErrors.description && validationErrors.description.length > 0 && validationErrors.description.map(error => (
               <p className="validationError"><i className="fa-solid fa-circle-xmark" /> {error} </p>
@@ -323,11 +409,11 @@ export function CreateSpot() {
                 setNameEdited(true);
                 setName(e.target.value);
               }}
+              autoComplete="one-time-code"
             />
           </div>
           <div className="errorMessage">
-            {serverErrors.name && <p className="serverError"><i className="fa-sharp fa-solid fa-circle-exclamation" />
-              {serverErrors.name}</p>}
+            {serverErrors.name && <p className="serverError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {serverErrors.name}</p>}
             {availabilityErrors.name && <p className="availabilityError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {availabilityErrors.name}</p>}
             {validationErrors.name && validationErrors.name.length > 0 && validationErrors.name.map(error => (
               <p className="validationError"><i className="fa-solid fa-circle-xmark" /> {error} </p>
@@ -335,39 +421,122 @@ export function CreateSpot() {
           </div>
         </div>
         <div className="priceSection">
-          <h2>Set a base price for your spot</h2>
+          <h2>Set a base price for your place</h2>
           <p>Competitive pricing can help your listing stand out and rank higher in search results.</p>
           <div className={`inputBox ${availabilityErrors.price || (validationErrors.price && validationErrors.price.length) || serverErrors.price ? "error" : ""}`}>
             <label htmlFor="price">{"Price per Night (USD)"}</label>
             <input
               name="price"
               type="text"
-              value={onchangePrice}
+              value={`$ ${onchangePrice}`}
               onChange={(e) => {
-                setOnchangePrice(e.target.value);
+                setOnchangePrice(e.target.value.slice(2));
               }}
               onBlur={(e) => {
                 setPriceEdited(true);
-                setOnchangePrice(e.target.value);
-                setPrice(e.target.value);
+                setOnchangePrice(e.target.value.slice(2));
+                setPrice(e.target.value.slice(2));
               }}
               onKeyPress={preventSymbols}
+              autoComplete="one-time-code"
             />
           </div>
           <div className="errorMessage">
-            {serverErrors.price && <p className="serverError"><i className="fa-sharp fa-solid fa-circle-exclamation" />
-              {serverErrors.price}</p>}
+            {serverErrors.price && <p className="serverError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {serverErrors.price}</p>}
             {availabilityErrors.price && <p className="availabilityError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {availabilityErrors.price}</p>}
             {validationErrors.price && validationErrors.price.length > 0 && validationErrors.price.map(error => (
               <p className="validationError"><i className="fa-solid fa-circle-xmark" /> {error} </p>
             ))}
           </div>
         </div>
-
+        <div className="imageSection">
+          <h2>Liven up your place with photos</h2>
+          <p>Upload at least 5 photos to publish your place.</p>
+          <div
+            className={`dropBox ${availabilityErrors.images || (validationErrors.images && validationErrors.images.length) || serverErrors.images ? "error" : ""}`}
+            onDragEnter={handleDrag}
+          >
+            <input
+              ref={ref}
+              type="file"
+              className="fileUpload"
+              accept="image/*"
+              multiple={true}
+              name="images"
+              onChange={(e) => {
+                const dataTransfer = new DataTransfer();
+                Array.from(images).forEach(image => dataTransfer.items.add(image));
+                Array.from(e.target.files).forEach(image => dataTransfer.items.add(image));
+                e.target.files = dataTransfer.files;
+                setImages(e.target.files);
+              }}
+            />
+            <label htmlFor="images" className={`fileUpload ${dragActive ? "dragActive" : ""}`}>
+              <span>Drag your photos here to start uploading</span>
+              <span>— OR —</span>
+              <button
+                className="uploadButton"
+                onClick={(e) => {
+                  e.preventDefault();
+                  ref.current.click();
+                  setImagesEdited(true)
+                }}>
+                Browse photos
+              </button>
+            </label>
+            {dragActive && <div id="dragFileElement" onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}></div>}
+          </div>
+          <div className="errorMessage">
+            {serverErrors.images && <p className="serverError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {serverErrors.images}</p>}
+            {serverErrors.preview && <p className="serverError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {serverErrors.preview}</p>}
+            {availabilityErrors.images && <p className="availabilityError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {availabilityErrors.images}</p>}
+            {validationErrors.images && validationErrors.images.length > 0 && validationErrors.images.map(error => (
+              <p className="validationError"><i className="fa-solid fa-circle-xmark" /> {error} </p>
+            ))}
+          </div>
+          {images.length ? <span className="previewTitle">Selected Photos:</span> : null}
+          <div className="previewSection">
+            {Array.from(images).map((image, i) => {
+              return (
+                <div className="previewBox" key={i}>
+                  <img
+                    className={`preview ${preview === i ? "spotPreview" : ""}`}
+                    src={URL.createObjectURL(image)}
+                    alt={image.name}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setPreview(i)
+                    }}
+                  />
+                  {preview === i ? <div className="previewMark">Preview</div> : null}
+                  <div className="previewButtons">
+                    <span className="fileName">{image.name}</span>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const dataTransfer = new DataTransfer();
+                        Array.from(images).forEach(file => {
+                          if (file.name !== image.name) {
+                            dataTransfer.items.add(file)
+                          }
+                        });
+                        const input = document.querySelector(".dropBox input");
+                        input.files = dataTransfer.files;
+                        setImages(input.files);
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
         <div className="submitButtons">
           <button
             type="submit"
-            disabled={Object.values(availabilityErrors).length || Object.values(validationErrors).flat().length || !countryEdited || !stateEdited || !cityEdited || !addressEdited || !lat || !lng || !descriptionEdited}
+            disabled={Object.values(availabilityErrors).length || Object.values(validationErrors).flat().length || !countryEdited || !stateEdited || !cityEdited || !addressEdited || !lat || !lng || !descriptionEdited || !nameEdited || !priceEdited || !imagesEdited}
           >
             Create Spot
           </button>
