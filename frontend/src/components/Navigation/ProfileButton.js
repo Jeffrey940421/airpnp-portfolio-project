@@ -41,6 +41,11 @@ export function ProfileButton({ user }) {
     history.replace("/");
   };
 
+  const manageSpots = (e) => {
+    e.preventDefault();
+    history.push("/spots/current")
+  }
+
   let content;
   if (user) {
     content = (
@@ -50,7 +55,7 @@ export function ProfileButton({ user }) {
           <div>{user.email}</div>
         </li>
         <li className="clickableList">Manage Account</li>
-        <li className="clickableList">Manage Spots</li>
+        <li className="clickableList" onClick={manageSpots}>Manage Spots</li>
         <li className="clickableList">Manage Reviews</li>
         <li className="clickableList" onClick={handleLogout}>Log Out</li>
       </>

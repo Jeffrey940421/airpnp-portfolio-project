@@ -124,8 +124,8 @@ export function SpotDetail() {
             <MapContainer
               exactLocation={true}
               options={{
-                setLat: +spot.lat.toFixed(3),
-                setLng: +spot.lng.toFixed(3),
+                setLat: +(+spot.lat).toFixed(3),
+                setLng: +(+spot.lng).toFixed(3),
                 width: "100%",
                 height: "600px",
                 zoom: 16,
@@ -144,7 +144,7 @@ export function SpotDetail() {
                       className="bigCircle"
                       style={{
                         "width": `${circleRadius > 60 ? circleRadius : 60}px`,
-                        "border-radius": `${circleRadius > 60 ? circleRadius : 60}px`
+                        "borderRadius": `${circleRadius > 60 ? circleRadius : 60}px`
                       }}
                     >
                       <div
@@ -155,7 +155,7 @@ export function SpotDetail() {
                         <i className="fa-solid fa-house fa-bounce" style={{ "color": "white" }} />
                         <div className="note">
                           <span>Exact location provided after booking</span>
-                          <div class="arrow-down"></div>
+                          <div className="arrow-down"></div>
                         </div>
 
                       </div>
