@@ -3,15 +3,18 @@ import { GoogleMap, useJsApiLoader, Marker, OverlayView } from '@react-google-ma
 import { getGeocode, updateGeocode } from '../../store/maps';
 import { useDispatch, useSelector } from 'react-redux';
 
-const containerStyle = {
-  width: '100%',
-  height: '400px',
-};
+const Maps = ({ apiKey, address, city, state, country, exactLocation, options = { overlay: true, marker: true } }) => {
+  const { setLat, setLng, width, height, zoom, onZoomChange, draggable, overlay, offsetX, offsetY, overlayStyle, overlayContent, icon, marker } = options;
 
-const Maps = ({ apiKey, address, city, state, country, exactLocation }) => {
   const geocode = useSelector((state) => state.maps.geocode);
-  const lat = geocode ? geocode.coord.lat : "";
-  const lng = geocode ? geocode.coord.lng : "";
+  const lat = setLat ? setLat : geocode ? geocode.coord.lat : "";
+  const lng = setLng ? setLng : geocode ? geocode.coord.lng : "";
+  const [map, setMap] = useState(null);
+
+  const containerStyle = {
+    width: width || '100%',
+    height: height || '400px'
+  };
 
   const [position, setPosition] = useState({});
   const dispatch = useDispatch();
@@ -26,7 +29,9 @@ const Maps = ({ apiKey, address, city, state, country, exactLocation }) => {
   }, [lat, lng]);
 
   useEffect(() => {
-    dispatch(getGeocode(address, city, state, country, apiKey));
+    if (address, city, state, country) {
+      dispatch(getGeocode(address, city, state, country, apiKey));
+    }
   }, [address, city, state, country]);
 
   useEffect(() => {
@@ -42,14 +47,24 @@ const Maps = ({ apiKey, address, city, state, country, exactLocation }) => {
       )}
       {isLoaded && lat && lng && (
         <GoogleMap
+          onLoad={map => setMap(map)}
           mapContainerClassName='googleMap'
           mapContainerStyle={containerStyle}
           center={position}
-          zoom={17}
+          zoom={zoom ? zoom : 17}
+          onZoomChanged={() => {
+            if (map) {
+              const zoom = map.getZoom();
+              if (typeof onZoomChange === "function") {
+                onZoomChange(zoom);
+              }
+            }
+          }}
         >
-          <Marker
+          {marker ? <Marker
             position={position}
-            draggable={!exactLocation}
+            icon={icon || null}
+            draggable={draggable || !exactLocation}
             onDragEnd={async (coord) => {
               const { latLng } = coord;
               const newLat = latLng.lat();
@@ -57,13 +72,15 @@ const Maps = ({ apiKey, address, city, state, country, exactLocation }) => {
               setPosition({ lat: newLat, lng: newLng });
               await dispatch(updateGeocode(newLat, newLng, apiKey));
             }}
-          />
-          <OverlayView
+          /> : null
+          }
+          {overlay ? <OverlayView
             position={position}
+            className='overlay'
             mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-            getPixelPositionOffset={(x, y) => { return { x: -70, y: -100 } }} >
+            getPixelPositionOffset={(x, y) => { return { x: offsetX ? - (x / 2) : -70, y: offsetY ? - (y / 2) : -100 } }} >
             <div
-              style={{
+              style={overlayStyle ? overlayStyle : {
                 background: `white`,
                 fontSize: '11px',
                 color: `black`,
@@ -71,11 +88,17 @@ const Maps = ({ apiKey, address, city, state, country, exactLocation }) => {
                 padding: "10px"
               }}
             >
-              Latitude: {lat.toFixed(7)}
-              <br></br>
-              Longitude: {lng.toFixed(7)}
+              {overlayContent ? overlayContent :
+                (
+                  <>
+                    Latitude: {lat.toFixed(7)}
+                    <br></br>
+                    Longitude: {lng.toFixed(7)}
+                  </>
+                )
+              }
             </div>
-          </OverlayView>
+          </OverlayView> : null}
         </GoogleMap>
       )}
     </>

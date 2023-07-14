@@ -54,7 +54,6 @@ export const updateGeocode = (lat, lng, key) => async (dispatch) => {
   const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${query}&key=${key}`);
   const data = await res.json();
   const geocode = data.results[0];
-  console.log(geocode)
   dispatch(editGeocode(geocode.address_components, { lat, lng }, geocode.types));
 }
 

@@ -1,0 +1,352 @@
+div.spotDetail {
+  margin: auto;
+  max-width: 1200px;
+}
+
+div.spotReviews {
+  margin: auto;
+  max-width: 1200px;
+  padding-top: 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+.spotDetail .spotTitle {
+  margin-bottom: 10px;
+}
+
+.spotDetail .spotLocation {
+  margin: 0px;
+  font-size: 14px;
+}
+
+.spotDetail .spotImages {
+  width: 100%;
+  margin-top: 25px;
+  margin-bottom: 30px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 10px;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+img.bigImage {
+  width: 100%;
+  aspect-ratio: 1.28 / 1;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+img.bigImage:hover {
+  filter: brightness(80%);
+}
+
+div.smallImages {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+img.smallImages {
+  width: 100%;
+  aspect-ratio: 1.225 / 1;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+img.smallImages:hover {
+  filter: brightness(80%);
+}
+
+.spotDetail .spotImages button {
+  color: gray;
+  font-size: 12px;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  border-radius: 20px;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 15px;
+  background-color: white;
+  border-color: transparent;
+  cursor: pointer;
+  font-family: 'Manrope', sans-serif;
+}
+
+.spotDetail .spotImages button:hover {
+  color: white;
+  background-color: #FF5A5F;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid #DDDDDD;
+}
+
+.details .spotHost {
+  margin: 0px;
+}
+
+.details .introduction p {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.details .introduction .hiddenText {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
+
+.details .introduction button {
+  border: none;
+  background-color: transparent;
+  font-family: 'Manrope', sans-serif;
+  padding: 0px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.details .reserve div {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.details .reserve {
+  padding: 20px;
+  box-sizing: border-box;
+  border: 1px solid black;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  border-radius: 10px;
+  border: 1px solid #DDDDDD;
+  box-shadow: 0px 0px 10px 1px #DDDDDD;
+}
+
+.details .reserve button {
+  font-family: 'Manrope', sans-serif;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+  background-color: #FF5A5F;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 40px;
+}
+
+.reserve .spotPrice {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.reserve .night {
+  font-size: 16px;
+  font-weight: normal;
+}
+
+#modal .introduction {
+  font-family: 'Manrope', sans-serif;
+  width: 800px;
+  height: 600px;
+  padding: 30px 50px;
+  display: flex;
+  flex-direction: column;
+}
+
+#modal .introduction p {
+  line-height: 24px;
+  font-size: 16px;
+  overflow-y: auto;
+}
+
+
+#modal .allImages {
+  width: 800px;
+  height: 800px;
+  padding: 50px 50px;
+  display: flex;
+  flex-direction: column;
+}
+
+#modal .allImages div {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+#modal .allImages img {
+  width: 100%;
+  object-fit: cover;
+}
+
+.spotReviews h4 {
+  font-size: 22px;
+  font-weight: 600;
+  padding: 0px 0px 20px 0px;
+  margin: 0px;
+}
+
+.spotReviews .createReview {
+  font-family: 'Manrope', sans-serif;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+  background-color: #FF5A5F;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 40px;
+  width: 200px;
+  margin-bottom: 20px;
+}
+
+.spotReviews > span {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.reviewDetails div {
+  display: flex;
+  flex-direction: column;
+}
+
+.reviewer {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.reviewDate {
+  font-size: 14px;
+  color: #767676
+}
+
+.reviewDetails .review {
+  margin: 0px;
+  font-size: 16px;
+  line-height: 24px;
+  padding-top: 10px;
+}
+
+.reviewDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding-top: 10px;
+}
+
+div.reviewImages {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 10px;
+  padding-top: 10px;
+}
+
+.reviewImage {
+  width: 100%;
+  aspect-ratio: 1.28 / 1;
+  object-fit: cover;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.reviewImage:hover {
+  filter: brightness(80%);
+}
+
+#modal .bigReviewImage {
+  width: 1000px;
+  height: auto;
+}
+
+.smallCircle {
+  color: black;
+  font-size: 20px;
+  width: 60px;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #FF5A5F;
+  border-radius: 60px;
+  position: relative;
+}
+
+.bigCircle {
+  background-color: rgba(240, 105, 110, 0.3);
+  aspect-ratio: 1 / 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  position: relative;
+}
+
+.note {
+  position: absolute;
+  font-size: 16px;
+  top: -60px;
+  padding: 10px;
+  width: 280px;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 10px;
+}
+
+.arrow-down {
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-top: 20px solid white;
+  position: absolute;
+  top: 30px;
+}
+
+div.spotMap {
+  display: flex;
+  flex-direction: column;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.overlay {
+  position: absolute;
+}
+
+.show .note {
+  display: flex;
+}
+
+.spotMap h4 {
+  font-size: 22px;
+  font-weight: 600;
+  padding: 0px 0px 20px 0px;
+  margin: 0px;
+}
+
+.spotMap p {
+  margin: 0px;
+}
+
+.spotMap {
+  border-bottom: 1px solid lightgrey;
+  padding: 40px 0px;
+}

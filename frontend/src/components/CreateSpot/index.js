@@ -5,6 +5,7 @@ import Select from 'react-select';
 import geolocation from '../../utils/geolocation.json'
 import "./CreateSpot.css";
 import MapContainer from "../Maps";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 export function CreateSpot() {
 
@@ -35,6 +36,7 @@ export function CreateSpot() {
   const [validationErrors, setValidationErrors] = useState({});
   const [availabilityErrors, setAvailabilityErrors] = useState({});
   const [serverErrors, setServerErrors] = useState({});
+  const history = useHistory();
   const dispatch = useDispatch();
   const ref = React.useRef(null);
 
@@ -157,6 +159,7 @@ export function CreateSpot() {
 
     if (!Object.values(availabilityErrors).length && !Object.values(validationErrors).flat().length) {
       return dispatch(spotActions.addSpot(spot, images, preview))
+        .then((spotId) => history.push(`/spots/${spotId}`))
         .catch(
           async (res) => {
             const data = await res.json();
@@ -168,6 +171,18 @@ export function CreateSpot() {
         );
     }
   }
+
+  useEffect(() => {
+    const reviewImages = document.querySelectorAll(".previewBox img");
+    if (reviewImages.length) {
+      reviewImages.forEach(image => {
+        image.addEventListener("error", (e) => {
+          e.target.src = "https://jeffrey-zhang-resource.s3.us-west-1.amazonaws.com/public/imageNotFound-svg.png"
+          e.onerror = null
+        })
+      })
+    }
+  })
 
   useEffect(() => {
     if (onchangePrice.includes(".") && onchangePrice.split(".")[1].length > 2) {
@@ -192,12 +207,11 @@ export function CreateSpot() {
   useEffect(() => {
     const validTypes = ["street_address", "premise", "subpremise", "establishment", "plus_code", "natural_feature", "airport", "park", "point_of_interest", "floor", "landmark", "parking", "room"];
     if ((geocode && !geocode.address_types.find(type => validTypes.includes(type))) || (suggestedAddress && suggestedAddress.toLowerCase() !== `${address}, ${city}, ${state}, ${country}`.toLowerCase())) {
-      console.log(suggestedAddress, `${address}, ${city}, ${state}, ${country}`)
       setExactLocation(false);
     } else {
       setExactLocation(true);
     }
-  }, [geocode]);
+  }, [geocode, address, city, state, country]);
 
   useEffect(() => {
     const errors = {};
@@ -349,7 +363,7 @@ export function CreateSpot() {
               <p className="validationError"><i className="fa-solid fa-circle-xmark" /> {error} </p>
             ))}
           </div>
-          {address && city && state && country && suggestedAddress && !exactLocation ?
+          {address && city && state && country && suggestedAddress && suggestedCountry in geolocation && suggestedState in geolocation[suggestedCountry] && geolocation[suggestedCountry][suggestedState].includes(suggestedCity) && !exactLocation ?
             <div className="addressSuggestion">
               <span>Suggested Address: {suggestedAddress}</span>
               <button
