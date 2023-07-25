@@ -6,6 +6,7 @@ const ADD_IMAGES = "spots/ADD_IMAGES";
 const DELETE_NEW_SPOT = "spots/DELETE_NEW_SPOT";
 const GET_SINGLE_SPOT = "spots/GET_SINGLE_SPOT";
 
+
 const getSpots = (spots) => {
   return {
     type: GET_SPOTS,

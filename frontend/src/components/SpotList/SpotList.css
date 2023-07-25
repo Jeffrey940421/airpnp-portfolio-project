@@ -52,3 +52,40 @@
 .spotPrice > span {
   font-weight: bold;
 }
+
+.spotManagement {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px
+}
+
+.spotManagement button {
+  font-family: 'Manrope', sans-serif;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+  background-color: #FF5A5F;
+  color: white;
+  padding: 5px 20px;
+  border-radius: 10px;
+  width: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.manageSpotsTitle h1 {
+  margin-bottom: 10px;
+}
+
+.manageSpotsTitle button {
+  font-family: 'Manrope', sans-serif;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+  background-color: #FF5A5F;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 40px;
+  width: 200px;
+}

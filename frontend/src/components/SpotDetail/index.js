@@ -102,7 +102,7 @@ export function SpotDetail() {
             <div className="details">
               <div className="introduction">
                 <h2 className="spotHost">Hosted by {spot.Owner.firstName} {spot.Owner.lastName}</h2>
-                <p className={hasMore ? "hiddenText" : ""}>{spot.description}</p>
+                <p className={hasMore ? "hiddenText" : ""} style={{"white-space": "pre-line"}}>{spot.description}</p>
                 {hasMore ? <OpenModalButton buttonText="Show More >" modalComponent={<SpotIntroduction text={spot.description} />} /> : null}
               </div>
               <div className="reserve">

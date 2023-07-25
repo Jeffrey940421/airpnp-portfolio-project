@@ -2,7 +2,7 @@ export function SpotIntroduction({text}) {
   return (
     <div className="introduction">
       <h2>About This Place</h2>
-      <p>{text}</p>
+      <p style={{"white-space": "pre-line"}}>{text}</p>
     </div>
   )
 }

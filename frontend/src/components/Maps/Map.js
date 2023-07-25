@@ -4,7 +4,7 @@ import { getGeocode, updateGeocode } from '../../store/maps';
 import { useDispatch, useSelector } from 'react-redux';
 
 const Maps = ({ apiKey, address, city, state, country, exactLocation, options = { overlay: true, marker: true } }) => {
-  const { setLat, setLng, width, height, zoom, onZoomChange, draggable, overlay, offsetX, offsetY, overlayStyle, overlayContent, icon, marker } = options;
+  const { setLat, setLng, width, height, zoom, onZoomChange, draggable, overlay, offsetX, offsetY, overlayStyle, overlayContent, icon, marker, spot } = options;
 
   const geocode = useSelector((state) => state.maps.geocode);
   const lat = setLat ? setLat : geocode ? geocode.coord.lat : "";
@@ -16,7 +16,8 @@ const Maps = ({ apiKey, address, city, state, country, exactLocation, options = 
     height: height || '400px'
   };
 
-  const [position, setPosition] = useState({});
+  const [position, setPosition] = useState({ lat, lng });
+  const [isFirstRender, setIsFirstRender] = useState(true);
   const dispatch = useDispatch();
 
   const { isLoaded } = useJsApiLoader({
@@ -29,21 +30,28 @@ const Maps = ({ apiKey, address, city, state, country, exactLocation, options = 
   }, [lat, lng]);
 
   useEffect(() => {
-    if (address, city, state, country) {
-      dispatch(getGeocode(address, city, state, country, apiKey));
+    if (address && city && state && country) {
+      if (lat && lng && spot && spot.country === country && spot.state === state && spot.city === city && spot.address === address && ((geocode && geocode.coord && geocode.coord.lat && geocode.coord.lng && +spot.lat === +geocode.coord.lat && +spot.lng === +geocode.coord.lat) || !geocode)) {
+        dispatch(updateGeocode(lat, lng, apiKey));
+      } else {
+        dispatch(getGeocode(address, city, state, country, apiKey))
+          .then((geocode) => {
+            const coord = geocode.geometry.location;
+            const newLat = +coord.lat.toFixed(7);
+            const newLng = +coord.lng.toFixed(7);
+            if (newLat !== setLat && newLng !== setLng && spot && (spot.country !== country || spot.state !== state || spot.city !== city || spot.address !== address)) {
+              setPosition({ lat: newLat, lng: newLng });
+            }
+            dispatch(updateGeocode(newLat, newLng, apiKey));
+          })
+      }
     }
   }, [address, city, state, country]);
-
-  useEffect(() => {
-    if (lat && lng) {
-      dispatch(updateGeocode(lat, lng, apiKey))
-    }
-  }, [lat, lng])
 
   return (
     <>
       {exactLocation ? null : (
-        <p className='warningMessage'><i className="fa-sharp fa-solid fa-circle-exclamation" /> Cannot find the exact location of your place. Please check the address or locate your place on map </p>
+        <p className='warningMessage'><i className="fa-sharp fa-solid fa-circle-exclamation" /> Cannot find the exact location of your place based on address. Please check the address or locate your place on map </p>
       )}
       {isLoaded && lat && lng && (
         <GoogleMap
@@ -91,9 +99,9 @@ const Maps = ({ apiKey, address, city, state, country, exactLocation, options = 
               {overlayContent ? overlayContent :
                 (
                   <>
-                    Latitude: {lat.toFixed(7)}
+                    Latitude: {(+position.lat).toFixed(7)}
                     <br></br>
-                    Longitude: {lng.toFixed(7)}
+                    Longitude: {(+position.lng).toFixed(7)}
                   </>
                 )
               }

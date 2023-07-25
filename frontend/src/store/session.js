@@ -2,6 +2,8 @@ import { csrfFetch } from "./csrf";
 
 const SET_USER = "session/SET_USER";
 const REMOVE_USER = "session/REMOVE_USER";
+const GET_CURRENT_SPOTS = "session/GET_CURRENT_SPOTS";
+const DELETE_CURRENT_SPOTS = "session/DELETE_CURRENT_SPOTS";
 
 const setUser = (user) => {
   return {
@@ -15,6 +17,20 @@ const removeUser = () => {
     type: REMOVE_USER,
   };
 };
+
+const getSpots = (spots) => {
+  return {
+    type: GET_CURRENT_SPOTS,
+    spots
+  }
+};
+
+const deleteSpots = (spotId) => {
+  return {
+    type: DELETE_CURRENT_SPOTS,
+    spotId
+  }
+}
 
 export const login = (user) => async (dispatch) => {
   const response = await csrfFetch("/api/session", {
@@ -51,7 +67,25 @@ export const restoreUser = () => async (dispatch) => {
   return response;
 };
 
-const initialState = { user: null };
+export const listSpots = () => async (dispatch) => {
+  const response = await csrfFetch("/api/spots/current");
+  const data = await response.json();
+  dispatch(getSpots(data.Spots));
+  return response;
+}
+
+export const removeSpot = (spotId) => async (dispatch) => {
+  const response = await csrfFetch(`/api/spots/${spotId}`, {
+    method: 'DELETE'
+  });
+  if (response.ok) {
+    dispatch(deleteSpots(spotId));
+  } else {
+    return response;
+  }
+}
+
+const initialState = { user: null, spots: {} };
 
 const sessionReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -59,6 +93,14 @@ const sessionReducer = (state = initialState, action) => {
       return { ...state, user: action.user }
     case REMOVE_USER:
       return { ...state, user: null }
+    case GET_CURRENT_SPOTS:
+      const spots = {};
+      action.spots.forEach(spot => spots[spot.id] = spot);
+      return { ...state, spots: { ...state.spots, ...spots } }
+    case DELETE_CURRENT_SPOTS:
+      const existingSpots = { ...state.spots };
+      delete existingSpots[action.spotId];
+      return { ...state, spots: existingSpots }
     default:
       return state;
   }

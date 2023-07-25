@@ -1,0 +1,33 @@
+.deleteModal {
+  height: auto;
+  width: 500px;
+  font-family: 'Manrope', sans-serif;
+  padding: 20px 20px 50px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  justify-content: center;
+  align-items: center;
+}
+
+.deleteModal p {
+  margin-top: 0px;
+}
+
+.deleteModal h1 {
+  font-family: 'Manrope', sans-serif;
+  margin: 20px 0px 10px 0px;
+}
+
+.deleteModal button {
+  font-family: 'Manrope', sans-serif;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+  background-color: #FF5A5F;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 40px;
+  width: 100%;
+  margin-top: 10px;
+}

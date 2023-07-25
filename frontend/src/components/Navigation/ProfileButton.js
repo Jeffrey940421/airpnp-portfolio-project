@@ -43,7 +43,8 @@ export function ProfileButton({ user }) {
 
   const manageSpots = (e) => {
     e.preventDefault();
-    history.push("/spots/current")
+    history.push("/spots/current");
+    setShowMenu(false);
   }
 
   let content;
@@ -82,7 +83,7 @@ export function ProfileButton({ user }) {
       {
         user &&
           <li>
-            <button className="createSpotButton" onClick={() => history.push("/spots/new")}>Airpnp your place</button>
+            <button className="createSpotButton" onClick={() => history.push("/spots/new")}>Airpnp Your Place</button>
           </li>
       }
       <button className="profile" onClick={openMenu}>

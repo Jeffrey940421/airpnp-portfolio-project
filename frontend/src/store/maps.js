@@ -3,6 +3,7 @@ import { csrfFetch } from './csrf';
 const LOAD_API_KEY = 'maps/LOAD_API_KEY';
 const GET_GEOCODE = "maps/GET_GEOCODE";
 const UPDATE_GEOCODE = "maps/UPDATE_GEOCODE";
+const RESET_GEOCODE = "maps/RESET_GEOCODE";
 
 const loadApiKey = (key) => ({
   type: LOAD_API_KEY,
@@ -21,7 +22,7 @@ const editGeocode = (address_components, coord, address_types) => ({
   address_components,
   coord: { lat: +coord.lat.toFixed(7), lng: +coord.lng.toFixed(7) },
   address_types
-})
+});
 
 export const getKey = () => async (dispatch) => {
   const res = await csrfFetch('/api/maps/key', {
@@ -47,6 +48,7 @@ export const getGeocode = (address, city, state, country, key) => async (dispatc
   const data = await res.json();
   const geocode = data.results[0];
   dispatch(loadGeocode(geocode.address_components, geocode.geometry.location, geocode.types));
+  return geocode;
 }
 
 export const updateGeocode = (lat, lng, key) => async (dispatch) => {
@@ -56,6 +58,10 @@ export const updateGeocode = (lat, lng, key) => async (dispatch) => {
   const geocode = data.results[0];
   dispatch(editGeocode(geocode.address_components, { lat, lng }, geocode.types));
 }
+
+export const resetGeocode = () => ({
+  type: RESET_GEOCODE
+})
 
 const initialState = { key: null, geocode: null };
 
@@ -78,7 +84,9 @@ const mapsReducer = (state = initialState, action) => {
           coord: action.coord,
           address_types: action.address_types
         }
-      }
+      };
+    case RESET_GEOCODE:
+      return {...state, geocode: null};
     default:
       return state;
   }

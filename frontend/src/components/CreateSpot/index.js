@@ -1,13 +1,42 @@
 import React, { useState, useEffect, useRef } from "react";
 import * as spotActions from "../../store/spots";
+import * as mapActions from "../../store/maps";
 import { useDispatch, useSelector } from "react-redux";
 import Select from 'react-select';
 import geolocation from '../../utils/geolocation.json'
 import "./CreateSpot.css";
 import MapContainer from "../Maps";
-import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { useHistory, useParams } from "react-router-dom/cjs/react-router-dom.min";
 
-export function CreateSpot() {
+export function CreateSpot({ type }) {
+  const { spotId } = useParams();
+  const spot = useSelector((state) => state.spots.singleSpot);
+
+  let existingCountry = "";
+  let existingState = "";
+  let existingCity = "";
+  let existingAddress = "";
+  let existingAddress2 = "";
+  let existingLat = "";
+  let existingLng = "";
+  let existingDescription = "";
+  let existingName = "";
+  let existingPrice = "";
+  let existingImages = [];
+
+  if (spot && +spotId === spot.id) {
+    existingCountry = spot.country;
+    existingState = spot.state;
+    existingCity = spot.city;
+    existingAddress = spot.address.split(" | ")[0];
+    existingAddress2 = spot.address.split(" | ")[1];
+    existingLat = spot.lat;
+    existingLng = spot.lng;
+    existingDescription = spot.description;
+    existingName = spot.name;
+    existingPrice = spot.price.toString();
+    existingImages = spot.SpotImages;
+  }
 
   const [country, setCountry] = useState("");
   const [countryEdited, setCountryEdited] = useState(false);
@@ -18,6 +47,7 @@ export function CreateSpot() {
   const [address, setAddress] = useState("");
   const [onchangeAddress, setOnchangeAddress] = useState("");
   const [addressEdited, setAddressEdited] = useState(false);
+  const [address2, setAddress2] = useState("");
   const [exactLocation, setExactLocation] = useState(true);
   const [description, setDescription] = useState("");
   const [onchangeDescription, setOnchangeDescription] = useState("");
@@ -47,7 +77,7 @@ export function CreateSpot() {
   const suggestedStreetNumber = geocode ? geocode.address_components.find(el => el.types.includes("street_number")) ? geocode.address_components.find(el => el.types.includes("street_number")).long_name : "" : "";
   const suggestedStreet = geocode ? geocode.address_components.find(el => el.types.includes("route")) ? geocode.address_components.find(el => el.types.includes("route")).long_name : "" : ""
   const suggestedPlusCode = geocode ? geocode.address_components.find(el => el.types.includes("plus_code")) ? geocode.address_components.find(el => el.types.includes("plus_code")).long_name : "" : "";
-  const suggestedCity = geocode ? geocode.address_components.find(el => el.types.includes("locality")) ? geocode.address_components.find(el => el.types.includes("locality")).long_name : "" : "";
+  const suggestedCity = geocode ? geocode.address_components.find(el => el.types.includes("locality") || el.types.includes("administrative_area_level_2") || el.types.includes("administrative_area_level_3")) ? geocode.address_components.find(el => el.types.includes("locality") || el.types.includes("administrative_area_level_2") || el.types.includes("administrative_area_level_3")).long_name : "" : "";
   const suggestedState = geocode ? geocode.address_components.find(el => el.types.includes("administrative_area_level_1")) ? geocode.address_components.find(el => el.types.includes("administrative_area_level_1")).long_name : "" : "";
   const suggestedCountry = geocode ? geocode.address_components.find(el => el.types.includes("country")) ? geocode.address_components.find(el => el.types.includes("country")).long_name : "" : "";
   const suggestedStreetAddress = (suggestedStreetNumber && suggestedStreet && suggestedCity && suggestedState && suggestedCountry) ? `${suggestedStreetNumber} ${suggestedStreet}, ${suggestedCity}, ${suggestedState}, ${suggestedCountry}` : "";
@@ -78,7 +108,7 @@ export function CreateSpot() {
     }),
     singleValue: (base, state) => ({
       ...base,
-      paddingTop: "17px",
+      paddingTop: "10px",
       backgroundColor: "transparent"
     }),
     indicatorContainer: (base, state) => ({
@@ -91,7 +121,7 @@ export function CreateSpot() {
       ...base,
       minHeight: "60px !important",
       maxHeight: "60px",
-      paddingTop: "17px",
+      paddingTop: "10px",
       backgroundColor: "transparent"
     }),
     menu: (base, state) => ({
@@ -146,7 +176,7 @@ export function CreateSpot() {
     setServerErrors({});
 
     const spot = {
-      address,
+      address: `${address}${address2 ? ` | ${address2}` : ""}`,
       city,
       state,
       country,
@@ -171,6 +201,48 @@ export function CreateSpot() {
         );
     }
   }
+
+  useEffect(() => {
+    dispatch(mapActions.resetGeocode());
+  }, [spotId])
+
+  useEffect(() => {
+    if (type === "edit" && spotId) {
+      dispatch(spotActions.loadSingleSpot(spotId));
+    }
+  }, [type, spotId])
+
+  useEffect(() => {
+    setCountry(existingCountry);
+    setState(existingState);
+    setCity(existingCity);
+    setAddress(existingAddress);
+    setOnchangeAddress(existingAddress);
+    setAddress2(existingAddress2);
+    setDescription(existingDescription);
+    setOnchangeDescription(existingDescription);
+    setName(existingName);
+    setOnchangeName(existingName);
+    setPrice(existingPrice);
+    setOnchangePrice(existingPrice);
+    if (type === "edit" && spotId) {
+      setCountryEdited(true);
+      setStateEdited(true)
+      setCityEdited(true);
+      setAddressEdited(true);
+      setDescriptionEdited(true);
+      setNameEdited(true);
+      setPriceEdited(true);
+    } else {
+      setCountryEdited(false);
+      setStateEdited(false)
+      setCityEdited(false);
+      setAddressEdited(false);
+      setDescriptionEdited(false);
+      setNameEdited(false);
+      setPriceEdited(false);
+    }
+  }, [existingCountry, existingState, existingCity, existingAddress, existingAddress2, existingPrice, type])
 
   useEffect(() => {
     const reviewImages = document.querySelectorAll(".previewBox img");
@@ -205,8 +277,8 @@ export function CreateSpot() {
   }, [onchangePrice, price])
 
   useEffect(() => {
-    const validTypes = ["street_address", "premise", "subpremise", "establishment", "plus_code", "natural_feature", "airport", "park", "point_of_interest", "floor", "landmark", "parking", "room"];
-    if ((geocode && !geocode.address_types.find(type => validTypes.includes(type))) || (suggestedAddress && suggestedAddress.toLowerCase() !== `${address}, ${city}, ${state}, ${country}`.toLowerCase())) {
+    const validTypes = ["street_address", "premise", "subpremise", "plus_code", "natural_feature", "floor", "room"];
+    if ((geocode && !geocode.address_types.find(type => validTypes.includes(type)) && !suggestedStreetNumber && !suggestedPlusCode) || (suggestedAddress && suggestedAddress.toLowerCase() !== `${address}, ${city}, ${state}, ${country}`.toLowerCase()) || !suggestedAddress) {
       setExactLocation(false);
     } else {
       setExactLocation(true);
@@ -220,7 +292,7 @@ export function CreateSpot() {
     if (countryEdited && !country) errors.country = "Country is required";
     if (stateEdited && !state) errors.state = "State is required";
     if (cityEdited && !city) errors.city = "City is required";
-    if (addressEdited && !address) errors.address = "Address is required";
+    if (addressEdited && !address) errors.address = "Street address is required";
     if (descriptionEdited && !description) errors.description = "Description is required";
     if (nameEdited && !name) errors.name = "Name is required";
     if (priceEdited && !price) errors.price = "Price is required";
@@ -231,9 +303,11 @@ export function CreateSpot() {
   }, [country, countryEdited, state, stateEdited, city, cityEdited, address, addressEdited, description, descriptionEdited, name, nameEdited, price, priceEdited, images, imagesEdited]);
 
   useEffect(() => {
-    const errors = { address: [], description: [], name: [], price: [], images: [] };
+    const errors = { address: [], address2: [], description: [], name: [], price: [], images: [] };
 
-    if (address && address.length > 255) errors.address.push("Address must be at most 255 characters long");
+    if (address && address.length > 200) errors.address.push("Street address must be at most 200 characters long");
+
+    if (address2 && address2.length > 50) errors.address2.push("Apt, suite, or unit must be at most 50 characters long");
 
     if (description && description.length < 30) errors.description.push("Description must be at least 30 characters long");
 
@@ -244,11 +318,11 @@ export function CreateSpot() {
     if (images && Array.from(images).find(image => !image.type.startsWith("image"))) errors.images.push("Only image files are accepted")
 
     setValidationErrors(errors);
-  }, [address, description, name, price, images])
+  }, [address, address2, description, name, price, images])
 
   return (
     <div className="createSpotForm">
-      <h1>Create a New Place</h1>
+      <h1>{type === "edit" ? "Update Your Place" : "Create a New Place"}</h1>
       <form className="createSpotForm" onSubmit={handleSubmit}>
         <div className="locationSection">
           <h2>Where's your place located</h2>
@@ -363,7 +437,25 @@ export function CreateSpot() {
               <p className="validationError"><i className="fa-solid fa-circle-xmark" /> {error} </p>
             ))}
           </div>
-          {address && city && state && country && suggestedAddress && suggestedCountry in geolocation && suggestedState in geolocation[suggestedCountry] && geolocation[suggestedCountry][suggestedState].includes(suggestedCity) && !exactLocation ?
+          <div className={`inputBox ${(validationErrors.address2 && validationErrors.address2.length) || serverErrors.address ? "error" : ""}`}>
+            <label htmlFor="address2">Apt, Suite, or Unit (Optional)</label>
+            <input
+              name="address2"
+              type="text"
+              value={address2}
+              onChange={(e) => {
+                setAddress2(e.target.value);
+              }}
+              autoComplete="one-time-code"
+            />
+          </div>
+          <div className="errorMessage">
+            {serverErrors.address && <p className="serverError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {serverErrors.address}</p>}
+            {validationErrors.address2 && validationErrors.address2.length > 0 && validationErrors.address2.map(error => (
+              <p className="validationError"><i className="fa-solid fa-circle-xmark" /> {error} </p>
+            ))}
+          </div>
+          {address && city && state && country && suggestedAddress && suggestedCountry in geolocation && suggestedState in geolocation[suggestedCountry] && geolocation[suggestedCountry][suggestedState].includes(suggestedCity) && !exactLocation && suggestedAddress.toLowerCase() !== `${address}, ${city}, ${state}, ${country}`.toLowerCase() ?
             <div className="addressSuggestion">
               <span>Suggested Address: {suggestedAddress}</span>
               <button
@@ -379,7 +471,7 @@ export function CreateSpot() {
             </div>
             : null
           }
-          {address && city && state && country && <MapContainer address={address} city={city} state={state} country={country} exactLocation={exactLocation} />}
+          {address && city && state && country && <MapContainer address={address} city={city} state={state} country={country} exactLocation={exactLocation} options={type === "edit" ? { setLat: existingLat, setLng: existingLng, marker: true, overlay: true, spot } : undefined} />}
         </div>
         <div className="descriptionSection">
           <h2>Describe your place to guests</h2>
@@ -552,7 +644,7 @@ export function CreateSpot() {
             type="submit"
             disabled={Object.values(availabilityErrors).length || Object.values(validationErrors).flat().length || !countryEdited || !stateEdited || !cityEdited || !addressEdited || !lat || !lng || !descriptionEdited || !nameEdited || !priceEdited || !imagesEdited}
           >
-            Create Spot
+            {type === "edit" ? "Update Spot" : "Create Spot"}
           </button>
         </div>
       </form>

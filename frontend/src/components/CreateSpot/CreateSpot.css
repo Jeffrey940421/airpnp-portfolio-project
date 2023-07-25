@@ -141,6 +141,7 @@ p.availabilityError {
   border: transparent;
   font-family: 'Manrope', sans-serif;
   resize: none;
+  white-space: pre-wrap;
 }
 
 .inputArea textarea:focus {
@@ -260,7 +261,7 @@ label.fileUpload {
   background-color: #FF5A5F;
   color: white;
   padding: 3px 7px;
-  border-radius: 40px;
+  border-radius: 5px;
 }
 
 .previewButtons {
