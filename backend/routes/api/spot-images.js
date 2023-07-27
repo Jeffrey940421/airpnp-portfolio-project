@@ -26,11 +26,16 @@ router.delete("/:imageId", requireAuth, spotImageExist, spotImageAuthorization, 
   await spotImage.destroy();
   const spotImages = spotImage.Spot.SpotImages
   if (spotImages && spotImage.preview) {
-    spotImages[0].preview = true;
-    await spotImages[0].save();
+    for (let i = 0; i < spotImages.length; i += 1) {
+      if (spotImages[i].preview === false) {
+        spotImages[i].preview = true;
+        await spotImages[i].save();
+        break;
+      }
+    }
   }
   res.json({
-    message: "Successfully deleted"
+    message: "Successfully deleted",
   })
 })
 
@@ -38,6 +43,16 @@ router.delete("/:imageId", requireAuth, spotImageExist, spotImageAuthorization, 
 router.put("/:imageId", requireAuth, spotImageExist, spotImageAuthorization, validateSpotImageInfo, async (req, res, next) => {
   const spotImage = req.spotImage;
   const {preview} = req.body
+  const spotImages = spotImage.Spot.SpotImages
+  if (preview) {
+    for (let i = 0; i < spotImages.length; i += 1) {
+      if (spotImages[i].preview === true) {
+        spotImages[i].preview = false;
+        await spotImages[i].save();
+        break;
+      }
+    }
+  }
   let updatedSpotImage = await spotImage.update({preview});
   updatedSpotImage = updatedSpotImage.toJSON();
   delete updatedSpotImage.Spot;

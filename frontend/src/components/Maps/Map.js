@@ -17,7 +17,6 @@ const Maps = ({ apiKey, address, city, state, country, exactLocation, options = 
   };
 
   const [position, setPosition] = useState({ lat, lng });
-  const [isFirstRender, setIsFirstRender] = useState(true);
   const dispatch = useDispatch();
 
   const { isLoaded } = useJsApiLoader({
@@ -31,7 +30,7 @@ const Maps = ({ apiKey, address, city, state, country, exactLocation, options = 
 
   useEffect(() => {
     if (address && city && state && country) {
-      if (lat && lng && spot && spot.country === country && spot.state === state && spot.city === city && spot.address === address && ((geocode && geocode.coord && geocode.coord.lat && geocode.coord.lng && +spot.lat === +geocode.coord.lat && +spot.lng === +geocode.coord.lat) || !geocode)) {
+      if (lat && lng && spot && spot.country === country && spot.state === state && spot.city === city && spot.address === address && +spot.lat === +position.lat && +spot.lng === +position.lng) {
         dispatch(updateGeocode(lat, lng, apiKey));
       } else {
         dispatch(getGeocode(address, city, state, country, apiKey))

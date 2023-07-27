@@ -4,7 +4,7 @@ import { Route, Switch } from "react-router-dom";
 import * as sessionActions from "./store/session";
 import { Navigation } from "./components/Navigation";
 import { SpotList } from "./components/SpotList";
-import { CreateSpot } from "./components/CreateSpot";
+import { CreateSpotContainer } from "./components/CreateSpot";
 import { SpotDetail } from "./components/SpotDetail";
 
 function App() {
@@ -23,13 +23,13 @@ function App() {
             <SpotList />
           </Route>
           <Route exact path="/spots/new">
-            <CreateSpot />
+            <CreateSpotContainer />
           </Route>
           <Route exact path="/spots/current">
             <SpotList type="current"/>
           </Route>
           <Route exact path="/spots/:spotId/edit">
-            <CreateSpot type="edit" />
+            <CreateSpotContainer type="edit" />
           </Route>
           <Route exact path="/spots/:spotId">
             <SpotDetail />

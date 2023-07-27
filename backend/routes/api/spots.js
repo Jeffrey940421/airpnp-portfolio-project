@@ -64,11 +64,8 @@ const validateReviewInfo = [
 
 const validateSpotImageInfo = [
   check('preview')
-    .if((value) => {
-      return value !== undefined;
-    })
     .custom((value) => {
-      if (Number.isInteger(+value) && +value >= 0) {
+      if (value === "undefined" || Number.isInteger(+value) && +value >= 0) {
         return true;
       }
       return false;

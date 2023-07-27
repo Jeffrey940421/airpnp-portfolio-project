@@ -5,7 +5,9 @@ const CREATE_SPOT = "spots/CREATE_SPOT";
 const ADD_IMAGES = "spots/ADD_IMAGES";
 const DELETE_NEW_SPOT = "spots/DELETE_NEW_SPOT";
 const GET_SINGLE_SPOT = "spots/GET_SINGLE_SPOT";
-
+const UPDATE_SINGLE_SPOT = "spots/UPDATE_SINGLE_SPOT";
+const DELETE_IMAGES = "spots/DELETE_IMAGES";
+const SET_PREVIEW = "spots/SET_PREVIEW";
 
 const getSpots = (spots) => {
   return {
@@ -34,10 +36,31 @@ const deleteNewSpot = () => {
   }
 }
 
-const getSingleSpot = (spot) => {
+export const getSingleSpot = (spot) => {
   return {
     type: GET_SINGLE_SPOT,
     spot
+  }
+}
+
+const updateSingleSpot = (spot) => {
+  return {
+    type: UPDATE_SINGLE_SPOT,
+    spot
+  }
+}
+
+const deleteImages = (imageIds) => {
+  return {
+    type: DELETE_IMAGES,
+    imageIds
+  }
+}
+
+const setPreview = (imageId) => {
+  return {
+    type: SET_PREVIEW,
+    imageId
   }
 }
 
@@ -87,6 +110,19 @@ export const addSpot = (spot, images, preview) => async (dispatch) => {
   }
 }
 
+export const addNewImages = (spotId, images, preview) => async (dispatch) => {
+  const formData = new FormData();
+  Array.from(images).forEach(image => formData.append("images", image));
+  formData.append("preview", preview);
+  const response = await csrfFetch(`/api/spots/${spotId}/images`, {
+    method: "POST",
+    body: formData
+  });
+  const data = await response.json();
+  dispatch(addImages(data));
+  return response
+}
+
 export const removeNewSpot = (spotId) => async (dispatch) => {
   const response = await csrfFetch(`/api/spots/${spotId}`, {
     method: "DELETE"
@@ -99,6 +135,34 @@ export const loadSingleSpot = (spotId) => async (dispatch) => {
   const response = await csrfFetch(`/api/spots/${spotId}`);
   const data = await response.json();
   dispatch(getSingleSpot(data));
+  return response;
+}
+
+export const editSpot = (spot, spotId) => async (dispatch) => {
+  const response = await csrfFetch(`/api/spots/${spotId}`, {
+    method: "PUT",
+    body: JSON.stringify(spot)
+  });
+  const data = await response.json();
+  dispatch(updateSingleSpot(data));
+  return response;
+}
+
+export const removeImages = (imageIds) => async (dispatch) => {
+  const responses = await Promise.all(imageIds.map(async (id) => {
+    const response = await csrfFetch(`/api/spot-images/${id}`, { method: "DELETE" });
+    return await response.json()
+  }));
+  dispatch(deleteImages(imageIds));
+  return responses;
+}
+
+export const setPreviewImage = (imageId) => async (dispatch) => {
+  const response = await csrfFetch(`/api/spot-images/${imageId}`, {
+    method: "PUT",
+    body: JSON.stringify({preview: true})
+  });
+  dispatch(setPreview(imageId));
   return response;
 }
 
@@ -118,6 +182,22 @@ const spotsReducer = (state = initialState, action) => {
       return { ...state, singleSpot: {} };
     case GET_SINGLE_SPOT:
       return { ...state, singleSpot: action.spot };
+    case UPDATE_SINGLE_SPOT:
+      return { ...state, singleSpot: { ...state.singleSpot, ...action.spot } }
+    case DELETE_IMAGES:
+      let spotImages = [...state.singleSpot.SpotImages];
+      spotImages = spotImages.filter(image => !action.imageIds.includes(image.id));
+      return { ...state, singleSpot: { ...state.singleSpot, SpotImages: spotImages } }
+    case SET_PREVIEW:
+      let newSpotImages = [...state.singleSpot.SpotImages];
+      for (let image of newSpotImages) {
+        if (image.id === action.imageId) {
+          image.preview = true
+        } else {
+          image.preview = false
+        }
+      }
+      return { ...state, singleSpot: { ...state.singleSpot, SpotImages: newSpotImages } }
     default:
       return state;
   }

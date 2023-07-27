@@ -14,6 +14,7 @@ export function SpotList({ type }) {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true)
   const [isLoading, setIsLoading] = useState(false);
+  const [hasFetched, setHasFetched] = useState(false);
 
   const fetchSpots = async () => {
     if (type === "current") {
@@ -30,6 +31,7 @@ export function SpotList({ type }) {
         setIsLoading(false);
       }
     }
+    setHasFetched(true)
   }
 
   useEffect(() => {
@@ -62,6 +64,10 @@ export function SpotList({ type }) {
       })
     }
   })
+
+  if (!hasFetched) {
+    return null;
+  }
 
   return (
     <>

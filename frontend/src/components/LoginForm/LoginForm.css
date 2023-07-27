@@ -47,6 +47,7 @@
   font-size: 14px;
   border-radius: 8px;
   border: 1px solid #DDDDDD;
+  font-family: 'Manrope', sans-serif !important;
 }
 
 .inputBox input:hover {
