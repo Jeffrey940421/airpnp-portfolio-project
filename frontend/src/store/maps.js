@@ -12,14 +12,14 @@ const loadApiKey = (key) => ({
 const loadGeocode = (address_components, coord, address_types) => ({
   type: GET_GEOCODE,
   address_components,
-  coord: { lat: +coord.lat.toFixed(7), lng: +coord.lng.toFixed(7) },
+  coord: { lat: +(+coord.lat).toFixed(7), lng: +(+coord.lng).toFixed(7) },
   address_types
 });
 
 const editGeocode = (address_components, coord, address_types) => ({
   type: UPDATE_GEOCODE,
   address_components,
-  coord: { lat: +coord.lat.toFixed(7), lng: +coord.lng.toFixed(7) },
+  coord: { lat: +(+coord.lat).toFixed(7), lng: +(+coord.lng).toFixed(7) },
   address_types
 });
 

@@ -202,6 +202,7 @@ export function CreateSpot({ type, spot, spotId }) {
               const data = await res.json();
               if (data && data.errors) {
                 setServerErrors(data.errors);
+                // TO DO: Restore the spot
               }
             }
           )
