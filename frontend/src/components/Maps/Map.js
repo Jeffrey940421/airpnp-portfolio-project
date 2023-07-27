@@ -7,8 +7,8 @@ const Maps = ({ apiKey, address, city, state, country, exactLocation, options = 
   const { setLat, setLng, width, height, zoom, onZoomChange, draggable, overlay, offsetX, offsetY, overlayStyle, overlayContent, icon, marker, spot } = options;
 
   const geocode = useSelector((state) => state.maps.geocode);
-  const lat = setLat ? setLat : geocode ? geocode.coord.lat : "";
-  const lng = setLng ? setLng : geocode ? geocode.coord.lng : "";
+  const lat = setLat ? +setLat : geocode ? +geocode.coord.lat : "";
+  const lng = setLng ? +setLng : geocode ? +geocode.coord.lng : "";
   const [map, setMap] = useState(null);
 
   const containerStyle = {
