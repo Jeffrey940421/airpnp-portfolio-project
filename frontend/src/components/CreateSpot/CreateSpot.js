@@ -128,7 +128,7 @@ export function CreateSpot({ type, spot, spotId }) {
       setDragActive(true);
     } else if (e.type === "dragleave") {
       setDragActive(false);
-      setImagesEdited(true)
+      setImagesEdited(true);
     }
   };
 
@@ -143,6 +143,7 @@ export function CreateSpot({ type, spot, spotId }) {
     const input = document.querySelector(".dropBox input");
     input.files = dataTransfer.files;
     setImages(dataTransfer.files);
+    setImagesEdited(true);
   };
 
   const preventSymbols = (e) => {
@@ -565,6 +566,7 @@ export function CreateSpot({ type, spot, spotId }) {
                 Array.from(e.target.files).forEach(image => dataTransfer.items.add(image));
                 e.target.files = dataTransfer.files;
                 setImages(e.target.files);
+                setImagesEdited(true);
               }}
             />
             <label htmlFor="images" className={`fileUpload ${dragActive ? "dragActive" : ""}`}>
@@ -575,7 +577,7 @@ export function CreateSpot({ type, spot, spotId }) {
                 onClick={(e) => {
                   e.preventDefault();
                   ref.current.click();
-                  setImagesEdited(true)
+                  setImagesEdited(true);
                 }}>
                 Browse photos
               </button>
