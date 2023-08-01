@@ -6,6 +6,7 @@ const GET_CURRENT_SPOTS = "session/GET_CURRENT_SPOTS";
 const DELETE_CURRENT_SPOTS = "session/DELETE_CURRENT_SPOTS";
 const GET_CURRENT_REVIEWS = "session/GET_CURRENT_REVIEWS";
 const REMOVE_CURRENT_REVIEW = "session/REMOVE_CURRENT_REVIEW";
+const EDIT_CURRENT_REVIEW = "session/EDIT_CURRENT_REVIEW";
 
 const setUser = (user) => {
   return {
@@ -45,6 +46,13 @@ const removeReview = (reviewId) => {
   return {
     type: REMOVE_CURRENT_REVIEW,
     reviewId
+  }
+}
+
+const editReview = (review) => {
+  return {
+    type: EDIT_CURRENT_REVIEW,
+    review
   }
 }
 
@@ -119,6 +127,16 @@ export const deleteReview = (reviewId) => async (dispatch) => {
   }
 }
 
+export const updateReview = (reviewId, review) => async (dispatch) => {
+  const response = await csrfFetch(`/api/reviews/${reviewId}`, {
+    method: "PUT",
+    body: JSON.stringify(review)
+  });
+  const data = await response.json();
+  dispatch(editReview(data));
+  return response
+}
+
 const initialState = { user: null, spots: {}, reviews: {} };
 
 const sessionReducer = (state = initialState, action) => {
@@ -143,6 +161,8 @@ const sessionReducer = (state = initialState, action) => {
       const newReviews = { ...state.reviews };
       delete newReviews[action.reviewId];
       return { ...state, reviews: newReviews };
+    case EDIT_CURRENT_REVIEW:
+      return { ...state, reviews: { ...state.reviews, [action.review.id]: { ...state.reviews[action.review.id], ...action.review } } }
     default:
       return state;
   }

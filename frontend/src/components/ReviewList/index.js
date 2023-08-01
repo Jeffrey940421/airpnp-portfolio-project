@@ -4,8 +4,10 @@ import { useEffect } from "react";
 import * as reviewActions from "../../store/reviews";
 import * as sessionActions from "../../store/session";
 import { ConfirmDelete } from "../ConfirmDelete";
+import { CreateReview } from "../CreateReview/CreateReview";
+import { CreateReviewContainer } from "../CreateReview";
 
-export function ReviewList({ reviews, type }) {
+export function ReviewList({ spot, reviews, type }) {
   const { setModalContent, setOnModalClose } = useModal();
   const user = useSelector(state => state.session.user);
   const dispatch = useDispatch();
@@ -69,6 +71,15 @@ export function ReviewList({ reviews, type }) {
                   <div className="reviewButtons">
                     <button
                       className="updateReview"
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        if (type === "current") {
+                          setModalContent(<CreateReviewContainer spot={review.Spot} review={review} reviewId={review.id} type={type} formType="edit" />)
+                        } else {
+                          setModalContent(<CreateReviewContainer spot={spot} review={review} reviewId={review.id} formType="edit" />)
+                        }
+
+                      }}
                     >
                       Update
                     </button>

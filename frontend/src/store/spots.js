@@ -10,10 +10,11 @@ const DELETE_IMAGES = "spots/DELETE_IMAGES";
 const SET_PREVIEW = "spots/SET_PREVIEW";
 const REMOVE_SPOT = "spots/REMOVE_SPOT";
 
-const getSpots = (spots) => {
+const getSpots = (spots, page) => {
   return {
     type: GET_SPOTS,
-    spots
+    spots,
+    page
   }
 }
 
@@ -65,13 +66,6 @@ const setPreview = (imageId) => {
   }
 }
 
-export const removeSpot = (spotId) => {
-  return {
-    type: REMOVE_SPOT,
-    spotId
-  }
-}
-
 export const listSpots = (filter) => async (dispatch) => {
   const page = filter.page || "";
   const size = filter.size || "";
@@ -83,7 +77,7 @@ export const listSpots = (filter) => async (dispatch) => {
   const maxPrice = filter.maxPrice || "";
   const response = await csrfFetch(`/api/spots?page=${page}&size=${size}&minLng=${minLng}&maxLng=${maxLng}&minLat=${minLat}&maxLat=${maxLat}&minPrice=${minPrice}&maxPrice=${maxPrice}`);
   const data = await response.json();
-  dispatch(getSpots(data.Spots));
+  dispatch(getSpots(data.Spots, data.page));
   if (response.ok) {
     return data;
   } else {
@@ -181,7 +175,7 @@ const spotsReducer = (state = initialState, action) => {
     case GET_SPOTS:
       const spotList = {};
       action.spots.forEach(spot => spotList[spot.id] = spot);
-      return { ...state, spotList: { ...state.spotList, ...spotList } };
+      return { ...state, spotList: { ...state.spotList, [action.page]: spotList } };
     case CREATE_SPOT:
       return { ...state, singleSpot: action.spot };
     case ADD_IMAGES:
@@ -206,10 +200,6 @@ const spotsReducer = (state = initialState, action) => {
         }
       }
       return { ...state, singleSpot: { ...state.singleSpot, SpotImages: newSpotImages } }
-    case REMOVE_SPOT:
-      const newSpotList = { ...state.spotList };
-      delete newSpotList[action.spotId];
-      return { ...state, spotList: newSpotList };
     default:
       return state;
   }

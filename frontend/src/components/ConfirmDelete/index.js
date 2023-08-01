@@ -14,7 +14,6 @@ export function ConfirmDelete({ spot, review, type }) {
   const handleDelete = ({ spotId, review, type }) => {
     if (spotId) {
       return dispatch(sessionActions.removeSpot(spotId))
-        .then(() => dispatch(spotActions.removeSpot(spotId)))
         .then(closeModal)
         .catch(async (res) => {
           history.push(`/error/${res.status}`);

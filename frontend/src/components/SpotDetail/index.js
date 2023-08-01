@@ -179,7 +179,7 @@ export function SpotDetail() {
             {
               !reviewsNum && user && user.id !== spot.Owner.id ?
                 <span>Be the first one to post a review!</span> :
-                reviews && <ReviewList reviews={reviews} />
+                reviews && <ReviewList reviews={reviews} spot={spot}/>
             }
           </div>
         </>

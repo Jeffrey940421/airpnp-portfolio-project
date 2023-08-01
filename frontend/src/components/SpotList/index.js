@@ -16,6 +16,7 @@ export function SpotList({ type }) {
   const [hasMore, setHasMore] = useState(true)
   const [isLoading, setIsLoading] = useState(false);
   const [hasFetched, setHasFetched] = useState(false);
+  const spotList = type === "current" ? Object.values(spots) : Object.values(spots).map(page => Object.values(page)).flat()
 
   const fetchSpots = async () => {
     if (type === "current") {
@@ -78,17 +79,17 @@ export function SpotList({ type }) {
           <button onClick={() => history.push("/spots/new")}>Create a New Place</button>
         </div> : null}
       {
-        Object.values(spots).length ?
+        spotList.length ?
           <div className="spotList">
             {
-              Object.values(spots).map((spot, i) => {
+              spotList.map((spot, i) => {
                 return (
                   <div key={spot.id}>
                     <div className="spot" onClick={() => history.push(`/spots/${spot.id}`)}>
                       <img className="previewImage" src={spot.previewImage} alt={spot.name} />
                       <div className="spotLocation">
                         <span className="address">{spot.city}, {spot.state}</span>
-                        <span className="starts"><i className="fa-solid fa-star" /> {spot.avgRating ? (Number.isInteger(spot.avgRating) ? spot.avgRating.toFixed(1) : spot.avgRating.toFixed(2)) : "New"}</span>
+                        <span className="stars"><i className="fa-solid fa-star" /> {spot.avgRating ? (Number.isInteger(spot.avgRating) ? spot.avgRating.toFixed(1) : spot.avgRating.toFixed(2)) : "New"}</span>
                       </div>
                       <span className="spotName">{spot.name}</span>
                       <div className="spotPrice"><span>${spot.price.toLocaleString("en-US")}</span> night</div>

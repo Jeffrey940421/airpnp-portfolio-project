@@ -3,16 +3,17 @@ import { Loader } from "../Loader/Loader";
 import { usePopup } from "../../context/Popup";
 import { useDispatch, useSelector } from "react-redux";
 import * as reviewActions from "../../store/reviews";
+import * as sessionActions from "../../store/session";
 import { useHistory } from "react-router-dom";
 import { useModal } from "../../context/Modal";
 
-export function CreateReview({ spot, type }) {
-  const [review, setReview] = useState("");
-  const [onchangeReview, setOnchangeReview] = useState("");
-  const [reviewEdited, setReviewEdited] = useState(false);
-  const [stars, setStars] = useState(0);
-  const [onchangeStars, setOnchangeStars] = useState(0);
-  const [starsEdited, setStarsEdited] = useState(false);
+export function CreateReview({ spot, formType, type, existingReview }) {
+  const [review, setReview] = useState(existingReview ? existingReview.review : "");
+  const [onchangeReview, setOnchangeReview] = useState(existingReview ? existingReview.review : "");
+  const [reviewEdited, setReviewEdited] = useState(existingReview ? true : false);
+  const [stars, setStars] = useState(existingReview ? existingReview.stars : 0);
+  const [onchangeStars, setOnchangeStars] = useState(existingReview ? existingReview.stars : 0);
+  const [starsEdited, setStarsEdited] = useState(existingReview ? true : false);
   const [validationErrors, setValidationErrors] = useState({});
   const [availabilityErrors, setAvailabilityErrors] = useState({});
   const [serverErrors, setServerErrors] = useState({});
@@ -20,17 +21,46 @@ export function CreateReview({ spot, type }) {
   const dispatch = useDispatch();
   const history = useHistory();
   const user = useSelector(state => state.session.user);
-  const { setModalContent} = useModal();
+  const { setModalContent } = useModal();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setServerErrors({});
 
-    const newReview = {review, stars}
+    const newReview = { review, stars }
 
     if (!Object.values(availabilityErrors).length && !Object.values(validationErrors).flat().length) {
-      if (type === "edit") {
-
+      if (formType === "edit") {
+        setPopupContent(<Loader text={"Review is being updated"} />);
+        if (type === "current") {
+          return dispatch(sessionActions.updateReview(existingReview.id, newReview))
+            .then(() => {
+              setPopupContent(null);
+              setModalContent(null);
+            })
+            .catch(async (res) => {
+              const data = await res.json();
+              if (data && data.errors) {
+                setServerErrors(data.errors);
+              } else {
+                history.replace(`/error/${res.status}`);
+              }
+            })
+        } else {
+          return dispatch(reviewActions.updateReview(spot.id, existingReview.id, newReview))
+            .then(() => {
+              setPopupContent(null);
+              setModalContent(null);
+            })
+            .catch(async (res) => {
+              const data = await res.json();
+              if (data && data.errors) {
+                setServerErrors(data.errors);
+              } else {
+                history.replace(`/error/${res.status}`);
+              }
+            })
+        }
       } else {
         setPopupContent(<Loader text={"Review is being submitted"} />);
         return dispatch(reviewActions.createReview(spot.id, newReview, user))
@@ -40,9 +70,11 @@ export function CreateReview({ spot, type }) {
           })
           .catch(async (res) => {
             const data = await res.json();
-              if (data && data.errors) {
-                setServerErrors(data.errors);
-              }
+            if (data && data.errors) {
+              setServerErrors(data.errors);
+            } else {
+              history.replace(`/error/${res.status}`);
+            }
           })
       }
     }
@@ -106,7 +138,7 @@ export function CreateReview({ spot, type }) {
                   setStarsEdited(true);
                 }}
                 onClick={() => setStars(i + 1)}
-                key = {i}
+                key={i}
               />
             )
           })}
@@ -120,13 +152,13 @@ export function CreateReview({ spot, type }) {
         ))}
       </div>
       <div className="submitButtons">
-          <button
-            type="submit"
-            disabled={Object.values(availabilityErrors).length || Object.values(validationErrors).flat().length || !reviewEdited || !starsEdited}
-          >
-            {type === "edit" ? "Update Review" : "Submit Review"}
-          </button>
-        </div>
+        <button
+          type="submit"
+          disabled={Object.values(availabilityErrors).length || Object.values(validationErrors).flat().length || !reviewEdited || !starsEdited}
+        >
+          {formType === "edit" ? "Update Review" : "Submit Review"}
+        </button>
+      </div>
     </form>
   )
 }
