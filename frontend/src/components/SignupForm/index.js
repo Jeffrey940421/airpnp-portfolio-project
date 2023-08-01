@@ -129,8 +129,7 @@ export function SignupForm() {
           />
         </div>
         <div className="errorMessage">
-          {serverErrors.email && <p className="serverError"><i className="fa-sharp fa-solid fa-circle-exclamation" />
-            {serverErrors.email}</p>}
+          {serverErrors.email && <p className="serverError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {serverErrors.email}</p>}
           {availabilityErrors.email && <p className="availabilityError"><i className="fa-sharp fa-solid fa-circle-exclamation" /> {availabilityErrors.email}</p>}
           {validationErrors.email && validationErrors.email.length > 0 && validationErrors.email.map(error => (
             <p className="validationError"><i className="fa-solid fa-circle-xmark" /> {error} </p>

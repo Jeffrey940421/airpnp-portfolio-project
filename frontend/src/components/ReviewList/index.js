@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import * as reviewActions from "../../store/reviews";
 import * as sessionActions from "../../store/session";
+import { ConfirmDelete } from "../ConfirmDelete";
 
 export function ReviewList({ reviews, type }) {
   const { setModalContent, setOnModalClose } = useModal();
@@ -75,11 +76,7 @@ export function ReviewList({ reviews, type }) {
                       className="deleteReview"
                       onClick={async (e) => {
                         e.preventDefault();
-                        if (type === "current") {
-                          return dispatch(sessionActions.deleteReview(review.id));
-                        } else {
-                          return dispatch(reviewActions.deleteReview(review.spotId, review.id));
-                        }
+                        setModalContent(<ConfirmDelete review={review} type={type} />)
                       }}
                     >
                       Delete

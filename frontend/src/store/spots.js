@@ -8,6 +8,7 @@ const GET_SINGLE_SPOT = "spots/GET_SINGLE_SPOT";
 const UPDATE_SINGLE_SPOT = "spots/UPDATE_SINGLE_SPOT";
 const DELETE_IMAGES = "spots/DELETE_IMAGES";
 const SET_PREVIEW = "spots/SET_PREVIEW";
+const REMOVE_SPOT = "spots/REMOVE_SPOT";
 
 const getSpots = (spots) => {
   return {
@@ -61,6 +62,13 @@ const setPreview = (imageId) => {
   return {
     type: SET_PREVIEW,
     imageId
+  }
+}
+
+export const removeSpot = (spotId) => {
+  return {
+    type: REMOVE_SPOT,
+    spotId
   }
 }
 
@@ -198,6 +206,10 @@ const spotsReducer = (state = initialState, action) => {
         }
       }
       return { ...state, singleSpot: { ...state.singleSpot, SpotImages: newSpotImages } }
+    case REMOVE_SPOT:
+      const newSpotList = { ...state.spotList };
+      delete newSpotList[action.spotId];
+      return { ...state, spotList: newSpotList };
     default:
       return state;
   }

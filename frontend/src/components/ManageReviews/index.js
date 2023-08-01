@@ -33,13 +33,13 @@ export function ManageReviews() {
     .then(() => setHasFetched(true))
       .catch(async (res) => {
         if (res.status === 401) {
-          return history.replace("/unauthorized")
+          return history.replace("/error/401")
         }
       })
   }, [])
 
   if (!user) {
-    return history.replace("/unauthorized");
+    return history.replace("/error/401");
   } else if (!hasFetched) {
     return null;
   }

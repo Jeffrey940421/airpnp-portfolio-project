@@ -16,7 +16,7 @@ export function CreateSpotContainer({ type }) {
       dispatch(spotActions.loadSingleSpot(spotId))
         .catch(async (res) => {
           if (res.status === 404) {
-            return history.replace("/not-found");
+            return history.replace("/error/404");
           }
         });
     }

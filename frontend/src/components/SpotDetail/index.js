@@ -40,6 +40,9 @@ export function SpotDetail() {
     12: "December"
   };
 
+  const reviewsNum = reviews ? Object.values(reviews).length : null;
+  const reviewsAvg = reviewsNum ? Object.values(reviews).reduce((acc, review) => acc + review.stars, 0) / reviewsNum : null;
+
   const showAllImages = (e) => {
     e.preventDefault();
     setModalContent(
@@ -60,7 +63,7 @@ export function SpotDetail() {
       .then(() => dispatch(reviewActions.loadReviews(spotId)))
       .catch(async (res) => {
         if (res.status === 404) {
-          return history.replace("/not-found")
+          return history.replace("/error/404")
         }
       })
   }, [spotId]);
@@ -107,10 +110,10 @@ export function SpotDetail() {
                     ${spot.price.toLocaleString("en-US")} <span className="night">night</span>
                   </span>
                   <span>
-                    <i className="fa-solid fa-star" /> {spot.avgRating ? (Number.isInteger(spot.avgRating) ? spot.avgRating.toFixed(1) : spot.avgRating.toFixed(2)) : "New"} {spot.numReviews ? spot.numReviews === 1 ? `· ${spot.numReviews} review` : `· ${spot.numReviews} reviews` : null}
+                    <i className="fa-solid fa-star" /> {reviewsAvg ? (Number.isInteger(reviewsAvg) ? reviewsAvg.toFixed(1) : reviewsAvg.toFixed(2)) : "New"} {reviewsNum ? reviewsNum === 1 ? `· ${reviewsNum} review` : `· ${reviewsNum} reviews` : null}
                   </span>
                 </div>
-                <button>Reserve</button>
+                <button onClick={() => alert("Feature is coming soon")}>Reserve</button>
               </div>
             </div>
           </div>
@@ -153,7 +156,6 @@ export function SpotDetail() {
                           <span>Exact location provided after booking</span>
                           <div className="arrow-down"></div>
                         </div>
-
                       </div>
                     </div>
                   </>
@@ -162,7 +164,7 @@ export function SpotDetail() {
           </div>
           <div className="spotReviews">
             <h4>
-              <i className="fa-solid fa-star" /> {spot.avgRating ? (Number.isInteger(spot.avgRating) ? spot.avgRating.toFixed(1) : spot.avgRating.toFixed(2)) : "New"} {spot.numReviews ? spot.numReviews === 1 ? `· ${spot.numReviews} review` : `· ${spot.numReviews} reviews` : null}
+              <i className="fa-solid fa-star" /> {reviewsAvg ? (Number.isInteger(reviewsAvg) ? reviewsAvg.toFixed(1) : reviewsAvg.toFixed(2)) : "New"} {reviewsNum ? reviewsNum === 1 ? `· ${reviewsNum} review` : `· ${reviewsNum} reviews` : null}
             </h4>
             {
               user && user.id !== spot.Owner.id && reviews && !Object.values(reviews).find(review => review.userId === user.id) ?
@@ -175,7 +177,7 @@ export function SpotDetail() {
                 null
             }
             {
-              !spot.numReviews && user && user.id !== spot.Owner.id ?
+              !reviewsNum && user && user.id !== spot.Owner.id ?
                 <span>Be the first one to post a review!</span> :
                 reviews && <ReviewList reviews={reviews} />
             }

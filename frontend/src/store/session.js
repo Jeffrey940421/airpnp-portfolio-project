@@ -130,7 +130,7 @@ const sessionReducer = (state = initialState, action) => {
     case GET_CURRENT_SPOTS:
       const spots = {};
       action.spots.forEach(spot => spots[spot.id] = spot);
-      return { ...state, spots: { ...state.spots, ...spots } }
+      return { ...state, spots: spots }
     case DELETE_CURRENT_SPOTS:
       const existingSpots = { ...state.spots };
       delete existingSpots[action.spotId];

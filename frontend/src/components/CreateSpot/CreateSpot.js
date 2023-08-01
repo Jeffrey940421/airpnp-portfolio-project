@@ -312,14 +312,14 @@ export function CreateSpot({ type, spot, spotId }) {
   }, [imagesToKeep, images]);
 
   if (!user) {
-    return history.replace("/unauthorized");
+    return history.replace("/error/401");
   } else if (spot && spot.ownerId !== user.id) {
-    return history.replace("/forbidden");
+    return history.replace("/error/403");
   }
 
   return (
     <div className="createSpotForm">
-      <h1>{type === "edit" ? "Update Your Place" : "Create a New Place"}</h1>
+      <h1>{type === "edit" ? "Update Your Place" : "Create New Place"}</h1>
       <form className="createSpotForm" onSubmit={handleSubmit}>
         <div className="locationSection">
           <h2>Where's your place located</h2>

@@ -62,7 +62,7 @@ export function ProfileButton({ user }) {
           <div>{user.email}</div>
         </li>
         <li className="clickableList">Manage Account</li>
-        <li className="clickableList" onClick={manageSpots}>Manage Spots</li>
+        <li className="clickableList" onClick={manageSpots}>Manage Places</li>
         <li className="clickableList" onClick={manageReviews}>Manage Reviews</li>
         <li className="clickableList" onClick={handleLogout}>Log Out</li>
       </>

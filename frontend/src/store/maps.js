@@ -39,10 +39,7 @@ const isPlusCode = (address) => {
 }
 
 export const getGeocode = (address, city, state, country, key) => async (dispatch) => {
-  if (isPlusCode(address)) {
-    address = address.split("+").join("%2B")
-  }
-  const query = `${address.split(" ").join("+")},+${city.split(" ").join("+")},+${state.split(" ").join("+")},+${country.split(" ").join("+")}`
+  const query = encodeURIComponent(`${address}, ${city}, ${state}, ${country}`)
   const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${query}&key=${key}`);
   const data = await res.json();
   const geocode = data.results[0];

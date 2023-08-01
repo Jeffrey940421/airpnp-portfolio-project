@@ -74,7 +74,7 @@ export function SpotList({ type }) {
     <>
       {type === "current" ?
         <div className="manageSpotsTitle">
-          <h1>Manage Spots</h1>
+          <h1>Manage Places</h1>
           <button onClick={() => history.push("/spots/new")}>Create a New Place</button>
         </div> : null}
       {
