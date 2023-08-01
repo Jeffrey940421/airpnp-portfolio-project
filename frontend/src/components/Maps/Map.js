@@ -47,10 +47,6 @@ const Maps = ({ apiKey, address, city, state, country, exactLocation, options = 
     }
   }, [address, city, state, country]);
 
-  if (typeof lat !== "number") {
-    console.log(lat)
-  }
-
   return (
     <>
       {exactLocation ? null : (
