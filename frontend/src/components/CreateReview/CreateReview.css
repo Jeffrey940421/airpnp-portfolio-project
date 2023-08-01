@@ -1,0 +1,45 @@
+.reviewModal {
+  height: auto;
+  width: 700px;
+  font-family: 'Manrope', sans-serif;
+  padding: 20px 20px 50px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.reviewModal .reviewModalTitle1 {
+  margin-top: 20px;
+  margin-bottom: 0px;
+  font-size: 25px;
+  white-space: pre-wrap;
+  text-align: center;
+}
+
+.reviewModal .reviewModalTitle2 {
+  margin-top: 0px;
+  margin-bottom: 5px;
+  font-size: 20px;
+  white-space: pre-wrap;
+  text-align: center;
+}
+
+.rating {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.rating span {
+  font-size: 12px;
+}
+
+.rating .stars {
+  font-size: 17px;
+}
+
+.errorRating span {
+  color: red
+}

@@ -47,6 +47,12 @@ export function ProfileButton({ user }) {
     setShowMenu(false);
   }
 
+  const manageReviews = (e) => {
+    e.preventDefault();
+    history.push("/reviews/current");
+    setShowMenu(false);
+  }
+
   let content;
   if (user) {
     content = (
@@ -57,7 +63,7 @@ export function ProfileButton({ user }) {
         </li>
         <li className="clickableList">Manage Account</li>
         <li className="clickableList" onClick={manageSpots}>Manage Spots</li>
-        <li className="clickableList">Manage Reviews</li>
+        <li className="clickableList" onClick={manageReviews}>Manage Reviews</li>
         <li className="clickableList" onClick={handleLogout}>Log Out</li>
       </>
     )

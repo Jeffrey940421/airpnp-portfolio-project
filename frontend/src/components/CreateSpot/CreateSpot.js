@@ -294,7 +294,7 @@ export function CreateSpot({ type, spot, spotId }) {
 
     if (name && name.length > 50) errors.name.push("Place title must be at most 50 characters long");
 
-    if (price && price === "0") errors.price.push("Price must be greater than 0");
+    if (price && price <= 0) errors.price.push("Price must be greater than 0");
 
     if (images && Array.from(images).find(image => !image.type.startsWith("image"))) errors.images.push("Only image files are accepted")
 
@@ -310,6 +310,12 @@ export function CreateSpot({ type, spot, spotId }) {
       setPreview(end);
     }
   }, [imagesToKeep, images]);
+
+  if (!user) {
+    return history.replace("/unauthorized");
+  } else if (spot && spot.ownerId !== user.id) {
+    return history.replace("/forbidden");
+  }
 
   return (
     <div className="createSpotForm">

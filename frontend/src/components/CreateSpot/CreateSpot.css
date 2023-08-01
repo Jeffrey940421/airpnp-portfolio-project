@@ -79,7 +79,8 @@ p.warningMessage {
   padding-top: 10px;
 }
 
-p.availabilityError {
+p.availabilityError,
+p.validationError {
   margin: 0px;
   padding-top: 5px;
 }

@@ -89,3 +89,7 @@
   border-radius: 40px;
   width: 200px;
 }
+
+.manageSpotsTitle + .textBox {
+  margin-top: 50px;
+}

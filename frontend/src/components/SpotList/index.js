@@ -6,6 +6,7 @@ import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import "./SpotList.css";
 import { OpenModalButton } from "../OpenModalButton";
 import { ConfirmDelete } from "../ConfirmDelete";
+import { NoContent } from "../NoContent";
 
 export function SpotList({ type }) {
   const dispatch = useDispatch();
@@ -76,30 +77,36 @@ export function SpotList({ type }) {
           <h1>Manage Spots</h1>
           <button onClick={() => history.push("/spots/new")}>Create a New Place</button>
         </div> : null}
-      <div className="spotList">
-        {Object.values(spots).map((spot, i) => {
-          return (
-            <div key={spot.id}>
-              <div className="spot" onClick={() => history.push(`/spots/${spot.id}`)}>
-                <img className="previewImage" src={spot.previewImage} alt={spot.name} />
-                <div className="spotLocation">
-                  <span className="address">{spot.city}, {spot.state}</span>
-                  <span className="starts"><i className="fa-solid fa-star" /> {spot.avgRating ? (Number.isInteger(spot.avgRating) ? spot.avgRating.toFixed(1) : spot.avgRating.toFixed(2)) : "New"}</span>
-                </div>
-                <span className="spotName">{spot.name}</span>
-                <div className="spotPrice"><span>${spot.price.toLocaleString("en-US")}</span> night</div>
-              </div>
-              {
-                type === "current" ?
-                  <div className="spotManagement">
-                    <button onClick={() => history.push(`/spots/${spot.id}/edit`)}>Update</button>
-                    <OpenModalButton buttonText="Delete" modalComponent={<ConfirmDelete spot={spot} />} />
-                  </div> : null
-              }
-            </div>
-          )
-        })}
-      </div>
+      {
+        Object.values(spots).length ?
+          <div className="spotList">
+            {
+              Object.values(spots).map((spot, i) => {
+                return (
+                  <div key={spot.id}>
+                    <div className="spot" onClick={() => history.push(`/spots/${spot.id}`)}>
+                      <img className="previewImage" src={spot.previewImage} alt={spot.name} />
+                      <div className="spotLocation">
+                        <span className="address">{spot.city}, {spot.state}</span>
+                        <span className="starts"><i className="fa-solid fa-star" /> {spot.avgRating ? (Number.isInteger(spot.avgRating) ? spot.avgRating.toFixed(1) : spot.avgRating.toFixed(2)) : "New"}</span>
+                      </div>
+                      <span className="spotName">{spot.name}</span>
+                      <div className="spotPrice"><span>${spot.price.toLocaleString("en-US")}</span> night</div>
+                    </div>
+                    {
+                      type === "current" ?
+                        <div className="spotManagement">
+                          <button onClick={() => history.push(`/spots/${spot.id}/edit`)}>Update</button>
+                          <OpenModalButton buttonText="Delete" modalComponent={<ConfirmDelete spot={spot} />} />
+                        </div> : null
+                    }
+                  </div>
+                )
+              })
+            }
+          </div> :
+          type === "current" ? <NoContent text="You haven't created any place yet" /> : null
+      }
     </>
   )
 }

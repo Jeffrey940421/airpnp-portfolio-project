@@ -1,0 +1,19 @@
+.textBox {
+  background-color: #F7F7F7;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 20px;
+  box-sizing: border-box;
+  padding: 50px 0px;
+}
+
+.noResult {
+  height: 30px;
+}
+
+.textBox p {
+  margin: 0px;
+}

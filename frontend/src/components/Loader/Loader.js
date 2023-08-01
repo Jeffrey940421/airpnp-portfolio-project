@@ -17,7 +17,7 @@ export function Loader({ text }) {
         <div></div>
         <div></div>
       </div>
-      <p className="loaderText" style={{"white-space": "pre-line"}}>{text}</p>
+      <p className="loaderText" style={{"whiteSpace": "pre-line"}}>{text}</p>
     </>
   )
 }

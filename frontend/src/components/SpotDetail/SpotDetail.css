@@ -226,9 +226,10 @@ img.smallImages:hover {
   flex-direction: column;
 }
 
-.reviewer {
+.reviewTitle {
   font-size: 16px;
   font-weight: bold;
+  padding-bottom: 5px;
 }
 
 .reviewDate {
@@ -349,4 +350,27 @@ div.spotMap {
 .spotMap {
   border-bottom: 1px solid lightgrey;
   padding: 40px 0px;
+}
+
+div.reviewButtons {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.reviewButtons button {
+  font-family: 'Manrope', sans-serif;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+  background-color: #FF5A5F;
+  color: white;
+  padding: 5px 20px;
+  border-radius: 10px;
+  width: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

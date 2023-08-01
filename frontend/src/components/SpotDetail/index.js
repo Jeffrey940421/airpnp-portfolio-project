@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom/cjs/react-router-dom.min";
+import { useHistory, useParams } from "react-router-dom";
 import * as spotActions from "../../store/spots";
 import * as reviewActions from "../../store/reviews";
 import "./SpotDetail.css"
@@ -8,6 +8,8 @@ import { OpenModalButton } from "../OpenModalButton";
 import { SpotIntroduction } from "../SpotIntroduction";
 import { useModal } from "../../context/Modal";
 import MapContainer from "../Maps";
+import { ReviewList } from "../ReviewList";
+import { CreateReviewContainer } from "../CreateReview";
 
 export function SpotDetail() {
   const { spotId } = useParams();
@@ -19,6 +21,7 @@ export function SpotDetail() {
   const [circleRadius, setCircleRadius] = useState(150);
   const [showNote, setShowNote] = useState(false);
   const { setModalContent, setOnModalClose } = useModal();
+  const history = useHistory();
 
   const changeRadius = (currentZoom) => setCircleRadius(150 * (1.8 ** (currentZoom - 16)))
 
@@ -53,8 +56,13 @@ export function SpotDetail() {
   }
 
   useEffect(() => {
-    dispatch(spotActions.loadSingleSpot(spotId));
-    dispatch(reviewActions.loadReviews(spotId));
+    dispatch(spotActions.loadSingleSpot(spotId))
+      .then(() => dispatch(reviewActions.loadReviews(spotId)))
+      .catch(async (res) => {
+        if (res.status === 404) {
+          return history.replace("/not-found")
+        }
+      })
   }, [spotId]);
 
   useEffect(() => {
@@ -66,18 +74,6 @@ export function SpotDetail() {
       }
     }
   }, [spot]);
-
-  useEffect(() => {
-    const reviewImages = document.querySelectorAll(".reviewImage, img.bigImage, img.smallImages, #modal .allImages img, #modal .bigReviewImage");
-    if (reviewImages.length) {
-      reviewImages.forEach(image => {
-        image.addEventListener("error", (e) => {
-          e.target.src = "https://jeffrey-zhang-resource.s3.us-west-1.amazonaws.com/public/imageNotFound-svg.png"
-          e.onerror = null
-        })
-      })
-    }
-  });
 
   return (
     <>
@@ -102,7 +98,7 @@ export function SpotDetail() {
             <div className="details">
               <div className="introduction">
                 <h2 className="spotHost">Hosted by {spot.Owner.firstName} {spot.Owner.lastName}</h2>
-                <p className={hasMore ? "hiddenText" : ""} style={{"white-space": "pre-line"}}>{spot.description}</p>
+                <p className={hasMore ? "hiddenText" : ""} style={{ "whiteSpace": "pre-line" }}>{spot.description}</p>
                 {hasMore ? <OpenModalButton buttonText="Show More >" modalComponent={<SpotIntroduction text={spot.description} />} /> : null}
               </div>
               <div className="reserve">
@@ -168,38 +164,20 @@ export function SpotDetail() {
             <h4>
               <i className="fa-solid fa-star" /> {spot.avgRating ? (Number.isInteger(spot.avgRating) ? spot.avgRating.toFixed(1) : spot.avgRating.toFixed(2)) : "New"} {spot.numReviews ? spot.numReviews === 1 ? `· ${spot.numReviews} review` : `· ${spot.numReviews} reviews` : null}
             </h4>
-            {user && user.id !== spot.Owner.id && reviews && !Object.values(reviews).find(review => review.userId === user.id) ? <button className="createReview">Post a Review</button> : null}
+            {
+              user && user.id !== spot.Owner.id && reviews && !Object.values(reviews).find(review => review.userId === user.id) ?
+                <button
+                  className="createReview"
+                  onClick={() => setModalContent(<CreateReviewContainer spot={spot}/>)}
+                >
+                  Post a Review
+                </button> :
+                null
+            }
             {
               !spot.numReviews && user && user.id !== spot.Owner.id ?
                 <span>Be the first one to post a review!</span> :
-                reviews && <div className="reviewDetails">
-                  {Object.values(reviews).slice(0).reverse().map(review => {
-                    const date = review.createdAt;
-                    const year = date.split("-")[0];
-                    const month = date.split("-")[1]
-                    return (
-                      <div key={review.id}>
-                        <span className="reviewer">{review.User.firstName}</span>
-                        <span className="reviewDate">{months[+month]} {year}</span>
-                        <p className="review">{review.review}</p>
-                        {
-                          review.ReviewImages.length ?
-                            <div className="reviewImages">
-                              {review.ReviewImages.map(image => {
-                                return (
-                                  <img src={image.url} key={image.id} className="reviewImage" onClick={(e) => {
-                                    e.preventDefault();
-                                    setModalContent(<img className="bigReviewImage" src={image.url} />)
-                                  }} />
-                                )
-                              })}
-                            </div> :
-                            null
-                        }
-                      </div>
-                    )
-                  })}
-                </div>
+                reviews && <ReviewList reviews={reviews} />
             }
           </div>
         </>
