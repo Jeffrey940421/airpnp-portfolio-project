@@ -25,7 +25,7 @@ const Maps = ({ apiKey, address, city, state, country, exactLocation, options = 
   });
 
   useEffect(() => {
-    setPosition({ lat, lng })
+    setPosition({ lat: +lat, lng: +lng })
   }, [lat, lng]);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const Maps = ({ apiKey, address, city, state, country, exactLocation, options = 
             const coord = geocode.geometry.location;
             const newLat = +coord.lat.toFixed(7);
             const newLng = +coord.lng.toFixed(7);
-            if (newLat !== setLat && newLng !== setLng && spot && (spot.country !== country || spot.state !== state || spot.city !== city || spot.address !== address)) {
+            if (newLat !== +setLat && newLng !== +setLng && spot && (spot.country !== country || spot.state !== state || spot.city !== city || spot.address !== address)) {
               setPosition({ lat: newLat, lng: newLng });
             }
             dispatch(updateGeocode(newLat, newLng, apiKey));
