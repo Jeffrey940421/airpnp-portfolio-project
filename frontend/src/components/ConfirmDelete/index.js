@@ -12,7 +12,6 @@ export function ConfirmDelete({ spot, review, type }) {
   const history = useHistory();
 
   const handleDelete = ({ spotId, review, type }) => {
-    console.log(review, type)
     if (spotId) {
       return dispatch(sessionActions.removeSpot(spotId))
         .then(() => dispatch(spotActions.removeSpot(spotId)))
