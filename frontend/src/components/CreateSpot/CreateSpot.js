@@ -68,6 +68,10 @@ export function CreateSpot({ type, spot, spotId }) {
   const suggestedAddress = suggestedStreetAddress || suggestedPlusCodeAddress;
 
   const selectMenuStyle = {
+    placeholder: (base, state) => ({
+      ...base,
+      paddingTop: "10px",
+    }),
     control: (base, state) => ({
       ...base,
       minHeight: "60px !important",
@@ -86,7 +90,6 @@ export function CreateSpot({ type, spot, spotId }) {
       ...base,
       minHeight: "60px !important",
       maxHeight: "60px",
-
       position: "relative",
       backgroundColor: "transparent"
     }),
@@ -345,7 +348,7 @@ export function CreateSpot({ type, spot, spotId }) {
                 )
               }}
               className="selectOptions"
-              value={{ value: country, label: country }}
+              value={country ? { value: country, label: country } : null}
               isSearchable={true}
               isClearable={false}
               name="country"
@@ -354,6 +357,7 @@ export function CreateSpot({ type, spot, spotId }) {
               })}
               styles={selectMenuStyle}
               autoComplete="one-time-code"
+              placeholder="Country"
             />
           </div>
           <div className="errorMessage">
@@ -367,7 +371,7 @@ export function CreateSpot({ type, spot, spotId }) {
                 setState(selectedVal.value);
                 setCity("");
               }}
-              value={{ value: state, label: state }}
+              value={state ? { value: state, label: state } : null}
               className="selectOptions"
               isSearchable={true}
               isClearable={false}
@@ -382,6 +386,7 @@ export function CreateSpot({ type, spot, spotId }) {
                   state.isFocused ? "focusedSelect" : "unfocusedSelect"
                 )
               }}
+              placeholder="State"
               autoComplete="one-time-code"
             />
           </div>
@@ -395,7 +400,7 @@ export function CreateSpot({ type, spot, spotId }) {
               onChange={(selectedVal) => {
                 setCity(selectedVal.value);
               }}
-              value={{ value: city, label: city }}
+              value={city ? { value: city, label: city } : city}
               className="selectOptions"
               isSearchable={true}
               isClearable={false}
@@ -410,6 +415,7 @@ export function CreateSpot({ type, spot, spotId }) {
                   state.isFocused ? "focusedSelect" : "unfocusedSelect"
                 )
               }}
+              placeholder="City"
               autoComplete="one-time-code"
             />
           </div>
@@ -431,6 +437,7 @@ export function CreateSpot({ type, spot, spotId }) {
                 setAddress(e.target.value);
               }}
               autoComplete="one-time-code"
+              placeholder="Street Address"
             />
           </div>
           <div className="errorMessage">
@@ -450,6 +457,7 @@ export function CreateSpot({ type, spot, spotId }) {
                 setAddress2(e.target.value);
               }}
               autoComplete="one-time-code"
+              placeholder="Apt, Suite, or Unit"
             />
           </div>
           <div className="errorMessage">
@@ -492,6 +500,7 @@ export function CreateSpot({ type, spot, spotId }) {
                 setDescription(e.target.value);
               }}
               autoComplete="one-time-code"
+              placeholder="Please provide a description with at least 30 characters"
             />
           </div>
           <div className="errorMessage">
@@ -519,6 +528,7 @@ export function CreateSpot({ type, spot, spotId }) {
                 setName(e.target.value);
               }}
               autoComplete="one-time-code"
+              placeholder="Place Title"
             />
           </div>
           <div className="errorMessage">
@@ -537,17 +547,18 @@ export function CreateSpot({ type, spot, spotId }) {
             <input
               name="price"
               type="text"
-              value={`$ ${onchangePrice}`}
+              value={onchangePrice ? `$ ${onchangePrice}` : null}
               onChange={(e) => {
-                setOnchangePrice(e.target.value.slice(2));
+                setOnchangePrice(e.target.value.startsWith("$") ? e.target.value.slice(2) : e.target.value);
               }}
               onBlur={(e) => {
                 setPriceEdited(true);
-                setOnchangePrice(e.target.value.slice(2));
-                setPrice(e.target.value.slice(2));
+                setOnchangePrice(e.target.value.startsWith("$") ? e.target.value.slice(2) : e.target.value);
+                setPrice(e.target.value.startsWith("$") ? e.target.value.slice(2) : e.target.value);
               }}
               onKeyPress={preventSymbols}
               autoComplete="one-time-code"
+              placeholder="Price per Night (USD)"
             />
           </div>
           <div className="errorMessage">
