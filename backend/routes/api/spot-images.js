@@ -8,7 +8,7 @@ const sequelize = require("sequelize");
 
 const validateSpotImageInfo = [
   check('preview')
-    .exists({checkNull: true})
+    .exists({ checkNull: true })
     .custom((value) => {
       if (value === true || value === false) {
         return true;
@@ -42,18 +42,20 @@ router.delete("/:imageId", requireAuth, spotImageExist, spotImageAuthorization, 
 // edit a spot image
 router.put("/:imageId", requireAuth, spotImageExist, spotImageAuthorization, validateSpotImageInfo, async (req, res, next) => {
   const spotImage = req.spotImage;
-  const {preview} = req.body
+  const { preview } = req.body
   const spotImages = spotImage.Spot.SpotImages
+  const { imageId } = req.params;
   if (preview) {
-    for (let i = 0; i < spotImages.length; i += 1) {
-      if (spotImages[i].preview === true) {
-        spotImages[i].preview = false;
-        await spotImages[i].save();
-        break;
-      }
-    }
+    await Promise.all(
+      spotImages.map(async (image) => {
+        if (image.id !== +imageId) {
+          image.preview = false;
+          await image.save();
+        }
+      })
+    )
   }
-  let updatedSpotImage = await spotImage.update({preview});
+  let updatedSpotImage = await spotImage.update({ preview: preview });
   updatedSpotImage = updatedSpotImage.toJSON();
   delete updatedSpotImage.Spot;
   res.json(updatedSpotImage);

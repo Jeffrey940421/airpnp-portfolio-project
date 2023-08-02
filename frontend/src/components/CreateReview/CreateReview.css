@@ -1,15 +1,15 @@
 .reviewModal {
-  height: auto;
+  max-height: 700px;
   width: 700px;
   font-family: 'Manrope', sans-serif;
-  padding: 20px 20px 50px 20px;
+  padding: 50px 20px 50px 20px;
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
 
 .reviewModal .reviewModalTitle1 {
-  margin-top: 20px;
+  margin-top: 0px;
   margin-bottom: 0px;
   font-size: 25px;
   white-space: pre-wrap;
@@ -29,7 +29,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  margin-top: 15px;
+  margin-top: 10px;
 }
 
 .rating span {
@@ -42,4 +42,45 @@
 
 .errorRating span {
   color: red
+}
+
+.dropBox > span {
+  font-size: 12px;
+  padding-top: 10px;
+}
+
+.reviewModal .dropBox {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.reviewModal .dropBox label {
+  font-size: 12px;
+  gap: 10px
+}
+
+.reviewModal .dropBox label button {
+  font-size: 12px;
+  padding: 7px 14px;
+}
+
+.reviewModal .dropBox.error span {
+  color: red;
+}
+
+.reviewModal .previewSection {
+  padding-top: 5px;
+  gap: 20px 20px
+}
+
+.reviewModal .previewTitle {
+  font-size: 12px;
+  padding-top: 5px;
+}
+
+.reviewModal > div {
+  overflow-y: auto;
+  padding: 0px 20px;
 }

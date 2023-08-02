@@ -62,9 +62,7 @@ export function SpotDetail() {
     dispatch(spotActions.loadSingleSpot(spotId))
       .then(() => dispatch(reviewActions.loadReviews(spotId)))
       .catch(async (res) => {
-        if (res.status === 404) {
-          return history.replace("/error/404")
-        }
+        return history.replace(`/error/${res.status}`)
       })
   }, [spotId]);
 
@@ -170,7 +168,7 @@ export function SpotDetail() {
               user && user.id !== spot.Owner.id && reviews && !Object.values(reviews).find(review => review.userId === user.id) ?
                 <button
                   className="createReview"
-                  onClick={() => setModalContent(<CreateReviewContainer spot={spot}/>)}
+                  onClick={() => setModalContent(<CreateReviewContainer spot={spot} />)}
                 >
                   Post a Review
                 </button> :
@@ -179,7 +177,7 @@ export function SpotDetail() {
             {
               !reviewsNum && user && user.id !== spot.Owner.id ?
                 <span>Be the first one to post a review!</span> :
-                reviews && <ReviewList reviews={reviews} spot={spot}/>
+                reviews && <ReviewList reviews={reviews} spot={spot} />
             }
           </div>
         </>

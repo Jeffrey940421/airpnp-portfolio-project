@@ -3,6 +3,7 @@ import * as sessionActions from "../../store/session";
 import { useDispatch, useSelector } from "react-redux";
 import { useModal } from "../../context/Modal";
 import "./SignupForm.css";
+import { useHistory } from "react-router-dom";
 
 export function SignupForm() {
   const [email, setEmail] = useState("");
@@ -29,6 +30,7 @@ export function SignupForm() {
   const [availabilityErrors, setAvailabilityErrors] = useState({});
   const [serverErrors, setServerErrors] = useState({});
   const dispatch = useDispatch();
+  const history = useHistory();
   const { closeModal } = useModal();
 
   const capitalize = (str) => {
@@ -76,7 +78,6 @@ export function SignupForm() {
     e.preventDefault();
     setServerErrors({});
 
-
     if (!Object.values(availabilityErrors).length && !Object.values(validationErrors).flat().length) {
       return dispatch(sessionActions.signup({
         email,
@@ -91,12 +92,14 @@ export function SignupForm() {
             const data = await res.json();
             if (data && data.errors) {
               setServerErrors(data.errors);
+            } else {
+              closeModal();
+              history.replace(`/error/${res.status}`);
             }
           }
         );
     }
   }
-
 
   const handleHidePassword = (e) => {
     e.preventDefault();

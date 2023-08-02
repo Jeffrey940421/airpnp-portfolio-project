@@ -3,6 +3,7 @@ import * as sessionActions from "../../store/session";
 import { useDispatch, useSelector } from "react-redux";
 import "./LoginForm.css";
 import { useModal } from "../../context/Modal";
+import { useHistory } from "react-router-dom";
 
 export function LoginForm() {
   const [credential, setCredential] = useState("");
@@ -16,6 +17,7 @@ export function LoginForm() {
   const [availabilityErrors, setAvailabilityErrors] = useState({});
   const [serverErrors, setServerErrors] = useState({});
   const dispatch = useDispatch();
+  const history = useHistory();
   const { closeModal } = useModal();
 
   useEffect(() => {
@@ -48,6 +50,9 @@ export function LoginForm() {
             const data = await res.json();
             if (data && data.errors) {
               setServerErrors(data.errors);
+            } else {
+              closeModal();
+              history.replace(`/error/${res.status}`);
             }
           }
         );

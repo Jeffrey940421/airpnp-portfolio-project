@@ -7,6 +7,7 @@ import "./SpotList.css";
 import { OpenModalButton } from "../OpenModalButton";
 import { ConfirmDelete } from "../ConfirmDelete";
 import { NoContent } from "../NoContent";
+import { Loader } from "../Loader/Loader";
 
 export function SpotList({ type }) {
   const dispatch = useDispatch();
@@ -56,9 +57,9 @@ export function SpotList({ type }) {
 
 
   useEffect(() => {
-    const reviewImages = document.querySelectorAll(".spot .previewImage");
-    if (reviewImages.length) {
-      reviewImages.forEach(image => {
+    const images = document.querySelectorAll("img");
+    if (images.length) {
+      images.forEach(image => {
         image.addEventListener("error", (e) => {
           e.target.src = "https://jeffrey-zhang-resource.s3.us-west-1.amazonaws.com/public/imageNotFound-svg.png"
           e.onerror = null
@@ -86,7 +87,7 @@ export function SpotList({ type }) {
                 return (
                   <div key={spot.id}>
                     <div className="spot" onClick={() => history.push(`/spots/${spot.id}`)}>
-                      <img className="previewImage" src={spot.previewImage} alt={spot.name} />
+                      <img className="previewImage" src={spot.previewImage || "https://jeffrey-zhang-resource.s3.us-west-1.amazonaws.com/public/imageNotFound-svg.png"} alt={spot.name} />
                       <div className="spotLocation">
                         <span className="address">{spot.city}, {spot.state}</span>
                         <span className="stars"><i className="fa-solid fa-star" /> {spot.avgRating ? (Number.isInteger(spot.avgRating) ? spot.avgRating.toFixed(1) : spot.avgRating.toFixed(2)) : "New"}</span>
@@ -107,6 +108,18 @@ export function SpotList({ type }) {
             }
           </div> :
           type === "current" ? <NoContent text="You haven't created any place yet" /> : null
+      }
+      {
+        isLoading ?
+          <div className="spotLoading">
+            <span>Loading</span>
+            <div className="eclipse">
+              <span>·</span>
+              <span>·</span>
+              <span>·</span>
+            </div>
+          </div> :
+          null
       }
     </>
   )

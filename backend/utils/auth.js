@@ -213,11 +213,14 @@ const reviewAuthorization = async function (req, res, next) {
 
 const reviewLimit = async function (req, res, next) {
   const review = req.review;
+  const error = {};
+  error.title = "Forbidden";
+  error.status = 403;
   if (review.ReviewImages.length >= 10) {
-    const error = {};
-    error.title = "Forbidden";
-    error.status = 403;
-    error.message = "Maximum number of images for this resource was reached";
+    error.message = "Maximum number of images for this review was reached";
+    return next(error);
+  } else if (review.ReviewImages.length + req.files.length > 10) {
+    error.message = "Maximum of 10 images are allowed for each review";
     return next(error);
   }
   return next();

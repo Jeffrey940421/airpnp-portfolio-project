@@ -16,6 +16,7 @@ export function ConfirmDelete({ spot, review, type }) {
       return dispatch(sessionActions.removeSpot(spotId))
         .then(closeModal)
         .catch(async (res) => {
+          closeModal();
           history.push(`/error/${res.status}`);
         })
     } else if (review) {
@@ -23,12 +24,14 @@ export function ConfirmDelete({ spot, review, type }) {
         return dispatch(sessionActions.deleteReview(review.id))
           .then(closeModal)
           .catch(async (res) => {
+            closeModal();
             history.push(`/error/${res.status}`);
           });
       } else {
         return dispatch(reviewActions.deleteReview(review.spotId, review.id))
           .then(closeModal)
           .catch(async (res) => {
+            closeModal();
             history.push(`/error/${res.status}`);
           });
       }

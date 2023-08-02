@@ -32,9 +32,7 @@ export function ManageReviews() {
     dispatch(sessionActions.listReviews())
     .then(() => setHasFetched(true))
       .catch(async (res) => {
-        if (res.status === 401) {
-          return history.replace("/error/401")
-        }
+        return history.replace(`/error/${res.status}`);
       })
   }, [])
 

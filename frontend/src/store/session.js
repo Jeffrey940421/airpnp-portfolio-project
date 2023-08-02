@@ -7,6 +7,8 @@ const DELETE_CURRENT_SPOTS = "session/DELETE_CURRENT_SPOTS";
 const GET_CURRENT_REVIEWS = "session/GET_CURRENT_REVIEWS";
 const REMOVE_CURRENT_REVIEW = "session/REMOVE_CURRENT_REVIEW";
 const EDIT_CURRENT_REVIEW = "session/EDIT_CURRENT_REVIEW";
+const ADD_REVIEW_IMAGES = "session/ADD_REVIEW_IMAGES";
+const DELETE_REVIEW_IMAGES = "session/DELETE_REVIEW_IMAGES";
 
 const setUser = (user) => {
   return {
@@ -53,6 +55,22 @@ const editReview = (review) => {
   return {
     type: EDIT_CURRENT_REVIEW,
     review
+  }
+}
+
+const addImages = (reviewId, images) => {
+  return {
+    type: ADD_REVIEW_IMAGES,
+    reviewId,
+    images
+  }
+}
+
+const deleteImages = (reviewId, imageIds) => {
+  return {
+    type: DELETE_REVIEW_IMAGES,
+    reviewId,
+    imageIds
   }
 }
 
@@ -137,6 +155,29 @@ export const updateReview = (reviewId, review) => async (dispatch) => {
   return response
 }
 
+export const addReviewImages = (reviewId, images) => async (dispatch) => {
+  const formData = new FormData();
+  Array.from(images).forEach(image => formData.append("images", image));
+  const response = await csrfFetch(`/api/reviews/${reviewId}/images`, {
+    method: "POST",
+    body: formData
+  });
+  const data = await response.json();
+  dispatch(addImages(reviewId, data));
+  return response;
+}
+
+export const removeReviewImages = (reviewId, imageIds) => async (dispatch) => {
+  const response = await Promise.all(imageIds.map(async (id) => {
+    const response = await csrfFetch(`/api/review-images/${id}`, {
+      method: "DELETE"
+    });
+    return await response.json();
+  }));
+  dispatch(deleteImages(reviewId, imageIds));
+  return response;
+}
+
 const initialState = { user: null, spots: {}, reviews: {} };
 
 const sessionReducer = (state = initialState, action) => {
@@ -163,6 +204,12 @@ const sessionReducer = (state = initialState, action) => {
       return { ...state, reviews: newReviews };
     case EDIT_CURRENT_REVIEW:
       return { ...state, reviews: { ...state.reviews, [action.review.id]: { ...state.reviews[action.review.id], ...action.review } } }
+    case ADD_REVIEW_IMAGES:
+      return { ...state, reviews: { ...state.reviews, [action.reviewId]: { ...state.reviews[action.reviewId], ReviewImages: [...state.reviews[action.reviewId].ReviewImages, ...action.images] } } }
+    case DELETE_REVIEW_IMAGES:
+      let reviewImages = [...state.reviews[action.reviewId].ReviewImages];
+      reviewImages = reviewImages.filter(image => !action.imageIds.includes(image.id));
+      return { ...state, reviews: { ...state.reviews, [action.reviewId]: { ...state.reviews[action.reviewId], ReviewImages: reviewImages } } }
     default:
       return state;
   }

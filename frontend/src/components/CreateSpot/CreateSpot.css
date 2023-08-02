@@ -227,7 +227,7 @@ label.fileUpload {
 .previewSection {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 40px;
+  gap: 20px 40px;
   padding-top: 15px;
 }
 

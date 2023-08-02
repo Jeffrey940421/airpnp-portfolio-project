@@ -50,6 +50,7 @@ export function CreateSpot({ type, spot, spotId }) {
   const dispatch = useDispatch();
   const ref = React.useRef(null);
   const { setPopupContent } = usePopup();
+  const imagesNum = Array.from(images).filter(file => file.type.startsWith("image")).length + imagesToKeep.length;
 
   const user = useSelector(state => state.session.user);
   const geocode = useSelector((state) => state.maps.geocode);
@@ -200,11 +201,14 @@ export function CreateSpot({ type, spot, spotId }) {
           .then(() => history.push(`/spots/${spotId}`))
           .catch(
             async (res) => {
+              setPopupContent(null)
               const data = await res.json();
               if (data && data.errors) {
                 setServerErrors(data.errors);
-                // TO DO: Restore the spot
+              } else {
+                history.replace(`/error/${res.status}`);
               }
+              // TO DO: Restore the spot
             }
           )
       } else {
@@ -214,10 +218,13 @@ export function CreateSpot({ type, spot, spotId }) {
           .then(() => setPopupContent(null))
           .catch(
             async (res) => {
+              setPopupContent(null)
               const data = await res.json();
               if (data && data.errors) {
                 setServerErrors(data.errors);
                 await dispatch(spotActions.removeNewSpot(res.url.split("/")[5]));
+              } else {
+                history.replace(`/error/${res.status}`);
               }
             }
           );
@@ -268,7 +275,6 @@ export function CreateSpot({ type, spot, spotId }) {
 
   useEffect(() => {
     const errors = {};
-    const imagesNum = Array.from(images).filter(file => file.type.startsWith("image")).length + imagesToKeep.length;
 
     if (countryEdited && !country) errors.country = "Country is required";
     if (stateEdited && !state) errors.state = "State is required";
@@ -598,7 +604,7 @@ export function CreateSpot({ type, spot, spotId }) {
               <p className="validationError"><i className="fa-solid fa-circle-xmark" /> {error} </p>
             ))}
           </div>
-          {images.length ? <span className="previewTitle">Selected Photos:</span> : null}
+          {imagesNum ? <span className="previewTitle">Selected Photos:</span> : null}
           <div className="previewSection">
             {imagesToKeep.map((image, i) => {
               const imageUrl = image.url.split("/");

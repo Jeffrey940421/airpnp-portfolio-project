@@ -1,0 +1,39 @@
+.error {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.errorTitle1 {
+  color: #FF5A5F;
+  font-size: 100px;
+  margin: 0px
+}
+
+.errorTitle2 {
+  color: lightgrey;
+  font-size: 50px;
+  margin: 0px
+}
+
+.error img {
+  height: 400px;
+  width: 800px;
+  object-fit: cover;
+}
+
+.error button {
+  font-family: 'Manrope', sans-serif;
+  cursor: pointer;
+  font-size: 20px;
+  border: none;
+  background-color: #FF5A5F;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  width: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
