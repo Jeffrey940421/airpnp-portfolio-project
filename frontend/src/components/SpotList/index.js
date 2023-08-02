@@ -93,7 +93,7 @@ export function SpotList({ type }) {
                         <span className="stars"><i className="fa-solid fa-star" /> {spot.avgRating ? (Number.isInteger(spot.avgRating) ? spot.avgRating.toFixed(1) : spot.avgRating.toFixed(2)) : "New"}</span>
                       </div>
                       <span className="spotName">{spot.name}</span>
-                      <div className="spotPrice"><span>${spot.price.toLocaleString("en-US")}</span> night</div>
+                      <div className="spotPrice"><span>${(+spot.price).toLocaleString("en-US", {minimumFractionDigits: 2})}</span> night</div>
                     </div>
                     {
                       type === "current" ?

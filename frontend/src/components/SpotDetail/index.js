@@ -105,7 +105,7 @@ export function SpotDetail() {
               <div className="reserve">
                 <div>
                   <span className="spotPrice">
-                    ${(+spot.price).toLocaleString("en-US")} <span className="night">night</span>
+                    ${(+spot.price).toLocaleString("en-US", {minimumFractionDigits: 2})} <span className="night">night</span>
                   </span>
                   <span>
                     <i className="fa-solid fa-star" /> {reviewsAvg ? (Number.isInteger(reviewsAvg) ? reviewsAvg.toFixed(1) : reviewsAvg.toFixed(2)) : "New"} {reviewsNum ? reviewsNum === 1 ? `· ${reviewsNum} review` : `· ${reviewsNum} reviews` : null}
