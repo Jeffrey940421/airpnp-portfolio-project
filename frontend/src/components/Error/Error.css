@@ -1,4 +1,4 @@
-.error {
+.errorPage {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -17,13 +17,13 @@
   margin: 0px
 }
 
-.error img {
+.errorPage img {
   height: 400px;
   width: 800px;
   object-fit: cover;
 }
 
-.error button {
+.errorPage button {
   font-family: 'Manrope', sans-serif;
   cursor: pointer;
   font-size: 20px;

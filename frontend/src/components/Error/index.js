@@ -32,7 +32,7 @@ export function Error({ status }) {
   }
 
   return (
-    <div className="error">
+    <div className="errorPage">
       <h1 className="errorTitle1">Error {statusCode}</h1>
       <h1 className="errorTitle2">{errorDescription}</h1>
       <img src="https://cdn.dribbble.com/users/285475/screenshots/2083086/dribbble_1.gif" />
