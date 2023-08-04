@@ -96,16 +96,19 @@ export function SpotList({ type }) {
                         onMouseMove={
                           (e) => {
                             e.stopPropagation();
-                            const x = e.clientX;
-                            const y = e.clientY;
+                            const cursorX = e.clientX;
+                            const cursorY = e.clientY;
                             const spotEl = e.target.getBoundingClientRect();
-                            const xx = spotEl.left;
-                            const yy = spotEl.top;
-
-                            console.log(x-xx, y-yy, e.target)
-
-                            document.querySelector(`.tooltip-${spot.id}`).style.left = x-xx + "px";
-                            document.querySelector(`.tooltip-${spot.id}`).style.top = y-yy + "px";
+                            const imageX = spotEl.left;
+                            const imageY = spotEl.top;
+                            document.querySelector(`.tooltip-${spot.id}`).style.left = cursorX - imageX + 20 + "px";
+                            document.querySelector(`.tooltip-${spot.id}`).style.top = cursorY - imageY + 20 + "px";
+                          }
+                        }
+                        onMouseLeave={
+                          () => {
+                            document.querySelector(`.tooltip-${spot.id}`).style.left = "0px";
+                            document.querySelector(`.tooltip-${spot.id}`).style.top = "0px";
                           }
                         }
                         />

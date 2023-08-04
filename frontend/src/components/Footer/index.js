@@ -3,7 +3,7 @@ import "./Footer.css";
 export function Footer() {
   return (
     <footer>
-      <span>© 2023 Airbnb, Inc.</span>
+      <span>© 2023 Airpnp, Inc.</span>
       <div className="socialMedia">
         <span>Contact Us</span>
         <i className="fa-brands fa-square-facebook" />

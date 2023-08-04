@@ -173,6 +173,6 @@
   z-index: 1;
 }
 
-.spot:hover .tooltip {
+.previewImage:hover ~ .tooltip {
   opacity: 1;
 }
