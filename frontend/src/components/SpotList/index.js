@@ -86,14 +86,36 @@ export function SpotList({ type }) {
               spotList.map((spot, i) => {
                 return (
                   <div key={spot.id}>
-                    <div className="spot" onClick={() => history.push(`/spots/${spot.id}`)}>
-                      <img className="previewImage" src={spot.previewImage || "https://jeffrey-zhang-resource.s3.us-west-1.amazonaws.com/public/imageNotFound-svg.png"} alt={spot.name} />
+                    <div
+                      className="spot"
+                      onClick={() => history.push(`/spots/${spot.id}`)}
+                    >
+                      <img
+                        className="previewImage"
+                        src={spot.previewImage || "https://jeffrey-zhang-resource.s3.us-west-1.amazonaws.com/public/imageNotFound-svg.png"} alt={spot.name}
+                        onMouseMove={
+                          (e) => {
+                            e.stopPropagation();
+                            const x = e.clientX;
+                            const y = e.clientY;
+                            const spotEl = e.target.getBoundingClientRect();
+                            const xx = spotEl.left;
+                            const yy = spotEl.top;
+
+                            console.log(x-xx, y-yy, e.target)
+
+                            document.querySelector(`.tooltip-${spot.id}`).style.left = x-xx + "px";
+                            document.querySelector(`.tooltip-${spot.id}`).style.top = y-yy + "px";
+                          }
+                        }
+                        />
                       <div className="spotLocation">
                         <span className="address">{spot.city}, {spot.state}</span>
                         <span className="stars"><i className="fa-solid fa-star" /> {spot.avgRating ? (Number.isInteger(spot.avgRating) ? spot.avgRating.toFixed(1) : spot.avgRating.toFixed(2)) : "New"}</span>
                       </div>
                       <span className="spotName">{spot.name}</span>
-                      <div className="spotPrice"><span>${(+spot.price).toLocaleString("en-US", {minimumFractionDigits: 2})}</span> night</div>
+                      <div className="spotPrice"><span>${(+spot.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span> night</div>
+                      <span className={`tooltip tooltip-${spot.id}`}>{spot.name}</span>
                     </div>
                     {
                       type === "current" ?
