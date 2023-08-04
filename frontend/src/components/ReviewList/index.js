@@ -51,7 +51,7 @@ export function ReviewList({ spot, reviews, type }) {
             <div key={review.id}>
               <span className="reviewTitle">{type === "current" ? review.Spot.name : review.User.firstName}</span>
               <span className="reviewDate">{months[+month]} {year}</span>
-              <p className="review">{review.review}</p>
+              <p className="review" style={{whiteSpace: "pre-wrap"}}>{review.review}</p>
               {
                 review.ReviewImages.length ?
                   <div className="reviewImages">
