@@ -59,7 +59,7 @@ export function ReviewList({ spot, reviews, type }) {
                       return (
                         <img src={image.url} key={image.id} className="reviewImage" onClick={(e) => {
                           e.preventDefault();
-                          setModalContent(<img className="bigReviewImage" src={image.url} style={{maxHeight: "400px"}}/>)
+                          setModalContent(<img className="bigReviewImage" src={image.url} style={{maxHeight: "600px", aspectRatio: "auto"}}/>)
                         }} />
                       )
                     })}
