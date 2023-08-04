@@ -8,6 +8,8 @@ import { CreateSpotContainer } from "./components/CreateSpot";
 import { SpotDetail } from "./components/SpotDetail";
 import { ManageReviews } from "./components/ManageReviews";
 import { Error } from "./components/Error";
+import { Reserve } from "./components/Reserve";
+import { Footer } from "./components/Footer";
 
 function App() {
   const dispatch = useDispatch();
@@ -21,35 +23,41 @@ function App() {
 
   return (
     isLoaded && (
-      <main>
-        <Navigation isLoaded={isLoaded} />
-        <Switch>
-          <Route exact path="/">
-            <SpotList />
-          </Route>
-          <Route exact path="/spots/new">
-            <CreateSpotContainer />
-          </Route>
-          <Route exact path="/spots/current">
-            <SpotList type="current" key={user ? user.id : 0} />
-          </Route>
-          <Route exact path="/spots/:spotId/edit">
-            <CreateSpotContainer type="edit" />
-          </Route>
-          <Route exact path="/spots/:spotId">
-            <SpotDetail />
-          </Route>
-          <Route exact path="/reviews/current">
-            <ManageReviews key={user ? user.id : 0} />
-          </Route>
-          <Route exact path="/error/:status">
-            <Error />
-          </Route>
-          <Route>
-            <Error status="404" />
-          </Route>
-        </Switch>
-      </main>
+      <>
+        <main>
+          <Navigation isLoaded={isLoaded} />
+          <Switch>
+            <Route exact path="/">
+              <SpotList />
+            </Route>
+            <Route exact path="/spots/new">
+              <CreateSpotContainer />
+            </Route>
+            <Route exact path="/spots/current">
+              <SpotList type="current" key={user ? user.id : 0} />
+            </Route>
+            <Route exact path="/spots/:spotId/edit">
+              <CreateSpotContainer type="edit" />
+            </Route>
+            <Route exact path="/spots/:spotId">
+              <SpotDetail />
+            </Route>
+            <Route exact path="/reviews/current">
+              <ManageReviews key={user ? user.id : 0} />
+            </Route>
+            <Route exact path="/error/:status">
+              <Error />
+            </Route>
+            <Route exact path="/test">
+              <Reserve />
+            </Route>
+            <Route>
+              <Error status="404" />
+            </Route>
+          </Switch>
+        </main>
+        <Footer />
+      </>
     )
   );
 }
