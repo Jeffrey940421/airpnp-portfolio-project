@@ -105,12 +105,12 @@ export function SpotList({ type }) {
                             document.querySelector(`.tooltip-${spot.id}`).style.top = cursorY - imageY + 20 + "px";
                           }
                         }
-                        onMouseLeave={
-                          () => {
-                            document.querySelector(`.tooltip-${spot.id}`).style.left = "0px";
-                            document.querySelector(`.tooltip-${spot.id}`).style.top = "0px";
-                          }
-                        }
+                        // onMouseLeave={
+                        //   () => {
+                        //     document.querySelector(`.tooltip-${spot.id}`).style.left = "0px";
+                        //     document.querySelector(`.tooltip-${spot.id}`).style.top = "0px";
+                        //   }
+                        // }
                         />
                       <div className="spotLocation">
                         <span className="address">{spot.city}, {spot.state}</span>

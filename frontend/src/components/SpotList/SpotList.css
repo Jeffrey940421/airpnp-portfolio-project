@@ -160,7 +160,7 @@
 }
 
 .tooltip {
-  opacity: 0;
+  display: none;
   width: 200px;
   font-size: 10px;
   height: fit-content;
@@ -174,5 +174,7 @@
 }
 
 .previewImage:hover ~ .tooltip {
-  opacity: 1;
+  display: flex;
+  justify-content: center;
+  padding: 5px;
 }
