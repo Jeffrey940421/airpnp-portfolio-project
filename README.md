@@ -24,33 +24,33 @@ Airpnp project attempts to build a full stack clone of the Airbnb website, inclu
 ![spot-list]
 
 [spot-list]: ./images/spot-list.gif
-2. Spot Detail
+2. Spot Detail <br>
 ![spot-detail]
 
 [spot-detail]: ./images/spot-detail.gif
-3. Spot Creation
+3. Spot Creation <br>
 ![create-spot-1]![create-spot-2]![create-spot-3]
 
 [create-spot-1]: ./images/create-spot-1.gif
 [create-spot-2]: ./images/create-spot-2.gif
 [create-spot-3]: ./images/create-spot-3.gif
-4. Spot Updating
+4. Spot Updating <br>
 ![update-spot]
 
 [update-spot]: ./images/update-spot.gif
-5. Review Creation
+5. Review Creation <br>
 ![create-review]
 
 [create-review]: ./images/create-review.gif
-6. Review Updating
+6. Review Updating <br>
 ![update-review]
 
 [update-review]: ./images/update-review.gif
-7. Spot Deletion
+7. Spot Deletion <br>
 ![delete-spot]
 
 [delete-spot]: ./images/delete-spot.gif
-8. Review Deletion
+8. Review Deletion <br>
 ![delete-review]
 
 [delete-review]: ./images/delete-review.gif
@@ -75,11 +75,16 @@ AWS_SECRET_ACCESS_KEY=
 ```
 npm i
 ```
-4. Go to backend folder and start the server
+4. Go to backend folder and run all migrations and seeds
+```
+npx dotenv sequelize db:migrate
+npx dotenv sequelize db:seed:all
+```
+5. Go to backend folder and start the server
 ```
 npm start
 ```
-5. Open a new terminal, go to frontend folder, and start the app
+6. Open a new terminal, go to frontend folder, and start the app
 ```
 npm start
 ```
