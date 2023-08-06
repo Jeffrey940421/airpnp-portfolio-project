@@ -32,7 +32,7 @@ const validateBookingInfo = [
       format: "YYYY-MM-DD",
       delimiters: ["-"]
     })
-    .withMessage("Start date must be a date in YYYY-MM-DD format"),
+    .withMessage("End date must be a date in YYYY-MM-DD format"),
   check("endDate")
     .custom((value, { req }) => {
       if (new Date(value).getTime() <= new Date(req.body.startDate).getTime()) {
@@ -40,7 +40,7 @@ const validateBookingInfo = [
       }
       return true
     })
-    .withMessage("End Date must be after start date"),
+    .withMessage("End date must be after start date"),
   handleValidationErrors
 ]
 
@@ -64,8 +64,11 @@ const validateReviewInfo = [
 
 const validateSpotImageInfo = [
   check('preview')
+    .optional({
+      values: "undefined"
+    })
     .custom((value) => {
-      if (value === "undefined" || Number.isInteger(+value) && +value >= 0) {
+      if (Number.isInteger(+value) && +value >= 0) {
         return true;
       }
       return false;

@@ -115,7 +115,9 @@ export const addSpot = (spot, images, preview) => async (dispatch) => {
 export const addNewImages = (spotId, images, preview) => async (dispatch) => {
   const formData = new FormData();
   Array.from(images).forEach(image => formData.append("images", image));
-  formData.append("preview", preview);
+  if (preview) {
+    formData.append("preview", preview);
+  }
   const response = await csrfFetch(`/api/spots/${spotId}/images`, {
     method: "POST",
     body: formData
@@ -162,7 +164,7 @@ export const removeImages = (imageIds) => async (dispatch) => {
 export const setPreviewImage = (imageId) => async (dispatch) => {
   const response = await csrfFetch(`/api/spot-images/${imageId}`, {
     method: "PUT",
-    body: JSON.stringify({preview: true})
+    body: JSON.stringify({ preview: true })
   });
   dispatch(setPreview(imageId));
   return response;
