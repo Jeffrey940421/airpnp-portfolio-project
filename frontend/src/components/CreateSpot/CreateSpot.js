@@ -376,7 +376,7 @@ export function CreateSpot({ type, spot, spotId }) {
               isSearchable={true}
               isClearable={false}
               name="state"
-              options={country ? Object.keys(geolocation[country]).map(state => {
+              options={country && geolocation[country] ? Object.keys(geolocation[country]).map(state => {
                 return { value: state, label: state }
               }) : []}
               styles={selectMenuStyle}
@@ -405,7 +405,7 @@ export function CreateSpot({ type, spot, spotId }) {
               isSearchable={true}
               isClearable={false}
               name="city"
-              options={(country && state) ? geolocation[country][state].map(city => {
+              options={(country && state && geolocation[country][state]) ? geolocation[country][state].map(city => {
                 return { value: city, label: city }
               }) : []}
               styles={selectMenuStyle}
