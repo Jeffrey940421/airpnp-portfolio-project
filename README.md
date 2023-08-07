@@ -13,6 +13,7 @@ Airpnp project attempts to build a full stack clone of the Airbnb website, inclu
 
 ## Tools
 * React
+* Redux
 * Express
 * Sequelize
 * Sqlite3
