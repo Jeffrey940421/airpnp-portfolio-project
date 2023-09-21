@@ -10,7 +10,6 @@ import { ManageReviews } from "./components/ManageReviews";
 import { Error } from "./components/Error";
 import { Reserve } from "./components/Reserve";
 import { Footer } from "./components/Footer";
-import Editor from "./Editor";
 
 
 function App() {
