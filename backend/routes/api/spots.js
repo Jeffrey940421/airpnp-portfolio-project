@@ -6,7 +6,7 @@ const { handleValidationErrors } = require('../../utils/validation');
 const router = express.Router();
 const { Op } = require("sequelize");
 const fs = require("fs");
-const { multipleFilesUpload, multipleMulterUpload, retrievePrivateFile } = require("../../awsS3");
+const { multipleFilesUpload, multipleMulterUpload, retrievePrivateFile, singleMulterUpload, singleFileUpload } = require("../../awsS3");
 
 const geolocation = JSON.parse(fs.readFileSync(require.resolve("../../utils/geolocation.json")).toString());
 
@@ -317,6 +317,21 @@ const validateSpotInfo = [
     .withMessage("Please provide a price expressed to 2 decimal places"),
   handleValidationErrors
 ];
+
+router.post("/test", singleMulterUpload("image"), async (req, res, next) => {
+  const url = req.file ?
+    await singleFileUpload({ file: req.file, public: true }) :
+    null;
+  res.json({default: url})
+})
+
+router.post("/test2", multipleMulterUpload("images"), async (req, res, next) => {
+  const urls = req.files ?
+    await multipleFilesUpload({ files: req.files, public: true }) :
+    null;
+  res.json({urls})
+})
+
 
 // get all spots
 router.get("/", validateSpotQuery, async (req, res) => {

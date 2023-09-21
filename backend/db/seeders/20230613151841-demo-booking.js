@@ -15,26 +15,26 @@ module.exports = {
       {
         spotId: 2,
         userId: 2,
-        startDate: "2023-08-10",
-        endDate: "2023-08-11"
+        startDate: "2023-10-10",
+        endDate: "2023-10-11"
       },
       {
         spotId: 3,
         userId: 3,
-        startDate: "2023-09-15",
+        startDate: "2023-10-15",
         endDate: "2023-10-17"
       },
       {
         spotId: 3,
         userId: 1,
-        startDate: "2023-08-17",
-        endDate: "2023-08-20"
+        startDate: "2023-10-17",
+        endDate: "2023-10-20"
       },
       {
         spotId: 1,
         userId: 1,
-        startDate: "2023-09-20",
-        endDate: "2023-09-30"
+        startDate: "2023-10-20",
+        endDate: "2023-10-30"
       }
     ], {validate: true});
 
@@ -60,10 +60,10 @@ module.exports = {
     const {Op} = require("sequelize");
     await queryInterface.bulkDelete(options, {
       [Op.or]: [
-        {spotId: 2, userId: 2, startDate: "2023-07-11", endDate: "2023-08-11"},
-        {spotId: 3, userId: 3, startDate: "2023-09-15", endDate: "2023-10-17"},
-        {spotId: 3, userId: 1, startDate: "2023-08-17", endDate: "2023-08-20"},
-        {spotId: 1, userId: 1, startDate: "2023-09-20", endDate: "2023-09-30"},
+        {spotId: 2, userId: 2, startDate: "2023-10-10", endDate: "2023-10-11"},
+        {spotId: 3, userId: 3, startDate: "2023-10-15", endDate: "2023-10-17"},
+        {spotId: 3, userId: 1, startDate: "2023-10-17", endDate: "2023-10-20"},
+        {spotId: 1, userId: 1, startDate: "2023-10-20", endDate: "2023-10-30"},
         {spotId: 3, userId: 1, startDate: "2023-06-01", endDate: "2023-06-30"},
         {spotId: 2, userId: 1, startDate: "2023-06-01", endDate: "2023-06-10"}
       ]

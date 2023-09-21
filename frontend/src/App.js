@@ -10,6 +10,8 @@ import { ManageReviews } from "./components/ManageReviews";
 import { Error } from "./components/Error";
 import { Reserve } from "./components/Reserve";
 import { Footer } from "./components/Footer";
+import Editor from "./Editor";
+
 
 function App() {
   const dispatch = useDispatch();
@@ -25,6 +27,8 @@ function App() {
     isLoaded && (
       <>
         <main>
+          <Editor initial="<h1>aa</h1>"/>
+          <Editor initial="<h1>bb</h1>"/>
           <Navigation isLoaded={isLoaded} />
           <Switch>
             <Route exact path="/">
@@ -55,7 +59,7 @@ function App() {
               <Error status="404" />
             </Route>
           </Switch>
-        </main>
+        </main >
         <Footer />
       </>
     )

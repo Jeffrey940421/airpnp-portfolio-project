@@ -8,3 +8,11 @@ body {
   margin: 0px;
   min-height: 100%;
 }
+
+#root > main > div.ck.ck-reset.ck-editor.ck-rounded-corners > div.ck.ck-editor__top.ck-reset_all > div > div.ck.ck-sticky-panel__content > div > div > span.ck-file-dialog-button > button {
+  height: 20px
+}
+
+/* .ck-button {
+  height: 100px !important
+} */
