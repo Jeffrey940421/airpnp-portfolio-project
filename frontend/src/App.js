@@ -27,8 +27,6 @@ function App() {
     isLoaded && (
       <>
         <main>
-          <Editor initial="<h1>aa</h1>"/>
-          <Editor initial="<h1>bb</h1>"/>
           <Navigation isLoaded={isLoaded} />
           <Switch>
             <Route exact path="/">
