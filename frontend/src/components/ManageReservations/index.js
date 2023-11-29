@@ -101,7 +101,7 @@ export function ManageReservations() {
       <div
         className={`eventButton${eventInfo.event.end.setDate(eventInfo.event.end.getDate() - 1) <= new Date().setHours(0, 0, 0, 0) ? " grayout" : ""}${eventInfo.isStart ? " eventStart" : ""}${eventInfo.isEnd ? " eventEnd" : ""}`}
       >
-        <p>{eventInfo.isStart && eventInfo.isEnd ? `Booked by ${eventInfo.event.title}` : eventInfo.isStart ? "Booked by" : eventInfo.event.title}</p>
+        <p>{eventInfo.event.title}</p>
         {
           eventInfo.event.start > new Date().setHours(0, 0, 0, 0) && eventInfo.isEnd ?
           <button
@@ -195,7 +195,6 @@ export function ManageReservations() {
                   <FullCalendar
                     ref={calendarRef}
                     initialDate={currentDate}
-
                     contentHeight="600px"
                     slotDuration={{ hours: 12 }}
                     slotLabelInterval={{ hours: 24 }}
@@ -220,7 +219,7 @@ export function ManageReservations() {
                     events={reservationsList.map(reservation => {
                       return {
                         extendedProps: reservation,
-                        title: `${reservation.User.firstName} ${reservation.User.lastName}`,
+                        title: `Booked by ${reservation.User.firstName} ${reservation.User.lastName}`,
                         start: new Date(reservation.startDate.split("-").join("/")),
                         end: new Date(reservation.endDate.split("-").join("/")).setDate(new Date(reservation.endDate.split("-").join("/")).getDate() + 1),
                         allDay: true

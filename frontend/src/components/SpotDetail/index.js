@@ -101,10 +101,15 @@ export function SpotDetail() {
   useEffect(() => {
     dispatch(spotActions.loadSingleSpot(spotId))
       .then(() => dispatch(reviewActions.loadReviews(spotId)))
+      .then(() => {
+        if (user) {
+          dispatch(spotActions.loadSpotBookings(spotId))
+        }
+      })
       .catch(async (res) => {
         return history.replace(`/error/${res.status}`)
       })
-  }, [spotId]);
+  }, [spotId, user]);
 
   useEffect(() => {
     const introduction = document.querySelector(".details .introduction p");

@@ -10,6 +10,7 @@ const DELETE_IMAGES = "spots/DELETE_IMAGES";
 const SET_PREVIEW = "spots/SET_PREVIEW";
 const REMOVE_SPOT = "spots/REMOVE_SPOT";
 const ADD_BOOKING = "spots/ADD_BOOKING";
+const GET_SPOT_BOOKINGS = "spots/GET_SPOT_BOOKINGS";
 
 const getSpots = (spots, page) => {
   return {
@@ -71,6 +72,13 @@ const createBooking = (booking) => {
   return {
     type: ADD_BOOKING,
     booking
+  }
+}
+
+const getSpotBookings = (bookings) => {
+  return {
+    type: GET_SPOT_BOOKINGS,
+    bookings
   }
 }
 
@@ -144,13 +152,17 @@ export const removeNewSpot = (spotId) => async (dispatch) => {
 }
 
 export const loadSingleSpot = (spotId) => async (dispatch) => {
-  const spotResponse = await csrfFetch(`/api/spots/${spotId}`);
-  const spotData = await spotResponse.json();
-  const bookingResponse = await csrfFetch(`/api/spots/${spotId}/bookings`);
-  const bookingData = await bookingResponse.json();
-  spotData.Bookings = bookingData.Bookings;
-  dispatch(getSingleSpot(spotData));
-  return spotResponse;
+  const response = await csrfFetch(`/api/spots/${spotId}`);
+  const data = await response.json();
+  dispatch(getSingleSpot(data));
+  return response;
+}
+
+export const loadSpotBookings = (spotId) => async (dispatch) => {
+  const response = await csrfFetch(`/api/spots/${spotId}/bookings`);
+  const data = await response.json();
+  dispatch(getSpotBookings(data.Bookings));
+  return response;
 }
 
 export const editSpot = (spot, spotId) => async (dispatch) => {
@@ -226,6 +238,8 @@ const spotsReducer = (state = initialState, action) => {
     case ADD_BOOKING:
       const booking = {spotId: `${action.booking.spotId}`, startDate: action.booking.startDate, endDate: action.booking.endDate};
       return { ...state, singleSpot: { ...state.singleSpot, Bookings: [...state.singleSpot.Bookings, booking] } }
+    case GET_SPOT_BOOKINGS:
+      return { ...state, singleSpot: { ...state.singleSpot, Bookings: action.bookings } }
     default:
       return state;
   }
