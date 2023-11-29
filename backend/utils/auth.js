@@ -3,6 +3,7 @@ const { jwtConfig } = require('../config');
 const { Spot, Review, SpotImage, User, ReviewImage, Booking } = require('../db/models');
 
 const { secret, expiresIn } = jwtConfig;
+const timeOffset = new Date().getTimezoneOffset();
 
 //generate a JWT token and save it in the cookie when the user is logged in or signed in
 const setTokenCookie = (res, user) => {
@@ -269,7 +270,7 @@ const bookingDeleteAuthorization = async function (req, res, next) {
     error.message = "Cannot delete a booking that does not belong to the current user or is not associated with a spot the current user owns";
     return next(error);
   }
-  if (new Date(startDate).getTime() <= new Date().setHours(-7, 0, 0, 0)) {
+  if (new Date(startDate).getTime() <= new Date().setHours(0, -timeOffset, 0, 0)) {
     error.message = "Cannot delete an ongoing or completed booking";
     return next(error);
   }
@@ -284,11 +285,11 @@ const pastBooking = async function (req, res, next) {
   const error = {};
   error.title = "Forbidden";
   error.status = 403;
-  if (new Date(originalStartDate).getTime() < new Date().setHours(-7, 0, 0, 0) && startDate && startDate !== originalStartDate) {
+  if (new Date(originalStartDate).getTime() < new Date().setHours(0, -timeOffset, 0, 0) && startDate && startDate !== originalStartDate) {
     error.message = "Cannot edit a past start date. Only end date can be edited";
     return next(error);
   }
-  if (new Date(originalEndDate).getTime() < new Date().setHours(-7, 0, 0, 0)) {
+  if (new Date(originalEndDate).getTime() < new Date().setHours(0, -timeOffset, 0, 0)) {
     error.message = "Cannot edit a past booking";
     return next(error);
   }

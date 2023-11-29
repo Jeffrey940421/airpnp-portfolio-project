@@ -9,6 +9,7 @@ const fs = require("fs");
 const { multipleFilesUpload, multipleMulterUpload, retrievePrivateFile, singleMulterUpload, singleFileUpload } = require("../../awsS3");
 
 const geolocation = JSON.parse(fs.readFileSync(require.resolve("../../utils/geolocation.json")).toString());
+const timeOffset = new Date().getTimezoneOffset();
 
 const validateBookingInfo = [
   check("startDate")
@@ -20,7 +21,7 @@ const validateBookingInfo = [
     .withMessage("Start date must be a date in YYYY-MM-DD format"),
   check("startDate")
     .custom((value) => {
-      if (new Date(value).getTime() < new Date().setHours(-7, 0, 0, 0)) {
+      if (new Date(value).getTime() < new Date().setHours(0, -timeOffset, 0, 0)) {
         return false
       }
       return true
@@ -544,6 +545,7 @@ router.get("/:spotId/bookings", requireAuth, spotExist, async (req, res, next) =
   if (spot.ownerId !== userId) {
     let bookings = spot.Bookings.map(booking => {
       return {
+        id: booking.id,
         spotId,
         startDate: booking.startDate,
         endDate: booking.endDate

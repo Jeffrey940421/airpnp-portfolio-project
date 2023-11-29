@@ -1,0 +1,55 @@
+.modifyReservation {
+  width: 480px;
+  height: fit-content;
+  padding: 10px 40px;
+  margin-bottom: 20px;
+  position: relative;
+  font-family: 'Manrope', sans-serif;
+  box-sizing: border-box;
+}
+
+.modifyReservation h1 {
+  font-family: 'Manrope', sans-serif;
+  font-weight: bold;
+}
+
+#modal-content:has(.modifyReservation) {
+  overflow: visible !important;
+  top: 50px !important;
+}
+
+.modifyReservation .datePicker {
+  margin-top: 20px;
+  right: -21px;
+  top: -30px;
+  padding: 85px 20px 20px 20px
+}
+
+.modifyReservationButtons button {
+  font-family: 'Manrope', sans-serif;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+  background-color: #FF5A5F;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 40px;
+  width: 100%;
+}
+
+.modifyReservationButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modifyReservationButtons button:disabled {
+  cursor: default;
+  background-color: #bdbcbc;
+  color: gray;
+}
+
+.modifyReservation .validationError {
+  padding-left: 0px !important;
+}

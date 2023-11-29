@@ -1,0 +1,110 @@
+.upcomingTrip {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.upcomingTripsList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.spotBookingInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.spotBookingImage {
+  width: 110px;
+  height: 110px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.spotBookingName {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0px !important;
+}
+
+.spotBookingDate,
+.spotBookingLocation {
+  font-size: 14px;
+  margin: 0px !important;
+  color: gray
+}
+
+.spotBookingButtons {
+  display: flex;
+  gap: 10px;
+}
+
+.spotBookingButtons button {
+  font-family: 'Manrope', sans-serif;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+  background-color: #FF5A5F;
+  color: white;
+  padding: 5px 20px;
+  border-radius: 10px;
+  width: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.noTrips {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: lightgray 1px solid;
+  border-radius: 10px;
+}
+
+.noTrips img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  object-position: center;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.noTripsText {
+  width: 800px;
+  padding: 32px;
+}
+
+.noTripsText h3 {
+  margin-bottom: 0px;
+}
+
+.noTripsText p {
+  font-size: 14px;
+  color: gray;
+  margin-top: 5px;
+  width: 70%;
+}
+
+.noTripsText i {
+  color: #FF5A5F;
+  font-size: 40px;
+}
+
+.noTripsText button {
+  font-family: 'Manrope', sans-serif;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+  background-color: #FF5A5F;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  width: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

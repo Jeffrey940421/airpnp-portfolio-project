@@ -81,12 +81,12 @@
   border: 1px solid red;
 }
 
-.error input:focus{
+.error input:focus {
   outline: 1.5px solid red;
   border: 1px solid red;
 }
 
-.errorMessage p{
+.errorMessage p {
   font-size: 12px;
   color: red;
 }

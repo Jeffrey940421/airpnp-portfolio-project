@@ -1,3 +1,123 @@
+.datePickerContainer {
+  position: relative;
+}
+
+.datePicker {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  position: absolute;
+  border: 1px solid #DDDDDD;
+  padding: 85px 20px 20px 20px;
+  border-radius: 10px;
+  background-color: white;
+  top: -20px;
+  z-index: 100;
+  right: -42px;
+}
+
+.datePickerButton {
+  background-color: transparent;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: none;
+  z-index: 10;
+  cursor: pointer;
+}
+
+.rangeInput {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 5px;
+  position: relative;
+  z-index: 200;
+  background-color: white;
+}
+
+.datePicker .validationError,
+.datePicker .serverError {
+  color: red;
+  font-size: 12px;
+  padding-top: 0px !important;
+  padding-left: 20px;
+}
+
+.dateInputs {
+  width: 100%;
+  display: flex;
+  border: 1px solid #DDDDDD;
+  border-radius: 8px;
+}
+
+.dateInputs > div {
+  width: 50%;
+}
+
+.dateInputs > div input {
+  border: none;
+  padding-left: 14px !important;
+  padding-top: 25px !important;
+}
+
+.dateInputs > .error input:hover:not(:focus) {
+  outline: none;
+  border: none;
+}
+
+.dateInputs .grayout input:disabled::placeholder {
+  color: #cccbcb !important;
+}
+
+.dateInputs .grayout input:disabled {
+  color: #cccbcb !important;
+}
+
+.dateInputs .grayout label:has(+ input:disabled) {
+  color: #cccbcb !important;
+}
+
+
+.dateInputs > div label {
+  left: 14px !important;
+  top: 10px !important
+}
+
+.datePickerContainer .inputBox {
+  margin-top: 0px !important;
+}
+
+.dateInputs span {
+  width: 1px;
+  background-color: #DDDDDD;
+}
+
+.dateInputs:has( input:focus) span {
+  opacity: 0;
+}
+
+.popupText {
+  font-family: 'Manrope', sans-serif;
+  font-size: 12px;
+  color: #484848;
+  justify-content: center;
+  background-color: white;
+  border: 1px solid #DDDDDD;
+  position: absolute;
+  top: -35px;
+  left: -26px;
+  text-wrap: nowrap;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.reserveDates {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
 .dateField::-webkit-calendar-picker-indicator {
   display: none;
 }
@@ -10,11 +130,13 @@
   width: 400px;
   max-width: 100%;
   background: white;
-  border: 1px solid #DDDDDD;
-  box-shadow: 0px 0px 10px 1px #DDDDDD;
   font-family: 'Manrope', sans-serif !important;
-  border-radius: 10px;
-  padding: 20px;
+}
+
+.react-calendar .startDate:disabled {
+  text-decoration: none !important;
+  cursor: pointer !important;
+  color: gray
 }
 
 .react-calendar button {
@@ -22,6 +144,8 @@
   margin: 0;
   border: 0;
   outline: none;
+  position: relative;
+  overflow: visible !important;
 }
 
 .react-calendar,
@@ -50,8 +174,7 @@
   border-radius: 10px;
 }
 
-.react-calendar__navigation button:enabled:hover,
-.react-calendar__navigation button:enabled:focus {
+.react-calendar__navigation button:enabled:hover {
   background-color: #e6e6e6;
 }
 
@@ -79,12 +202,12 @@
 }
 
 .react-calendar__month-view__days__day {
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 57.14 / 40;
   padding: 0px !important;
 }
 
 .react-calendar__month-view__days {
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 }
 
@@ -123,7 +246,6 @@
 .react-calendar__tile--hasActive {
   background: #484848;
   color: white;
-  border-radius: 10px;
 }
 
 .react-calendar__tile--hasActive:enabled:hover,
@@ -227,4 +349,37 @@
 
 .react-calendar__tile--hoverEnd:enabled:not(:hover) {
   background: #e6e6e6 !important;
+}
+
+.startDate .startDateHover:hover + .popupText {
+  display: flex !important;
+  z-index: 1000 !important;
+}
+
+.datePickerWindowButtons {
+  padding-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 20px;
+  gap: 15px;
+}
+
+.clearDatesButton {
+  text-decoration: underline;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+}
+
+.closeButton {
+  padding: 8px 15px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  color: white;
+  border: none;
+  background-color: #484848;
+  cursor: pointer;
+  border-radius: 10px;
 }

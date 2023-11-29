@@ -5,6 +5,8 @@ const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 const router = express.Router();
 
+const timeOffset = new Date().getTimezoneOffset();
+
 const validateBookingInfo = [
   check("startDate")
     .exists({checkNull: true})
@@ -19,7 +21,7 @@ const validateBookingInfo = [
       const booking = await Booking.findByPk(bookingId);
       if (booking) {
         const originalStartDate = booking.startDate;
-        if (new Date(originalStartDate).getTime() >= new Date().setHours(-7, 0, 0, 0) && new Date(value).getTime() < new Date().setHours(-7, 0, 0, 0)) {
+        if (new Date(originalStartDate).getTime() >= new Date().setHours(0, -timeOffset, 0, 0) && new Date(value).getTime() < new Date().setHours(0, -timeOffset, 0, 0)) {
           return Promise.reject()
         }
       }
@@ -43,7 +45,7 @@ const validateBookingInfo = [
     .withMessage("End Date must be after start date"),
   check("endDate")
     .custom((value) => {
-      if (new Date(value).getTime() < new Date().setHours(-7, 0, 0, 0)) {
+      if (new Date(value).getTime() < new Date().setHours(0, -timeOffset, 0, 0)) {
         return false
       }
       return true

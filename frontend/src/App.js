@@ -7,9 +7,12 @@ import { SpotList } from "./components/SpotList";
 import { CreateSpotContainer } from "./components/CreateSpot";
 import { SpotDetail } from "./components/SpotDetail";
 import { ManageReviews } from "./components/ManageReviews";
+import { ManageTrips } from "./components/ManageTrips";
 import { Error } from "./components/Error";
 import { Reserve } from "./components/Reserve";
 import { Footer } from "./components/Footer";
+import { ManageReservations } from "./components/ManageReservations";
+import { ScrollToTop } from "./components/ScrollToTop";
 
 
 function App() {
@@ -25,6 +28,7 @@ function App() {
   return (
     isLoaded && (
       <>
+        <ScrollToTop />
         <main>
           <Navigation isLoaded={isLoaded} />
           <Switch>
@@ -46,11 +50,14 @@ function App() {
             <Route exact path="/reviews/current">
               <ManageReviews key={user ? user.id : 0} />
             </Route>
+            <Route exact path="/bookings/current">
+              <ManageTrips key={user ? user.id : 0} />
+            </Route>
             <Route exact path="/error/:status">
               <Error />
             </Route>
-            <Route exact path="/test">
-              <Reserve />
+            <Route exact path="/reservations/current">
+              <ManageReservations key={user ? user.id : 0}/>
             </Route>
             <Route>
               <Error status="404" />

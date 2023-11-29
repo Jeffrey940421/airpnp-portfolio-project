@@ -44,9 +44,10 @@ export function ReviewList({ spot, reviews, type }) {
     <>
       <div className="reviewDetails">
         {Object.values(reviews).slice(0).reverse().map(review => {
-          const date = review.createdAt;
-          const year = date.split("-")[0];
-          const month = date.split("-")[1]
+          const timeOffset = new Date().getTimezoneOffset();
+          const date = new Date(new Date(review.createdAt).setHours(0, -timeOffset, 0, 0));
+          const year = date.getUTCFullYear();
+          const month = date.getUTCMonth() + 1;
           return (
             <div key={review.id}>
               <span className="reviewTitle">{type === "current" ? review.Spot.name : review.User.firstName}</span>
@@ -85,7 +86,7 @@ export function ReviewList({ spot, reviews, type }) {
                     </button>
                     <button
                       className="deleteReview"
-                      onClick={async (e) => {
+                      onClick={(e) => {
                         e.preventDefault();
                         setModalContent(<ConfirmDelete review={review} type={type} />)
                       }}

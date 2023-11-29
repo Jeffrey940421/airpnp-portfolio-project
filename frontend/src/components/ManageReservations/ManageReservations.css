@@ -1,0 +1,115 @@
+.manageReservations div[id^="react-select-"] {
+  z-index: 10 !important;
+}
+
+.manageReservationsCalendar {
+  width: 100%;
+  overflow-x: scroll;
+}
+
+.fc-media-screen {
+  margin-top: 20px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px !important;
+  min-width: 1350px;
+}
+
+.fc-toolbar-title {
+  font-size: 16px !important;
+}
+
+.fc-header-toolbar {
+  margin-bottom: 15px !important;
+}
+
+a.fc-event {
+  font-size: 14px !important;
+  display: flex;
+  justify-content: center;
+  font-weight: bold;
+  height: 100% !important;
+}
+
+a.fc-event:has( .eventStart) {
+  border-top-left-radius: 10px !important;
+  border-bottom-left-radius: 10px !important;
+}
+
+a.fc-event:has( .eventEnd) {
+  border-top-right-radius: 10px !important;
+  border-bottom-right-radius: 10px !important;
+}
+
+a.fc-event:has( .grayout) {
+  background-color: #bdbcbc !important;
+  border-color: #bdbcbc !important;
+}
+
+.fc-daygrid-day-frame {
+  height: 86px !important;
+}
+
+.fc-daygrid-event-harness {
+  top: 0px !important;
+  height: 100% !important;
+}
+
+.fc-daygrid-day-events {
+  height: 50px !important
+}
+
+.eventButton {
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  padding: 0px 25px;
+}
+
+.eventButton.eventEnd:not(.eventStart) {
+  padding-left: 15px;
+  justify-content: flex-start;
+}
+
+.eventButton.eventStart:not(.eventEnd) {
+  padding-right: 15px;
+  justify-content: flex-end;
+}
+
+.eventButton button {
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  cursor: pointer;
+}
+
+.eventButton p {
+  text-wrap: wrap;
+  display: -webkit-box;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 15px;
+  max-height: 30px;
+}
+
+.fc-event-main {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}

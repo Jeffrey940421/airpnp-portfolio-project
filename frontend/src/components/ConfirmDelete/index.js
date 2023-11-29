@@ -6,12 +6,12 @@ import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { useDispatch } from "react-redux";
 import "./ConfirmDelete.css";
 
-export function ConfirmDelete({ spot, review, type }) {
+export function ConfirmDelete({ spot, review, booking, type }) {
   const { closeModal } = useModal();
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const handleDelete = ({ spotId, review, type }) => {
+  const handleDelete = ({ spotId, review, bookingId, type }) => {
     if (spotId) {
       return dispatch(sessionActions.removeSpot(spotId))
         .then(closeModal)
@@ -35,6 +35,22 @@ export function ConfirmDelete({ spot, review, type }) {
             history.push(`/error/${res.status}`);
           });
       }
+    } else if (bookingId) {
+      if (type === "reservation") {
+        return dispatch(sessionActions.deleteReservation(bookingId))
+          .then(closeModal)
+          .catch(async (res) => {
+            closeModal();
+            history.push(`/error/${res.status}`);
+          });
+      } else {
+        return dispatch(sessionActions.deleteBooking(bookingId))
+          .then(closeModal)
+          .catch(async (res) => {
+            closeModal();
+            history.push(`/error/${res.status}`);
+          });
+      }
     }
   }
 
@@ -48,11 +64,17 @@ export function ConfirmDelete({ spot, review, type }) {
             <button onClick={() => handleDelete({ spotId: spot.id })}>Yes (Remove Spot)</button>
             <button onClick={closeModal}>No (Keep Spot)</button>
           </> :
-          <>
-            <p>Are you sure your want to delete this review?</p>
-            <button onClick={() => handleDelete({ review, type })}>Yes (Delete Review)</button>
-            <button onClick={closeModal}>No (Keep Review)</button>
-          </>
+          review ?
+            <>
+              <p>Are you sure your want to delete this review?</p>
+              <button onClick={() => handleDelete({ review, type })}>Yes (Delete Review)</button>
+              <button onClick={closeModal}>No (Keep Review)</button>
+            </> :
+            <>
+              <p>Are you sure you want to cancel this reservation?</p>
+              <button onClick={() => handleDelete({ bookingId: booking.id, type })}>Yes (Cancel Reservation)</button>
+              <button onClick={closeModal}>No (Keep Reservation)</button>
+            </>
       }
 
     </div>

@@ -36,7 +36,8 @@ module.exports = (sequelize, DataTypes) => {
           msg: "Start date must be a date"
         },
         isAfterToday(value) {
-          if (new Date(value).getTime() < new Date().setHours(-7, 0, 0, 0)) {
+          const timeOffset = new Date().getTimezoneOffset();
+          if (new Date(value).getTime() < new Date().setHours(0, -timeOffset, 0, 0)) {
             throw new Error("Start date must be after today's date")
           }
         }

@@ -9,6 +9,11 @@ const REMOVE_CURRENT_REVIEW = "session/REMOVE_CURRENT_REVIEW";
 const EDIT_CURRENT_REVIEW = "session/EDIT_CURRENT_REVIEW";
 const ADD_REVIEW_IMAGES = "session/ADD_REVIEW_IMAGES";
 const DELETE_REVIEW_IMAGES = "session/DELETE_REVIEW_IMAGES";
+const GET_CURRENT_BOOKINGS = "session/GET_CURRENT_BOOKINGS";
+const REMOVE_CURRENT_BOOKING = "session/REMOVE_CURRENT_BOOKING";
+const EDIT_CURRENT_BOOKING = "session/EDIT_CURRENT_BOOKING";
+const GET_CURRENT_RESERVATIONS = "session/GET_CURRENT_RESERVATIONS";
+const REMOVE_CURRENT_RESERVATION = "session/REMOVE_CURRENT_RESERVATION";
 
 const setUser = (user) => {
   return {
@@ -71,6 +76,41 @@ const deleteImages = (reviewId, imageIds) => {
     type: DELETE_REVIEW_IMAGES,
     reviewId,
     imageIds
+  }
+}
+
+const getBookings = (bookings) => {
+  return {
+    type: GET_CURRENT_BOOKINGS,
+    bookings
+  }
+}
+
+const removeBooking = (bookingId) => {
+  return {
+    type: REMOVE_CURRENT_BOOKING,
+    bookingId
+  }
+}
+
+const editBooking = (booking) => {
+  return {
+    type: EDIT_CURRENT_BOOKING,
+    booking
+  }
+}
+
+const getReservations = (reservations) => {
+  return {
+    type: GET_CURRENT_RESERVATIONS,
+    reservations
+  }
+}
+
+const removeReservation = (reservationId) => {
+  return {
+    type: REMOVE_CURRENT_RESERVATION,
+    reservationId
   }
 }
 
@@ -178,7 +218,53 @@ export const removeReviewImages = (reviewId, imageIds) => async (dispatch) => {
   return response;
 }
 
-const initialState = { user: null, spots: {}, reviews: {} };
+export const listBookings = () => async (dispatch) => {
+  const response = await csrfFetch("/api/bookings/current");
+  const data = await response.json();
+  dispatch(getBookings(data.Bookings));
+  return response;
+}
+
+export const deleteBooking = (bookingId) => async (dispatch) => {
+  const response = await csrfFetch(`/api/bookings/${bookingId}`, {
+    method: "DELETE"
+  });
+  if (response.ok) {
+    dispatch(removeBooking(bookingId));
+  } else {
+    return response;
+  }
+}
+
+export const updateBooking = (bookingId, booking) => async (dispatch) => {
+  const response = await csrfFetch(`/api/bookings/${bookingId}`, {
+    method: "PUT",
+    body: JSON.stringify(booking)
+  });
+  const data = await response.json();
+  dispatch(editBooking(data));
+  return response;
+}
+
+export const listReservations = (spotId) => async (dispatch) => {
+  const response = await csrfFetch(`/api/spots/${spotId}/bookings`);
+  const data = await response.json();
+  dispatch(getReservations(data.Bookings));
+  return response;
+}
+
+export const deleteReservation = (reservationId) => async (dispatch) => {
+  const response = await csrfFetch(`/api/bookings/${reservationId}`, {
+    method: "DELETE"
+  });
+  if (response.ok) {
+    dispatch(removeReservation(reservationId));
+  } else {
+    return response;
+  }
+}
+
+const initialState = { user: null, spots: {}, reviews: {}, bookings: {}, reservations: {} };
 
 const sessionReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -210,6 +296,24 @@ const sessionReducer = (state = initialState, action) => {
       let reviewImages = [...state.reviews[action.reviewId].ReviewImages];
       reviewImages = reviewImages.filter(image => !action.imageIds.includes(image.id));
       return { ...state, reviews: { ...state.reviews, [action.reviewId]: { ...state.reviews[action.reviewId], ReviewImages: reviewImages } } }
+    case GET_CURRENT_BOOKINGS:
+      const bookings = {};
+      action.bookings.forEach(booking => bookings[booking.id] = booking);
+      return { ...state, bookings }
+    case REMOVE_CURRENT_BOOKING:
+      const newBookings = { ...state.bookings };
+      delete newBookings[action.bookingId];
+      return { ...state, bookings: newBookings };
+    case EDIT_CURRENT_BOOKING:
+      return { ...state, bookings: { ...state.bookings, [action.booking.id]: { ...state.bookings[action.booking.id], ...action.booking } } }
+    case GET_CURRENT_RESERVATIONS:
+      const reservations = {};
+      action.reservations.forEach(reservation => reservations[reservation.id] = reservation);
+      return { ...state, reservations }
+    case REMOVE_CURRENT_RESERVATION:
+      const newReservations = { ...state.reservations };
+      delete newReservations[action.reservationId];
+      return { ...state, reservations: newReservations };
     default:
       return state;
   }

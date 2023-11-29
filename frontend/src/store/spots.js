@@ -9,6 +9,7 @@ const UPDATE_SINGLE_SPOT = "spots/UPDATE_SINGLE_SPOT";
 const DELETE_IMAGES = "spots/DELETE_IMAGES";
 const SET_PREVIEW = "spots/SET_PREVIEW";
 const REMOVE_SPOT = "spots/REMOVE_SPOT";
+const ADD_BOOKING = "spots/ADD_BOOKING";
 
 const getSpots = (spots, page) => {
   return {
@@ -63,6 +64,13 @@ const setPreview = (imageId) => {
   return {
     type: SET_PREVIEW,
     imageId
+  }
+}
+
+const createBooking = (booking) => {
+  return {
+    type: ADD_BOOKING,
+    booking
   }
 }
 
@@ -136,10 +144,13 @@ export const removeNewSpot = (spotId) => async (dispatch) => {
 }
 
 export const loadSingleSpot = (spotId) => async (dispatch) => {
-  const response = await csrfFetch(`/api/spots/${spotId}`);
-  const data = await response.json();
-  dispatch(getSingleSpot(data));
-  return response;
+  const spotResponse = await csrfFetch(`/api/spots/${spotId}`);
+  const spotData = await spotResponse.json();
+  const bookingResponse = await csrfFetch(`/api/spots/${spotId}/bookings`);
+  const bookingData = await bookingResponse.json();
+  spotData.Bookings = bookingData.Bookings;
+  dispatch(getSingleSpot(spotData));
+  return spotResponse;
 }
 
 export const editSpot = (spot, spotId) => async (dispatch) => {
@@ -167,6 +178,16 @@ export const setPreviewImage = (imageId) => async (dispatch) => {
     body: JSON.stringify({ preview: true })
   });
   dispatch(setPreview(imageId));
+  return response;
+}
+
+export const addBooking = (booking, spotId) => async (dispatch) => {
+  const response = await csrfFetch(`/api/spots/${spotId}/bookings`, {
+    method: "POST",
+    body: JSON.stringify(booking)
+  });
+  const data = await response.json();
+  dispatch(createBooking(data));
   return response;
 }
 
@@ -202,6 +223,9 @@ const spotsReducer = (state = initialState, action) => {
         }
       }
       return { ...state, singleSpot: { ...state.singleSpot, SpotImages: newSpotImages } }
+    case ADD_BOOKING:
+      const booking = {spotId: `${action.booking.spotId}`, startDate: action.booking.startDate, endDate: action.booking.endDate};
+      return { ...state, singleSpot: { ...state.singleSpot, Bookings: [...state.singleSpot.Bookings, booking] } }
     default:
       return state;
   }

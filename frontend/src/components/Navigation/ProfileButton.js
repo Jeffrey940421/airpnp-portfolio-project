@@ -53,6 +53,18 @@ export function ProfileButton({ user }) {
     setShowMenu(false);
   }
 
+  const manageTrips = (e) => {
+    e.preventDefault();
+    history.push("/bookings/current");
+    setShowMenu(false);
+  }
+
+  const manageReservations = (e) => {
+    e.preventDefault();
+    history.push("/reservations/current");
+    setShowMenu(false);
+  }
+
   let content;
   if (user) {
     content = (
@@ -61,9 +73,10 @@ export function ProfileButton({ user }) {
           <div>Hello, {user.firstName}!</div>
           <div>{user.email}</div>
         </li>
-        <li className="clickableList">Manage Account</li>
         <li className="clickableList" onClick={manageSpots}>Manage Places</li>
         <li className="clickableList" onClick={manageReviews}>Manage Reviews</li>
+        <li className="clickableList" onClick={manageTrips}>Manage Trips</li>
+        <li className="clickableList" onClick={manageReservations}>Manage Reservations</li>
         <li className="clickableList" onClick={handleLogout}>Log Out</li>
       </>
     )

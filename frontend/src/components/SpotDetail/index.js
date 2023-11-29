@@ -10,6 +10,9 @@ import { useModal } from "../../context/Modal";
 import MapContainer from "../Maps";
 import { ReviewList } from "../ReviewList";
 import { CreateReviewContainer } from "../CreateReview";
+import { Reserve } from "../Reserve";
+import { LoginForm } from "../LoginForm";
+import { ConfirmReservation } from "../ConfirmReservation";
 
 export function SpotDetail() {
   const { spotId } = useParams();
@@ -20,10 +23,18 @@ export function SpotDetail() {
   const [hasMore, setHasMore] = useState(false);
   const [circleRadius, setCircleRadius] = useState(150);
   const [showNote, setShowNote] = useState(false);
+  const [validStartDate, setValidStartDate] = useState("");
+  const [validEndDate, setValidEndDate] = useState("");
+  const [serverErrors, setServerErrors] = useState({});
+  const [key, setKey] = useState(0);
   const { setModalContent, setOnModalClose } = useModal();
   const history = useHistory();
+  const disabledDates = spot.Bookings ? spot.Bookings.map(booking => {
+    return [booking.startDate, booking.endDate]
+  }) : [];
 
   const changeRadius = (currentZoom) => setCircleRadius(150 * (1.8 ** (currentZoom - 16)))
+  const nights = validStartDate && validEndDate ? Math.ceil((new Date(validEndDate) - new Date(validStartDate)) / (1000 * 60 * 60 * 24)) : "";
 
   const months = {
     1: "January",
@@ -58,6 +69,35 @@ export function SpotDetail() {
     )
   }
 
+  const handleReserve = (e) => {
+    e.preventDefault();
+    setServerErrors({});
+
+    const booking = {
+      startDate: validStartDate,
+      endDate: validEndDate,
+    }
+
+    if (validStartDate && validEndDate) {
+      return dispatch(spotActions.addBooking(booking, spot.id))
+        .then(() => {
+          setModalContent(<ConfirmReservation spot={spot} validStartDate={validStartDate} validEndDate={validEndDate} />)
+          setValidStartDate("");
+          setValidEndDate("");
+          setKey((prev) => prev + 1);
+        })
+        .catch(
+          async (res) => {
+            const data = await res.json();
+            if (data && data.errors) {
+              setServerErrors(data.errors);
+            }
+          }
+        )
+    }
+  }
+
+
   useEffect(() => {
     dispatch(spotActions.loadSingleSpot(spotId))
       .then(() => dispatch(reviewActions.loadReviews(spotId)))
@@ -70,7 +110,7 @@ export function SpotDetail() {
     const introduction = document.querySelector(".details .introduction p");
     if (introduction) {
       const lines = introduction.offsetHeight / 24;
-      if (lines > 4) {
+      if (lines > 5) {
         setHasMore(true);
       }
     }
@@ -105,13 +145,56 @@ export function SpotDetail() {
               <div className="reserve">
                 <div>
                   <span className="spotPrice">
-                    ${(+spot.price).toLocaleString("en-US", {minimumFractionDigits: 2})} <span className="night">night</span>
+                    ${(+spot.price).toLocaleString("en-US", { minimumFractionDigits: 2 })} <span className="night">night</span>
                   </span>
                   <span>
                     <i className="fa-solid fa-star" /> {reviewsAvg ? (Number.isInteger(reviewsAvg) ? reviewsAvg.toFixed(1) : reviewsAvg.toFixed(2)) : "New"} {reviewsNum ? reviewsNum === 1 ? `· ${reviewsNum} review` : `· ${reviewsNum} reviews` : null}
                   </span>
                 </div>
-                <button onClick={() => alert("Feature is coming soon")}>Reserve</button>
+                {
+                  user ?
+                    user.id !== spot.Owner.id ?
+                      <>
+                        <div className="datePickerContainer" key={key}>
+                          <Reserve dates={[disabledDates, validStartDate, setValidStartDate, validEndDate, setValidEndDate]} serverErrors={serverErrors}></Reserve>
+                        </div>
+                        <button
+                          disabled={!validStartDate || !validEndDate}
+                          onClick={handleReserve}
+                        >
+                          Reserve
+                        </button>
+                        {
+                          validStartDate && validEndDate ?
+                            <>
+                              <span className="priceNote">You won't be charged yet</span>
+                              <div className="priceDetail">
+                                <span>${(+spot.price).toLocaleString("en-US", { minimumFractionDigits: 2 })} x {nights} Nights</span>
+                                <span className="priceNum">${(+spot.price * nights).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+                                <span>Cleaning Fee</span>
+                                <span className="priceNum">${(+spot.price * 0.2).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+                                <span>Airpnp Service Fee</span>
+                                <span className="priceNum">${(+spot.price * nights * 0.1).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+                              </div>
+                              <div className="totalPrice">
+                                <span>Total</span>
+                                <span className="priceNum">${(+spot.price * nights * 1.1 + +spot.price * 0.2).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+                              </div>
+                            </> :
+                            null
+                        }
+                      </> :
+                      <button
+                        onClick={() => history.push({pathname: "/reservations/current", state: {defaultSpotId: spot.id} })}
+                      >
+                        Manage Reservations
+                      </button> :
+                    <button
+                      onClick={() => setModalContent(<LoginForm />)}
+                    >
+                      Login to Reserve
+                    </button>
+                }
               </div>
             </div>
           </div>
