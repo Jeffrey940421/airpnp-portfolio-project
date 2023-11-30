@@ -509,14 +509,14 @@ router.get("/", validateSpotQuery, async (req, res) => {
     where[Op.and].push(Sequelize.literal(`
       NOT EXISTS (
         SELECT *
-        FROM "Bookings"
-        WHERE "Bookings"."spotId" = "Spot"."id"
+        FROM ${schema}"Bookings"
+        WHERE ${schema}"Bookings"."spotId" = "Spot"."id"
         AND (
-          ("Bookings"."endDate" BETWEEN '${start}' AND '${end}')
+          (${schema}"Bookings"."endDate" BETWEEN '${start}' AND '${end}')
           OR
-          ("Bookings"."startDate" BETWEEN '${start}' AND '${end}')
+          (${schema}"Bookings"."startDate" BETWEEN '${start}' AND '${end}')
           OR
-          ("Bookings"."startDate" < '${start}' AND "Bookings"."endDate" > '${end}')
+          (${schema}"Bookings"."startDate" < '${start}' AND ${schema}"Bookings"."endDate" > '${end}')
         )
       )
     `))
@@ -551,9 +551,9 @@ router.get("/", validateSpotQuery, async (req, res) => {
         [
           Sequelize.literal(`
             (
-              SELECT COUNT("Reviews"."id")
-              FROM "Reviews"
-              WHERE "Reviews"."spotId" = "Spot"."id"
+              SELECT COUNT(${schema}"Reviews"."id")
+              FROM ${schema}"Reviews"
+              WHERE ${schema}"Reviews"."spotId" = "Spot"."id"
             )
           `),
           "reviewCount"
@@ -562,10 +562,10 @@ router.get("/", validateSpotQuery, async (req, res) => {
           Sequelize.literal(`
             (
               SELECT COUNT(*)
-              FROM "Bookings"
+              FROM ${schema}"Bookings"
               WHERE
-                "Bookings"."spotId" = "Spot"."id" AND
-                "Bookings"."createdAt" >= datetime('now', '-30 days')
+                ${schema}"Bookings"."spotId" = "Spot"."id" AND
+                ${schema}"Bookings"."createdAt" >= datetime('now', '-30 days')
             )
           `),
           "hot"
