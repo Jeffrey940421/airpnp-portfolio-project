@@ -10,6 +10,7 @@ const { multipleFilesUpload, multipleMulterUpload, retrievePrivateFile, singleMu
 
 const geolocation = JSON.parse(fs.readFileSync(require.resolve("../../utils/geolocation.json")).toString());
 const timeOffset = new Date().getTimezoneOffset();
+const schema = process.env.NODE_ENV === 'production' ? `${process.env.SCHEMA}.`: ""
 
 const validateBookingInfo = [
   check("startDate")
@@ -534,9 +535,9 @@ router.get("/", validateSpotQuery, async (req, res) => {
               NULLIF(
                 COALESCE(
                   (
-                    SELECT AVG("Reviews"."stars")
-                    FROM "Reviews"
-                    WHERE "Reviews"."spotId" = "Spot"."id"
+                    SELECT AVG(${schema}"Reviews"."stars")
+                    FROM ${schema}"Reviews"
+                    WHERE ${schema}"Reviews"."spotId" = "Spot"."id"
                   ),
                   NULL
                 ),
