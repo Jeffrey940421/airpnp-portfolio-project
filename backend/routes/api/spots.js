@@ -310,8 +310,8 @@ const validateSpotQuery = [
     .optional({
       values: "falsy"
     })
-    .isIn(["ASC", "DESC"])
-    .withMessage("Order must be ASC or DESC"),
+    .isIn(["ASC NULLS FIRST", "DESC NULLS LAST"])
+    .withMessage("Order must be ASC NULLS FIRST or DESC NULLS LAST"),
   handleValidationErrors
 ]
 
@@ -442,19 +442,19 @@ const validateSpotInfo = [
   handleValidationErrors
 ];
 
-router.post("/test", singleMulterUpload("image"), async (req, res, next) => {
-  const url = req.file ?
-    await singleFileUpload({ file: req.file, public: true }) :
-    null;
-  res.json({ default: url })
-})
+// router.post("/test", singleMulterUpload("image"), async (req, res, next) => {
+//   const url = req.file ?
+//     await singleFileUpload({ file: req.file, public: true }) :
+//     null;
+//   res.json({ default: url })
+// })
 
-router.post("/test2", multipleMulterUpload("images"), async (req, res, next) => {
-  const urls = req.files ?
-    await multipleFilesUpload({ files: req.files, public: true }) :
-    null;
-  res.json({ urls })
-})
+// router.post("/test2", multipleMulterUpload("images"), async (req, res, next) => {
+//   const urls = req.files ?
+//     await multipleFilesUpload({ files: req.files, public: true }) :
+//     null;
+//   res.json({ urls })
+// })
 
 
 // get all spots
@@ -587,7 +587,7 @@ router.get("/", validateSpotQuery, async (req, res) => {
       }
     ],
     order: [
-      [Sequelize.literal(`"${sort}"` || '"id"'), order || "ASC"]
+      [Sequelize.literal(sort ? `"${sort}"` : '"id"'), order || "ASC NULLS FIRST"]
     ],
     limit: size,
     offset: size * (page - 1)
