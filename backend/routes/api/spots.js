@@ -565,7 +565,7 @@ router.get("/", validateSpotQuery, async (req, res) => {
               FROM ${schema}"Bookings"
               WHERE
                 ${schema}"Bookings"."spotId" = "Spot"."id" AND
-                ${schema}"Bookings"."createdAt" >= datetime('now', '-30 days')
+                ${schema}"Bookings"."createdAt" >= ${process.env.NODE_ENV === 'production' ? "CURRENT_DATE - INTERVAL '30 days'" : "datetime('now', '-30 days')"}
             )
           `),
           "hot"
