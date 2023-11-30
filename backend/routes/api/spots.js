@@ -565,6 +565,15 @@ router.get("/", validateSpotQuery, async (req, res) => {
             )
           `),
           "hot"
+        ],
+        [
+          Sequelize.literal(`
+            (
+              SELECT avgRating * 20 + hot * 5 - price / 10 + reviewCount * 10
+              FROM ${schema}"Spots"
+            )
+          `),
+          "suggest"
         ]
       ]
     },
@@ -583,7 +592,7 @@ router.get("/", validateSpotQuery, async (req, res) => {
       }
     ],
     order: [
-      [Sequelize.literal(sort ? (sort === "suggest" ? '"avgRating" * 20 + "hot" * 5 - "price" / 10 + "reviewCount" * 10' : `"${sort}"`) : '"id"'), order || "ASC NULLS FIRST"]
+      [Sequelize.literal(sort ? `"${sort}"` : '"id"'), order || "ASC NULLS FIRST"]
     ],
     limit: size,
     offset: size * (page - 1)
