@@ -1,6 +1,6 @@
 const express = require('express');
 const { requireAuth, spotExist, spotAuthorization, spotReviewAuthorization, spotBookingAuthorization, duplicateReview } = require('../../utils/auth');
-const { Spot, Review, SpotImage, User, ReviewImage, Booking } = require('../../db/models');
+const { Spot, Review, SpotImage, User, ReviewImage, Booking, Sequelize } = require('../../db/models');
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 const router = express.Router();
@@ -189,6 +189,128 @@ const validateSpotQuery = [
       return true
     })
     .withMessage("minPrice must be less than or equal to maxPrice"),
+  check("city")
+    .optional({
+      values: "falsy"
+    })
+    .isLength({ min: 1, max: 70 })
+    .withMessage('Please provide a city with at least 1 character and no more than 70 characters'),
+  check("city")
+    .optional({
+      values: "falsy"
+    })
+    .if((value) => value)
+    .custom((value, { req }) => {
+      return req.query.country && req.query.state
+    })
+    .withMessage('Please provide state and country to validate city'),
+  check("city")
+    .optional({
+      values: "falsy"
+    })
+    .if((value, { req }) => {
+      return geolocation[req.query.country] && geolocation[req.query.country][req.query.state]
+    })
+    .custom((value, { req }) => {
+      if (!geolocation[req.query.country][req.query.state].find(city => city === value)) {
+        return false;
+      }
+      return true;
+    })
+    .withMessage('Please provide a valid city'),
+  check("state")
+    .optional({
+      values: "falsy"
+    })
+    .isLength({ min: 2, max: 70 })
+    .withMessage('Please provide a state with at least 2 characters and no more than 70 characters'),
+  check("state")
+    .optional({
+      values: "falsy"
+    })
+    .if((value) => value)
+    .custom((value, { req }) => {
+      return req.query.country
+    })
+    .withMessage('Please provide country to validate city'),
+  check("state")
+    .optional({
+      values: "falsy"
+    })
+    .if((value, { req }) => {
+      return geolocation[req.query.country]
+    })
+    .custom((value, { req }) => {
+      if (!geolocation[req.query.country][req.query.state]) {
+        return false;
+      }
+      return true;
+    })
+    .withMessage('Please provide a valid state. City is not validated with invalid state'),
+  check("country")
+    .optional({
+      values: "falsy"
+    })
+    .isLength({ min: 4, max: 50 })
+    .withMessage('Please provide a state with at least 4 characters and no more than 50 characters'),
+  check("country")
+    .optional({
+      values: "falsy"
+    })
+    .isIn(Object.keys(geolocation))
+    .withMessage("Please provide a valid country. State and city are not validated with invalid country"),
+  check("start")
+    .optional({
+      values: "falsy"
+    })
+    .isDate({
+      format: "YYYY-MM-DD",
+      delimiters: ["-"]
+    })
+    .withMessage("Start date must be a date in YYYY-MM-DD format"),
+  check("start")
+    .optional({
+      values: "falsy"
+    })
+    .custom((value) => {
+      if (new Date(value).getTime() < new Date().setHours(0, -timeOffset, 0, 0)) {
+        return false
+      }
+      return true
+    })
+    .withMessage("Start date must be after today's date"),
+  check("end")
+    .optional({
+      values: "falsy"
+    })
+    .isDate({
+      format: "YYYY-MM-DD",
+      delimiters: ["-"]
+    })
+    .withMessage("End date must be a date in YYYY-MM-DD format"),
+  check("end")
+    .optional({
+      values: "falsy"
+    })
+    .custom((value, { req }) => {
+      if (new Date(value).getTime() <= new Date(req.query.start).getTime()) {
+        return false
+      }
+      return true
+    })
+    .withMessage("End date must be after start date"),
+  check("sort")
+    .optional({
+      values: "falsy"
+    })
+    .isIn(["avgRating", "price", "hot", "reviewCount", "suggest"])
+    .withMessage("Sort must be avgRating, price, hot, reviewCount, or suggest"),
+  check("order")
+    .optional({
+      values: "falsy"
+    })
+    .isIn(["ASC", "DESC"])
+    .withMessage("Order must be ASC or DESC"),
   handleValidationErrors
 ]
 
@@ -323,20 +445,20 @@ router.post("/test", singleMulterUpload("image"), async (req, res, next) => {
   const url = req.file ?
     await singleFileUpload({ file: req.file, public: true }) :
     null;
-  res.json({default: url})
+  res.json({ default: url })
 })
 
 router.post("/test2", multipleMulterUpload("images"), async (req, res, next) => {
   const urls = req.files ?
     await multipleFilesUpload({ files: req.files, public: true }) :
     null;
-  res.json({urls})
+  res.json({ urls })
 })
 
 
 // get all spots
 router.get("/", validateSpotQuery, async (req, res) => {
-  let { page, size, maxLat, minLat, maxLng, minLng, maxPrice, minPrice } = req.query
+  let { page, size, maxLat, minLat, maxLng, minLng, maxPrice, minPrice, country, state, city, keyword, sort, order, start, end } = req.query
   page = +page || 1;
   size = +size || 20;
   maxLat = +maxLat || 90;
@@ -345,29 +467,115 @@ router.get("/", validateSpotQuery, async (req, res) => {
   minLng = +minLng || -180;
   minPrice = +minPrice || 0;
   const where = {
-    lat: {
-      [Op.lte]: maxLat,
-      [Op.gte]: minLat
-    },
-    lng: {
-      [Op.lte]: maxLng,
-      [Op.gte]: minLng
-    },
-    price: {
-      [Op.gte]: minPrice
-    }
+    [Op.and]: [
+      {
+        lat: {
+          [Op.lte]: maxLat,
+          [Op.gte]: minLat
+        }
+      },
+      {
+        lng: {
+          [Op.lte]: maxLng,
+          [Op.gte]: minLng
+        }
+      },
+      {
+        price: {
+          [Op.gte]: minPrice
+        }
+      }
+    ]
   };
 
   if (maxPrice) {
-    where.price[Op.lte] = +maxPrice
+    where[Op.and].push({ price: { [Op.lte]: +maxPrice } })
+  }
+
+  if (country) {
+    where[Op.and].push({ country: country });
+  }
+
+  if (state) {
+    where[Op.and].push({ state: state });
+  }
+
+  if (city) {
+    where[Op.and].push({ city: city });
+  }
+
+  if (start && end) {
+    where[Op.and].push(Sequelize.literal(`
+      NOT EXISTS (
+        SELECT *
+        FROM "Bookings"
+        WHERE "Bookings"."spotId" = "Spot"."id"
+        AND (
+          ("Bookings"."endDate" BETWEEN '${start}' AND '${end}')
+          OR
+          ("Bookings"."startDate" BETWEEN '${start}' AND '${end}')
+          OR
+          ("Bookings"."startDate" < '${start}' AND "Bookings"."endDate" > '${end}')
+        )
+      )
+    `))
+  }
+
+  if (sort === "suggest") {
+    sort = "avgRating * 20 + hot * 5 - price / 10 + reviewCount * 10";
   }
 
   let spots = await Spot.findAll({
+    attributes: {
+      include: [
+        [
+          Sequelize.literal(`
+            ROUND(
+              NULLIF(
+                COALESCE(
+                  (
+                    SELECT AVG("Reviews"."stars")
+                    FROM "Reviews"
+                    WHERE "Reviews"."spotId" = "Spot"."id"
+                  ),
+                  NULL
+                ),
+                0
+              ),
+              2
+            )
+          `),
+          "avgRating"
+        ],
+        [
+          Sequelize.literal(`
+            (
+              SELECT COUNT("Reviews"."id")
+              FROM "Reviews"
+              WHERE "Reviews"."spotId" = "Spot"."id"
+            )
+          `),
+          "reviewCount"
+        ],
+        [
+          Sequelize.literal(`
+            (
+              SELECT COUNT(*)
+              FROM "Bookings"
+              WHERE
+                "Bookings"."spotId" = "Spot"."id" AND
+                "Bookings"."createdAt" >= datetime('now', '-30 days')
+            )
+          `),
+          "hot"
+        ]
+      ]
+    },
     where,
     include: [
       {
         model: Review,
-        attributes: ["stars"]
+        attributes: []
       },
       {
         model: SpotImage,
@@ -376,6 +584,9 @@ router.get("/", validateSpotQuery, async (req, res) => {
         },
         required: false
       }
+    ],
+    order: [
+      [Sequelize.literal(sort || "id"), order || "ASC"]
     ],
     limit: size,
     offset: size * (page - 1)
@@ -387,13 +598,7 @@ router.get("/", validateSpotQuery, async (req, res) => {
     } else {
       spot.previewImage = null;
     }
-    if (spot.Reviews.length) {
-      spot.avgRating = +(spot.Reviews.reduce((sum, review) => sum += review.stars, 0) / spot.Reviews.length).toFixed(2);
-    } else {
-      spot.avgRating = null;
-    }
     delete spot.SpotImages;
-    delete spot.Reviews;
     return spot;
   });
   res.json({ Spots: spots, page, size });
