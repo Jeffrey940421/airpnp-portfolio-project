@@ -587,7 +587,7 @@ router.get("/", validateSpotQuery, async (req, res) => {
       }
     ],
     order: [
-      [Sequelize.literal('"avgRating"'), order || "ASC"]
+      [Sequelize.literal(`"${sort}"` || '"id"'), order || "ASC"]
     ],
     limit: size,
     offset: size * (page - 1)
