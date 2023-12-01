@@ -560,7 +560,7 @@ router.get("/", validateSpotQuery, async (req, res) => {
 
   if (keyword) {
     where[Op.and].push(Sequelize.literal(`
-      to_tsvector(${language}, "Spot"."description") @@ to_tsquery(${language}, 'english'), ${keyword})
+      to_tsvector(${language}, "Spot"."description") @@ to_tsquery(${language}, ${keyword})
     `))
   }
 
