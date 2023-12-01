@@ -320,8 +320,8 @@ const validateSpotQuery = [
     .optional({
       values: "falsy"
     })
-    .isIn(["avgRating", "price", "hot", "reviewCount"])
-    .withMessage("Sort must be avgRating, price, hot or, reviewCount"),
+    .isIn(["avgRating", "price", "popularity", "numReviews", "topPick"])
+    .withMessage("Sort must be avgRating, price, popularity, numReviews, or topPick"),
   check("order")
     .optional({
       values: "falsy"
@@ -502,21 +502,6 @@ const validateSpotInfo = [
   handleValidationErrors
 ];
 
-// router.post("/test", singleMulterUpload("image"), async (req, res, next) => {
-//   const url = req.file ?
-//     await singleFileUpload({ file: req.file, public: true }) :
-//     null;
-//   res.json({ default: url })
-// })
-
-// router.post("/test2", multipleMulterUpload("images"), async (req, res, next) => {
-//   const urls = req.files ?
-//     await multipleFilesUpload({ files: req.files, public: true }) :
-//     null;
-//   res.json({ urls })
-// })
-
-
 // get all spots
 router.get("/", validateSpotQuery, async (req, res) => {
   let { page, size, maxLat, minLat, maxLng, minLng, maxPrice, minPrice, country, state, city, keyword, language, sort, order, start, end } = req.query
@@ -625,7 +610,7 @@ router.get("/", validateSpotQuery, async (req, res) => {
               WHERE ${schema}"Reviews"."spotId" = "Spot"."id"
             )
           `),
-          "reviewCount"
+          "numReviews"
         ],
         [
           Sequelize.literal(`
@@ -637,7 +622,7 @@ router.get("/", validateSpotQuery, async (req, res) => {
                 ${schema}"Bookings"."createdAt" >= ${process.env.NODE_ENV === 'production' ? "CURRENT_DATE - INTERVAL '30 days'" : "datetime('now', '-30 days')"}
             )
           `),
-          "hot"
+          "popularity"
         ]
       ]
     },
@@ -656,7 +641,7 @@ router.get("/", validateSpotQuery, async (req, res) => {
       }
     ],
     order: [
-      [Sequelize.literal(sort ? `"${sort}"` : '"id"'), order || "ASC NULLS FIRST"]
+      [Sequelize.literal(sort ? sort === "topPick" ? "'popularity' * 10 + 'avgRating' * 3" : `"${sort}"` : '"id"'), order || "ASC NULLS FIRST"]
     ],
     limit: size,
     offset: size * (page - 1)
