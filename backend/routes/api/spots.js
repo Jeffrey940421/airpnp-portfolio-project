@@ -261,6 +261,14 @@ const validateSpotQuery = [
     .isIn(Object.keys(geolocation))
     .withMessage("Please provide a valid country. State and city are not validated with invalid country"),
   check("start")
+    .custom((value, { req }) => {
+      if (req.query.end && !req.query.start) {
+        return false;
+      }
+      return true;
+    })
+    .withMessage("Please provide a start date"),
+  check("start")
     .optional({
       values: "falsy"
     })
@@ -300,6 +308,14 @@ const validateSpotQuery = [
       return true
     })
     .withMessage("End date must be after start date"),
+  check("end")
+    .custom((value, { req }) => {
+      if (req.query.start && !req.query.end) {
+        return false;
+      }
+      return true;
+    })
+    .withMessage("Please provide an end date"),
   check("sort")
     .optional({
       values: "falsy"
@@ -347,6 +363,14 @@ const validateSpotQuery = [
       "turkish",
       "yiddish"
     ])
+    .withMessage("Please provide a valid language"),
+  check("language")
+    .custom((value, { req }) => {
+      if (req.query.keyword && !req.query.language) {
+        return false;
+      }
+      return true;
+    })
     .withMessage("Please provide a valid language"),
   handleValidationErrors
 ]
@@ -559,9 +583,16 @@ router.get("/", validateSpotQuery, async (req, res) => {
   }
 
   if (keyword) {
-    where[Op.and].push(Sequelize.literal(`
-      to_tsvector('${language}', "Spot"."description") @@ to_tsquery('${language}', '${keyword}')
-    `))
+    where[Op.and].push({
+      [Op.or]: [
+        Sequelize.literal(`
+          to_tsvector('${language}', "Spot"."description") @@ to_tsquery('${language}', '${keyword}')
+        `),
+        Sequelize.literal(`
+          to_tsvector('${language}', "Spot"."name") @@ to_tsquery('${language}', '${keyword}')
+        `)
+      ]
+    })
   }
 
   let spots = await Spot.findAll({
