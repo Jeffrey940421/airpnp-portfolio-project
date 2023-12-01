@@ -10,7 +10,7 @@ const { multipleFilesUpload, multipleMulterUpload, retrievePrivateFile, singleMu
 
 const geolocation = JSON.parse(fs.readFileSync(require.resolve("../../utils/geolocation.json")).toString());
 const timeOffset = new Date().getTimezoneOffset();
-const schema = process.env.NODE_ENV === 'production' ? `${process.env.SCHEMA}.`: ""
+const schema = process.env.NODE_ENV === 'production' ? `${process.env.SCHEMA}.` : ""
 
 const validateBookingInfo = [
   check("startDate")
@@ -304,14 +304,50 @@ const validateSpotQuery = [
     .optional({
       values: "falsy"
     })
-    .isIn(["avgRating", "price", "hot", "reviewCount", "suggest"])
-    .withMessage("Sort must be avgRating, price, hot, reviewCount, or suggest"),
+    .isIn(["avgRating", "price", "hot", "reviewCount"])
+    .withMessage("Sort must be avgRating, price, hot or, reviewCount"),
   check("order")
     .optional({
       values: "falsy"
     })
     .isIn(["ASC NULLS FIRST", "DESC NULLS LAST"])
     .withMessage("Order must be ASC NULLS FIRST or DESC NULLS LAST"),
+  check("language")
+    .optional({
+      values: "falsy"
+    })
+    .isIn([
+      "simple",
+      "arabic",
+      "armenian",
+      "basque",
+      "catalan",
+      "danish",
+      "dutch",
+      "english",
+      "finnish",
+      "french",
+      "german",
+      "greek",
+      "hindi",
+      "hungarian",
+      "indonesian",
+      "irish",
+      "italian",
+      "lithuanian",
+      "nepali",
+      "norwegian",
+      "portuguese",
+      "romanian",
+      "russian",
+      "serbian",
+      "spanish",
+      "swedish",
+      "tamil",
+      "turkish",
+      "yiddish"
+    ])
+    .withMessage("Please provide a valid language"),
   handleValidationErrors
 ]
 
@@ -459,7 +495,7 @@ const validateSpotInfo = [
 
 // get all spots
 router.get("/", validateSpotQuery, async (req, res) => {
-  let { page, size, maxLat, minLat, maxLng, minLng, maxPrice, minPrice, country, state, city, keyword, sort, order, start, end } = req.query
+  let { page, size, maxLat, minLat, maxLng, minLng, maxPrice, minPrice, country, state, city, keyword, language, sort, order, start, end } = req.query
   page = +page || 1;
   size = +size || 20;
   maxLat = +maxLat || 90;
@@ -522,6 +558,12 @@ router.get("/", validateSpotQuery, async (req, res) => {
     `))
   }
 
+  if (keyword) {
+    where[Op.and].push(Sequelize.literal(`
+      to_tsvector(${language}, "Spot"."description") @@ to_tsquery(${language}, 'english'), :keyword)
+    `), { keyword: keyword });
+  }
+
   let spots = await Spot.findAll({
     attributes: {
       include: [
@@ -565,15 +607,6 @@ router.get("/", validateSpotQuery, async (req, res) => {
             )
           `),
           "hot"
-        ],
-        [
-          Sequelize.literal(`
-            (
-              SELECT avgRating * 20 + hot * 5 - price / 10 + reviewCount * 10
-              FROM ${schema}"Spots"
-            )
-          `),
-          "suggest"
         ]
       ]
     },
