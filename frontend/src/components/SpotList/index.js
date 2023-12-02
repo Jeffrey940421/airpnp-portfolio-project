@@ -30,7 +30,7 @@ export function SpotList({ type }) {
         console.log("bbb")
         setIsLoading(true);
         const data = await dispatch(spotActions.listSpots(query ? `${query}&page=${page}` : `?page=${page}`));
-        if (data.Spots.length === 2) {
+        if (data.Spots.length === 20) {
           setPage(prev => prev + 1);
         } else {
           setHasMore(false);
@@ -47,7 +47,7 @@ export function SpotList({ type }) {
     } else {
       const date = await dispatch(spotActions.listSpots(query));
       setPage(1)
-      if (date.Spots.length === 2) {
+      if (date.Spots.length === 20) {
         setHasMore(true);
       } else {
         setHasMore(false);
