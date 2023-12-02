@@ -27,7 +27,7 @@ export function SpotList({ type }) {
     //   await dispatch(sessionActions.listSpots());
     // } else {
       if (page <= 10 && hasMore) {
-        console.log("bbb")
+        console.log(page)
         setIsLoading(true);
         const data = await dispatch(spotActions.listSpots(query ? `${query}&page=${page}` : `?page=${page}`));
         if (data.Spots.length === 4) {
@@ -46,9 +46,9 @@ export function SpotList({ type }) {
       await dispatch(sessionActions.listSpots());
     } else {
       const date = await dispatch(spotActions.listSpots(query));
-      setPage(1)
       if (date.Spots.length === 4) {
         setHasMore(true);
+        setPage(2);
       } else {
         setHasMore(false);
       }
@@ -76,7 +76,7 @@ export function SpotList({ type }) {
       window.addEventListener('scroll', handleScroll);
       return () => window.removeEventListener('scroll', handleScroll);
     }
-  }, [isLoading, hasMore]);
+  }, [isLoading, hasMore, page]);
 
 
   useEffect(() => {
