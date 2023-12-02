@@ -22,13 +22,15 @@ export function SpotList({ type }) {
   const spotList = type === "current" ? Object.values(spots) : Object.values(spots).map(page => Object.values(page)).flat()
 
   const fetchSpots = async () => {
-    if (type === "current") {
-      await dispatch(sessionActions.listSpots());
-    } else {
+    console.log(hasMore)
+    // if (type === "current") {
+    //   await dispatch(sessionActions.listSpots());
+    // } else {
       if (page <= 10 && hasMore) {
+        console.log("bbb")
         setIsLoading(true);
-        const data = await dispatch(spotActions.listSpots(query ? `${query}&page=${page}` :`?page=${page}`));
-        if (data.Spots.length === 20) {
+        const data = await dispatch(spotActions.listSpots(query ? `${query}&page=${page}` : `?page=${page}`));
+        if (data.Spots.length === 2) {
           setPage(prev => prev + 1);
         } else {
           setHasMore(false);
@@ -36,21 +38,31 @@ export function SpotList({ type }) {
         setIsLoading(false);
       }
     }
-    setHasFetched(true)
-  }
+
+  // }
 
   const initialFetch = async () => {
-    await dispatch(spotActions.listSpots(query));
-    setPage(1)
+    if (type === "current") {
+      await dispatch(sessionActions.listSpots());
+    } else {
+      const date = await dispatch(spotActions.listSpots(query));
+      setPage(1)
+      if (date.Spots.length === 2) {
+        setHasMore(true);
+      } else {
+        setHasMore(false);
+      }
+      setHasFetched(true)
+    }
   }
 
-  useEffect(() => {
-    fetchSpots();
-  }, [type]);
+  // useEffect(() => {
+  //   fetchSpots();
+  // }, [type, query]);
 
   useEffect(() => {
     initialFetch();
-  }, [query]);
+  }, [type, query]);
 
   const handleScroll = () => {
     const bottom = window.innerHeight + document.documentElement.scrollTop > document.body.offsetHeight;
@@ -64,7 +76,7 @@ export function SpotList({ type }) {
       window.addEventListener('scroll', handleScroll);
       return () => window.removeEventListener('scroll', handleScroll);
     }
-  }, [isLoading]);
+  }, [isLoading, hasMore, page]);
 
 
   useEffect(() => {
@@ -116,7 +128,7 @@ export function SpotList({ type }) {
                             document.querySelector(`.tooltip-${spot.id}`).style.top = cursorY - imageY + 20 + "px";
                           }
                         }
-                        />
+                      />
                       <div className="spotLocation">
                         <span className="address">{spot.city}, {spot.state}</span>
                         <span className="stars"><i className="fa-solid fa-star" /> {spot.avgRating ? (Number.isInteger(+spot.avgRating) ? (+spot.avgRating).toFixed(1) : (+spot.avgRating).toFixed(2)) : "New"}</span>
