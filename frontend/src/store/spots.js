@@ -82,16 +82,8 @@ const getSpotBookings = (bookings) => {
   }
 }
 
-export const listSpots = (filter) => async (dispatch) => {
-  const page = filter.page || "";
-  const size = filter.size || "";
-  const minLng = filter.minLng || "";
-  const maxLng = filter.maxLng || "";
-  const minLat = filter.minLat || "";
-  const maxLat = filter.maxLat || "";
-  const minPrice = filter.minPrice || "";
-  const maxPrice = filter.maxPrice || "";
-  const response = await csrfFetch(`/api/spots?page=${page}&size=${size}&minLng=${minLng}&maxLng=${maxLng}&minLat=${minLat}&maxLat=${maxLat}&minPrice=${minPrice}&maxPrice=${maxPrice}`);
+export const listSpots = (query) => async (dispatch) => {
+  const response = await csrfFetch(`/api/spots${query}`);
   const data = await response.json();
   dispatch(getSpots(data.Spots, data.page));
   if (response.ok) {
@@ -210,7 +202,11 @@ const spotsReducer = (state = initialState, action) => {
     case GET_SPOTS:
       const spotList = {};
       action.spots.forEach(spot => spotList[spot.id] = spot);
-      return { ...state, spotList: { ...state.spotList, [action.page]: spotList } };
+      if (action.page === 1) {
+        return { ...state, spotList: {1: spotList} };
+      } else {
+        return { ...state, spotList: { ...state.spotList, [action.page]: spotList } };
+      }
     case CREATE_SPOT:
       return { ...state, singleSpot: action.spot };
     case ADD_IMAGES:

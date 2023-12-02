@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import * as spotActions from "../../store/spots";
 import * as sessionActions from "../../store/session";
-import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { useHistory, useLocation } from "react-router-dom";
 import "./SpotList.css";
 import { OpenModalButton } from "../OpenModalButton";
 import { ConfirmDelete } from "../ConfirmDelete";
@@ -11,6 +11,8 @@ import { Loader } from "../Loader/Loader";
 
 export function SpotList({ type }) {
   const dispatch = useDispatch();
+  const location = useLocation();
+  const query = location.search;
   const history = useHistory();
   const spots = useSelector(state => type === "current" ? state.session.spots : state.spots.spotList);
   const [page, setPage] = useState(1);
@@ -25,7 +27,7 @@ export function SpotList({ type }) {
     } else {
       if (page <= 10 && hasMore) {
         setIsLoading(true);
-        const data = await dispatch(spotActions.listSpots({ page: page }));
+        const data = await dispatch(spotActions.listSpots(query ? `${query}&page=${page}` :`?page=${page}`));
         if (data.Spots.length === 20) {
           setPage(prev => prev + 1);
         } else {
@@ -37,9 +39,18 @@ export function SpotList({ type }) {
     setHasFetched(true)
   }
 
+  const initialFetch = async () => {
+    await dispatch(spotActions.listSpots(query));
+    setPage(1)
+  }
+
   useEffect(() => {
     fetchSpots();
   }, [type]);
+
+  useEffect(() => {
+    initialFetch();
+  }, [query]);
 
   const handleScroll = () => {
     const bottom = window.innerHeight + document.documentElement.scrollTop > document.body.offsetHeight;

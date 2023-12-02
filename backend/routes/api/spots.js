@@ -320,8 +320,8 @@ const validateSpotQuery = [
     .optional({
       values: "falsy"
     })
-    .isIn(["avgRating", "price", "popularity", "numReviews", "topPick"])
-    .withMessage("Sort must be avgRating, price, popularity, numReviews, or topPick"),
+    .isIn(["avgRating", "price", "popularity", "numReviews"])
+    .withMessage("Sort must be avgRating, price, popularity, or numReviews"),
   check("order")
     .optional({
       values: "falsy"
@@ -641,7 +641,7 @@ router.get("/", validateSpotQuery, async (req, res) => {
       }
     ],
     order: [
-      [Sequelize.literal(sort ? sort === "topPick" ? "'popularity' * 10 + 'avgRating' * 3" : `"${sort}"` : '"id"'), order || "ASC NULLS FIRST"]
+      [Sequelize.literal(sort ? `"${sort}"` : '"id"'), order || "ASC NULLS FIRST"]
     ],
     limit: size,
     offset: size * (page - 1)
