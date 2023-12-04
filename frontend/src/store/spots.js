@@ -11,6 +11,7 @@ const SET_PREVIEW = "spots/SET_PREVIEW";
 const REMOVE_SPOT = "spots/REMOVE_SPOT";
 const ADD_BOOKING = "spots/ADD_BOOKING";
 const GET_SPOT_BOOKINGS = "spots/GET_SPOT_BOOKINGS";
+const GET_PRICES = "spots/GET_PRICES";
 
 const getSpots = (spots, page) => {
   return {
@@ -82,6 +83,13 @@ const getSpotBookings = (bookings) => {
   }
 }
 
+const getPrices = (prices) => {
+  return {
+    type: GET_PRICES,
+    prices
+  }
+}
+
 export const listSpots = (query) => async (dispatch) => {
   const response = await csrfFetch(`/api/spots${query}`);
   const data = await response.json();
@@ -92,6 +100,23 @@ export const listSpots = (query) => async (dispatch) => {
     return response;
   }
 };
+
+export const listPrices = (query) => async (dispatch) => {
+  const minPriceResponse = await csrfFetch(`/api/spots${query}&sort=price&order=ASC NULLS FIRST&size=1&page=1`);
+  const minPriceData = await minPriceResponse.json();
+  const minPrice = minPriceData.Spots[0] ? minPriceData.Spots[0].price : 0;
+  if (!minPriceResponse.ok) {
+    return minPriceResponse;
+  }
+  const maxPriceResponse = await csrfFetch(`/api/spots${query}&sort=price&order=DESC NULLS LAST&size=1&page=1`);
+  const maxPriceData = await maxPriceResponse.json()
+  const maxPrice = maxPriceData.Spots[0] ? maxPriceData.Spots[0].price : undefined;
+  if (!maxPriceResponse.ok) {
+    return maxPriceResponse;
+  }
+  dispatch(getPrices({ minPrice, maxPrice }));
+  return { minPrice, maxPrice };
+}
 
 export const addSpot = (spot, images, preview) => async (dispatch) => {
   const spotResponse = await csrfFetch("/api/spots", {
@@ -195,7 +220,7 @@ export const addBooking = (booking, spotId) => async (dispatch) => {
   return response;
 }
 
-const initialState = { spotList: {}, singleSpot: {} };
+const initialState = { spotList: {}, singleSpot: {}, spotPrices: {} };
 
 const spotsReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -236,6 +261,8 @@ const spotsReducer = (state = initialState, action) => {
       return { ...state, singleSpot: { ...state.singleSpot, Bookings: [...state.singleSpot.Bookings, booking] } }
     case GET_SPOT_BOOKINGS:
       return { ...state, singleSpot: { ...state.singleSpot, Bookings: action.bookings } }
+    case GET_PRICES:
+      return { ...state, spotPrices: action.prices }
     default:
       return state;
   }

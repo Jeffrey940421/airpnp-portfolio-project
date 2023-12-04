@@ -126,7 +126,7 @@ li.profileSection {
   width: 100%;
   height: 60px;
   display: grid;
-  grid-template-columns: 2fr 2fr 3fr;
+  grid-template-columns: 2fr 2.5fr 3fr;
   align-items: center;
   border: 1px solid lightgray;
   border-radius: 30px;
@@ -182,12 +182,17 @@ li.profileSection {
 }
 
 .dropdownOptions > div {
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .dropdownOption {
   padding: 10px 20px;
   cursor: pointer;
+}
+
+.noOption {
+  padding: 10px 20px;
+  cursor: default;
 }
 
 .dropdownOption:hover {
@@ -275,6 +280,7 @@ li.profileSection {
   font-size: 14px;
   border-radius: 20px;
   width: fit-content;
+  cursor: pointer;
 }
 
 .dateFocused {
@@ -353,7 +359,7 @@ li.profileSection {
 
 .floatButtons {
   position: fixed;
-  top: 150px;
+  top: 120px;
   right: 20px;
   display: flex;
   flex-direction: column;
@@ -363,16 +369,26 @@ li.profileSection {
 
 .filter,
 .sort {
-  width: 100px;
+  width: 50px;
   height: 50px;
-  border-radius: 10px;
-  background-color: white;
-  border:1px solid lightgray;
+  border-radius: 50px;
+  background-color: #ff5a6096;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  color: white;
   font-size: 14px;
-  font-family: 'Manrope', sans-serif;
-  gap: 5px;
+}
+
+.filter:hover,
+.sort:hover {
+  background-color: #FF5A5F;
+}
+
+.filter:disabled,
+.sort:disabled {
+  background-color: lightgray;
+  cursor: default;
 }

@@ -1,0 +1,162 @@
+.filterContainer {
+  width: 700px;
+  height: 80vh;
+  font-family: 'Manrope', sans-serif;
+  padding: 30px 0px 70px 0px;
+  box-sizing: border-box;
+
+}
+
+.filterOptions {
+  height: calc(80vh - 200px);
+  padding-left: 40px;
+  padding-right: 24px;
+  padding-bottom: 20px;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid lightgray;
+  border-top: 1px solid lightgray;
+}
+
+.filterContainer h2 {
+  margin: 0px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.filterContainer h3 {
+  margin-bottom: 10px;
+}
+
+.filterContainer p {
+  font-size: 14px;
+  margin-top: 0px;
+  margin-bottom: 10px;
+}
+
+.doubleSlider {
+  width: 500px;
+  height: fit-content;
+  position: relative;
+  margin: 20px auto 0px auto;
+}
+
+.doubleSliderThumb.active {
+  background-color: grey;
+}
+
+.doubleSliderTrack.doubleSliderTrack-1 {
+  background: #83a9ff;
+  border-radius: 5px;
+  z-index: 2;
+}
+
+.doubleSliderTrack.doubleSliderTrack-0 {
+  background: #e7e7e7;
+  border-bottom-left-radius: 5px;
+  border-top-left-radius: 5px;
+}
+
+.doubleSliderTrack.doubleSliderTrack-2 {
+  background: #e7e7e7;
+  padding-left: 25px;
+  border-bottom-right-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.doubleSlider .doubleSliderTrack {
+  height: 10px;
+}
+
+.doubleSlider .doubleSliderThumb {
+  top: -8px;
+  width: 25px;
+  height: 25px;
+  outline: none;
+  background-color: white;
+  border: 1px solid lightgray;
+  border-radius: 100%;
+  line-height: 100px;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 100 !important;
+}
+
+.filterRange {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.filterRange h4 {
+  margin: 0px;
+  font-size: 14px;
+  color: gray;
+}
+
+.filterRange p {
+  margin: 0px;
+  font-size: 14px;
+}
+
+.minValue,
+.maxValue {
+  width: 200px;
+  height: fit-content;
+  border: 1px solid lightgray;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  gap: 5px;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.hyphen {
+  width: 20px;
+  height: 1px;
+  background-color: lightgray;
+}
+
+
+.priceFilter,
+.latFilter,
+.lngFilter {
+  margin-bottom: 30px;
+}
+
+.filterButtons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70px;
+  padding: 10px 40px 10px 40px
+}
+
+.clearFilters {
+  border: none;
+  background-color: transparent;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.applyFilters {
+  border: none;
+  background-color: black;
+  color: white;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}

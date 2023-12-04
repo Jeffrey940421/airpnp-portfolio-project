@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
 import { ProfileButton } from './ProfileButton';
 import logo from "../../assets/logo/logo.svg";
@@ -10,6 +10,9 @@ import placeData from '../../utils/placeObj.json'
 import places from '../../utils/placeArr.json'
 import Calendar from 'react-calendar';
 import { franc, francAll } from 'franc'
+import * as spotActions from "../../store/spots";
+import { Filter } from '../Filter';
+import { useModal } from '../../context/Modal';
 
 export function Navigation({ isLoaded }) {
   const convertToDestination = (city, state, country) => {
@@ -32,10 +35,13 @@ export function Navigation({ isLoaded }) {
   }
 
   const history = useHistory();
+  const dispatch = useDispatch();
+  const { setModalContent, setOnModalClose } = useModal();
   const user = useSelector(state => state.session.user);
   const location = useLocation();
   const query = location.search;
   const params = new URLSearchParams(query);
+  const spots = useSelector(state => state.spots.spotList);
   const [destination, setDestination] = useState(convertToDestination(params.get("city"), params.get("state"), params.get("country")));
   const [onchangeDestination, setOnchangeDestination] = useState(convertToDestination(params.get("city"), params.get("state"), params.get("country")));
   const [country, setCountry] = useState(params.get("country") || "");
@@ -52,6 +58,12 @@ export function Navigation({ isLoaded }) {
   const [showCalendar, setShowCalendar] = useState(false);
   const [keyword, setKeyword] = useState(params.get("keyword") || "");
   const [language, setLanguage] = useState(params.get("language") || "english");
+  const [minPrice, setMinPrice] = useState(params.get("minPrice") || "");
+  const [maxPrice, setMaxPrice] = useState(params.get("maxPrice") || "");
+  const [minLat, setMinLat] = useState(params.get("minLat") || "");
+  const [maxLat, setMaxLat] = useState(params.get("maxLat") || "");
+  const [minLng, setMinLng] = useState(params.get("minLng") || "");
+  const [maxLng, setMaxLng] = useState(params.get("maxLng") || "");
   const supportLanguages = [
     "simple",
     "arabic",
@@ -120,6 +132,22 @@ export function Navigation({ isLoaded }) {
     setRange(newRange);
   }
 
+  function getSearchQuery() {
+    let newCheckout
+    if (checkin && !checkout) {
+      newCheckout = new Date(new Date(changeDateFormat(checkin)).setDate(new Date(changeDateFormat(checkin)).getDate() + 1))
+      setCheckout(dateToString(newCheckout))
+      setRange([new Date(changeDateFormat(checkin)), newCheckout])
+      setSelectRange(false)
+    }
+    setOnchangeDestination(destination)
+    return `?country=${country}&state=${state}&city=${city}&start=${checkin}&end=${checkout || (newCheckout ? dateToString(newCheckout) : "")}&keyword=${keyword}&language=${language}`
+  }
+
+  const getFilterQuery = () => {
+    return `&minPrice=${minPrice}&maxPrice=${maxPrice}&minLat=${minLat}&maxLat=${maxLat}&minLng=${minLng}&maxLng=${maxLng}`
+  }
+
   useEffect(() => {
     if (!onchangeDestination) {
       setShowDropdown(false);
@@ -176,8 +204,11 @@ export function Navigation({ isLoaded }) {
       } else if (placeData[destination].type === "state") {
         setState(placeData[destination].state)
         setCountry(placeData[destination].country)
+        setCity("")
       } else if (placeData[destination].type === "country") {
         setCountry(placeData[destination].country)
+        setState("")
+        setCity("")
       }
     } else {
       setCity("")
@@ -202,6 +233,12 @@ export function Navigation({ isLoaded }) {
       setKeyword("")
       setRange("")
       setSelectRange(false)
+      setMinPrice("")
+      setMaxPrice("")
+      setMinLat("")
+      setMaxLat("")
+      setMinLng("")
+      setMaxLng("")
     }
   }, [query])
 
@@ -266,7 +303,7 @@ export function Navigation({ isLoaded }) {
                             </div>
                           )
                         }) :
-                      <div className="dropdownOption">
+                      <div className="noOption">
                         No results
                       </div>
                   }
@@ -365,7 +402,6 @@ export function Navigation({ isLoaded }) {
                   const languageNames = new Intl.DisplayNames(['en'], {
                     type: 'language'
                   });
-                  console.log()
                   if (supportLanguages.includes(languageNames.of(languageCode).toLowerCase())) {
                     setLanguage(languageNames.of(languageCode).toLowerCase())
                   } else {
@@ -376,14 +412,7 @@ export function Navigation({ isLoaded }) {
               <div className='searchButton'>
                 <button
                   onClick={() => {
-                    let newCheckout
-                    if (checkin && !checkout) {
-                      newCheckout = new Date(new Date(changeDateFormat(checkin)).setDate(new Date(changeDateFormat(checkin)).getDate() + 1))
-                      setCheckout(dateToString(newCheckout))
-                      setRange([new Date(changeDateFormat(checkin)), newCheckout])
-                      setSelectRange(false)
-                    }
-                    history.push(`?country=${country}&state=${state}&city=${city}&start=${checkin}&end=${checkout || (newCheckout ? dateToString(newCheckout) : "")}&keyword=${keyword}&language=${language}`)
+                    history.push(`${getSearchQuery()}${getFilterQuery()}`)
                   }}
                 >
                   <i className="fa-solid fa-magnifying-glass" /> Search
@@ -403,11 +432,19 @@ export function Navigation({ isLoaded }) {
       {
         isLoaded && location.pathname === "/" ? (
           <div className='floatButtons'>
-            <button className='filter'>
-              <i className="fa-solid fa-filter" />Filter
+            <button
+              className='filter'
+              onClick={async () => {
+                await dispatch(spotActions.listPrices(getSearchQuery()))
+                setModalContent(<Filter filters={{minPrice, setMinPrice, maxPrice, setMaxPrice, minLat, setMinLat, maxLat, setMaxLat, minLng, setMinLng, maxLng, setMaxLng}} searchQuery={getSearchQuery()}/>)
+              }}
+            >
+              <i className="fa-solid fa-sliders" />
             </button>
-            <button className='sort'>
-            <i className="fa-solid fa-sort" />Sort
+            <button
+              className='sort'
+            >
+              <i className="fa-solid fa-arrow-up-wide-short" />
             </button>
           </div>
         ) :
