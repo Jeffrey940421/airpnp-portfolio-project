@@ -22,31 +22,25 @@ export function SpotList({ type }) {
   const spotList = type === "current" ? Object.values(spots) : Object.values(spots).map(page => Object.values(page)).flat()
 
   const fetchSpots = async () => {
-    console.log(hasMore)
-    // if (type === "current") {
-    //   await dispatch(sessionActions.listSpots());
-    // } else {
-      if (page <= 10 && hasMore) {
-        console.log(page)
-        setIsLoading(true);
-        const data = await dispatch(spotActions.listSpots(query ? `${query}&page=${page}` : `?page=${page}`));
-        if (data.Spots.length === 4) {
-          setPage(prev => prev + 1);
-        } else {
-          setHasMore(false);
-        }
-        setIsLoading(false);
+    if (page <= 10 && hasMore) {
+      console.log(page)
+      setIsLoading(true);
+      const data = await dispatch(spotActions.listSpots(query ? `${query}&page=${page}` : `?page=${page}`));
+      if (data.Spots.length === 20) {
+        setPage(prev => prev + 1);
+      } else {
+        setHasMore(false);
       }
+      setIsLoading(false);
     }
-
-  // }
+  }
 
   const initialFetch = async () => {
     if (type === "current") {
       await dispatch(sessionActions.listSpots());
     } else {
       const date = await dispatch(spotActions.listSpots(query));
-      if (date.Spots.length === 4) {
+      if (date.Spots.length === 20) {
         setHasMore(true);
         setPage(2);
       } else {
@@ -55,10 +49,6 @@ export function SpotList({ type }) {
     }
     setHasFetched(true)
   }
-
-  // useEffect(() => {
-  //   fetchSpots();
-  // }, [type, query]);
 
   useEffect(() => {
     initialFetch();
@@ -149,7 +139,7 @@ export function SpotList({ type }) {
               })
             }
           </div> :
-          type === "current" ? <NoContent text="You haven't created any place yet" /> : null
+          type === "current" ? <NoContent text="You haven't created any place yet" /> : <NoContent text="No exact matches" />
       }
       {
         isLoading ?
