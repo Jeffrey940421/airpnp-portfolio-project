@@ -9,7 +9,7 @@ import Select from 'react-select';
 import placeData from '../../utils/placeObj.json'
 import places from '../../utils/placeArr.json'
 import Calendar from 'react-calendar';
-import {franc, francAll} from 'franc'
+import { franc, francAll } from 'franc'
 
 export function Navigation({ isLoaded }) {
   const convertToDestination = (city, state, country) => {
@@ -361,7 +361,7 @@ export function Navigation({ isLoaded }) {
                 value={keyword}
                 onChange={(e) => {
                   setKeyword(e.target.value)
-                  const languageCode = franc(e.target.value, {minLength: 3})
+                  const languageCode = franc(e.target.value, { minLength: 3 })
                   const languageNames = new Intl.DisplayNames(['en'], {
                     type: 'language'
                   });
@@ -374,21 +374,21 @@ export function Navigation({ isLoaded }) {
                 }}
               />
               <div className='searchButton'>
-              <button
-                onClick={() => {
-                  let newCheckout
-                  if (checkin && !checkout) {
-                    newCheckout = new Date(new Date(changeDateFormat(checkin)).setDate(new Date(changeDateFormat(checkin)).getDate() + 1))
-                    setCheckout(dateToString(newCheckout))
-                    setRange([new Date(changeDateFormat(checkin)), newCheckout])
-                    setSelectRange(false)
-                  }
-                  history.push(`?country=${country}&state=${state}&city=${city}&start=${checkin}&end=${checkout || (newCheckout ? dateToString(newCheckout) : "")}&keyword=${keyword}&language=${language}}`)
-                }}
-              >
-                <i className="fa-solid fa-magnifying-glass" /> Search
-              </button>
-            </div>
+                <button
+                  onClick={() => {
+                    let newCheckout
+                    if (checkin && !checkout) {
+                      newCheckout = new Date(new Date(changeDateFormat(checkin)).setDate(new Date(changeDateFormat(checkin)).getDate() + 1))
+                      setCheckout(dateToString(newCheckout))
+                      setRange([new Date(changeDateFormat(checkin)), newCheckout])
+                      setSelectRange(false)
+                    }
+                    history.push(`?country=${country}&state=${state}&city=${city}&start=${checkin}&end=${checkout || (newCheckout ? dateToString(newCheckout) : "")}&keyword=${keyword}&language=${language}`)
+                  }}
+                >
+                  <i className="fa-solid fa-magnifying-glass" /> Search
+                </button>
+              </div>
             </div>
 
           </div>
@@ -400,6 +400,19 @@ export function Navigation({ isLoaded }) {
           <ProfileButton user={user} />
         </li>
       )}
+      {
+        isLoaded && location.pathname === "/" ? (
+          <div className='floatButtons'>
+            <button className='filter'>
+              <i className="fa-solid fa-filter" />Filter
+            </button>
+            <button className='sort'>
+            <i className="fa-solid fa-sort" />Sort
+            </button>
+          </div>
+        ) :
+          null
+      }
     </ul>
   );
 }
