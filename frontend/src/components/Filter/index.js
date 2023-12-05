@@ -7,19 +7,21 @@ import { useModal } from '../../context/Modal';
 import "./Filter.css";
 
 export function Filter({ filters, searchQuery, sort, order }) {
-  const minSpotPrice = useSelector(state => +state.spots.spotPrices.minPrice);
-  const maxSpotPrice = useSelector(state => +state.spots.spotPrices.maxPrice);
+  const minSpotPrice = useSelector(state => +(state.spots.spotPrices.minPrice));
+  const maxSpotPrice = useSelector(state => +(state.spots.spotPrices.maxPrice));
   const { minPrice, setMinPrice, maxPrice, setMaxPrice, minLat, setMinLat, maxLat, setMaxLat, minLng, setMinLng, maxLng, setMaxLng } = filters;
-  const [onchangeMinPrice, setOnchangeMinPrice] = useState(minPrice ? minPrice : Math.min(minSpotPrice, maxSpotPrice ? maxSpotPrice - 50 : 99999));
-  const [onchangeMaxPrice, setOnchangeMaxPrice] = useState(maxPrice ? maxPrice : Math.max(maxSpotPrice ? maxSpotPrice : 99999, minSpotPrice + 50));
-  const [onchangeMinLat, setOnchangeMinLat] = useState(minLat ? minLat : -90);
-  const [onchangeMaxLat, setOnchangeMaxLat] = useState(maxLat ? maxLat : 90);
-  const [onchangeMinLng, setOnchangeMinLng] = useState(minLng ? minLng : -180);
-  const [onchangeMaxLng, setOnchangeMaxLng] = useState(maxLng ? maxLng : 180);
+  const priceRangeMin = minPrice ? Math.min(+minSpotPrice, +minPrice, Math.max(+maxPrice - 50, 0), Math.max(+maxSpotPrice - 50, 0)) : Math.min(+minSpotPrice, Math.max(+maxSpotPrice - 50, 0));
+  const priceRangeMax = maxPrice ? Math.max(+maxSpotPrice, +maxPrice, +minPrice + 50) : Math.max(+maxSpotPrice, +minSpotPrice + 50);
+  const [onchangeMinPrice, setOnchangeMinPrice] = useState(minPrice ? +minPrice : priceRangeMin);
+  const [onchangeMaxPrice, setOnchangeMaxPrice] = useState(maxPrice ? +maxPrice : priceRangeMax);
+  const [onchangeMinLat, setOnchangeMinLat] = useState(minLat ? +minLat : -90);
+  const [onchangeMaxLat, setOnchangeMaxLat] = useState(maxLat ? +maxLat : 90);
+  const [onchangeMinLng, setOnchangeMinLng] = useState(minLng ? +minLng : -180);
+  const [onchangeMaxLng, setOnchangeMaxLng] = useState(maxLng ? +maxLng : 180);
   const history = useHistory();
   const { closeModal } = useModal();
   const getFilterQuery = () => {
-    return `&minPrice=${onchangeMinPrice === 0 ? "" : onchangeMinPrice}&maxPrice=${onchangeMaxPrice === 99999 ? "" : onchangeMaxPrice}&minLat=${onchangeMinLat}&maxLat=${onchangeMaxLat}&minLng=${onchangeMinLng}&maxLng=${onchangeMaxLng}`
+    return `&minPrice=${onchangeMinPrice == priceRangeMin && onchangeMaxPrice === priceRangeMax ? "" : onchangeMinPrice}&maxPrice=${onchangeMinPrice == priceRangeMin && onchangeMaxPrice === priceRangeMax ? "" : onchangeMaxPrice}&minLat=${onchangeMinLat == -90 ? "" : onchangeMinLat}&maxLat=${onchangeMaxLat == 90 ? "" : onchangeMaxLat}&minLng=${onchangeMinLng == -180 ? "" : onchangeMinLng}&maxLng=${onchangeMaxLng == 180 ? "" : onchangeMaxLng}`
   }
 
   return (
@@ -37,17 +39,16 @@ export function Filter({ filters, searchQuery, sort, order }) {
             <div className='hyphen'></div>
             <div className='maxValue'>
               <h4>Maximum Price</h4>
-              <p>${onchangeMaxPrice === 99999 ? "99999+" : onchangeMaxPrice}</p>
+              <p>${onchangeMaxPrice}</p>
             </div>
           </div>
           <ReactSlider
             className="doubleSlider"
             thumbClassName="doubleSliderThumb"
             trackClassName="doubleSliderTrack"
-            defaultValue={[minPrice ? minPrice : Math.min(minSpotPrice, maxSpotPrice - 50), maxPrice ? maxPrice : Math.max(maxSpotPrice, minSpotPrice + 50)]}
             ariaLabel={['minThumb', 'maxThumb']}
-            max={maxPrice ? Math.max(maxSpotPrice, maxPrice, minPrice + 50) : Math.max(maxSpotPrice ? maxSpotPrice : 99999, minSpotPrice + 50)}
-            min={minPrice ? Math.min(minSpotPrice, minPrice, maxPrice - 50) : Math.min(minSpotPrice, maxSpotPrice ? maxSpotPrice - 50 : 99999)}
+            max={priceRangeMax}
+            min={priceRangeMin}
             value={[onchangeMinPrice, onchangeMaxPrice]}
             renderThumb={(props, state) => <div {...props}></div>}
             onChange={(value, index) => {
@@ -156,12 +157,12 @@ export function Filter({ filters, searchQuery, sort, order }) {
         <button
           className='applyFilters'
           onClick={() => {
-            setMinPrice(onchangeMinPrice === (minPrice ? Math.min(minSpotPrice, minPrice, maxPrice - 50) : Math.min(minSpotPrice, maxSpotPrice ? maxSpotPrice - 50 : 99999)) ? "" : onchangeMinPrice);
-            setMaxPrice(onchangeMaxPrice === (maxPrice ? Math.max(maxSpotPrice, maxPrice, minPrice + 50) : Math.max(maxSpotPrice ? maxSpotPrice : 99999, minSpotPrice + 50)) ? "" : onchangeMaxPrice);
-            setMinLat(onchangeMinLat === -90 ? "" : onchangeMinLat);
-            setMaxLat(onchangeMaxLat === 90 ? "" : onchangeMaxLat);
-            setMinLng(onchangeMinLng === -180 ? "" : onchangeMinLng);
-            setMaxLng(onchangeMaxLng === 180 ? "" : onchangeMaxLng);
+            setMinPrice(onchangeMinPrice == priceRangeMin && onchangeMaxPrice === priceRangeMax ? "" : onchangeMinPrice);
+            setMaxPrice(onchangeMinPrice == priceRangeMin && onchangeMaxPrice === priceRangeMax ? "" : onchangeMaxPrice);
+            setMinLat(onchangeMinLat == -90 ? "" : onchangeMinLat);
+            setMaxLat(onchangeMaxLat == 90 ? "" : onchangeMaxLat);
+            setMinLng(onchangeMinLng == -180 ? "" : onchangeMinLng);
+            setMaxLng(onchangeMaxLng == 180 ? "" : onchangeMaxLng);
             closeModal();
             history.push(`${searchQuery}${getFilterQuery()}&sort=${sort}&order=${order}`)
           }}

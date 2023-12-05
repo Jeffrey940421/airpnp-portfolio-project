@@ -110,7 +110,7 @@ export const listPrices = (query) => async (dispatch) => {
   }
   const maxPriceResponse = await csrfFetch(`/api/spots${query}&sort=price&order=DESC NULLS LAST&size=1&page=1`);
   const maxPriceData = await maxPriceResponse.json()
-  const maxPrice = maxPriceData.Spots[0] ? maxPriceData.Spots[0].price : undefined;
+  const maxPrice = maxPriceData.Spots[0] ? maxPriceData.Spots[0].price : 99999;
   if (!maxPriceResponse.ok) {
     return maxPriceResponse;
   }

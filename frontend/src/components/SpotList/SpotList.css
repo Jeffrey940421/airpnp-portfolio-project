@@ -92,7 +92,7 @@
 }
 
 .manageSpotsTitle + .textBox {
-  margin-top: 50px;
+  margin-top: 20px;
 }
 
 @media screen and (max-width: 1400px) {
@@ -177,4 +177,8 @@
   display: flex;
   justify-content: center;
   padding: 5px;
+}
+
+.floatButtons + .textBox {
+  margin-top: 20px;
 }

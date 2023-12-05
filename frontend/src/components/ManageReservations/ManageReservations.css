@@ -113,3 +113,7 @@ a.fc-event:has( .grayout) {
   display: flex;
   justify-content: center;
 }
+
+.selectMenu {
+  margin-bottom: 20px;
+}

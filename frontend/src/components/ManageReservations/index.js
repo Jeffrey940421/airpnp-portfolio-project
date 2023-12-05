@@ -27,6 +27,7 @@ export function ManageReservations() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [key, setKey] = useState(0);
   const { setModalContent, setOnModalClose } = useModal();
+  const user = useSelector(state => state.session.user);
 
   const selectMenuStyle = {
     placeholder: (base, state) => ({
@@ -161,7 +162,7 @@ export function ManageReservations() {
   }
 
   return (
-    <div>
+    <div key={user.id}>
       <h1>Manage Reservations</h1>
       {
         spotList.length ?
