@@ -59,6 +59,7 @@ export function Filter({ filters, searchQuery, sort, order }) {
             }}
             pearling
             minDistance={1}
+            step={1}
           />
         </div>
         <div className='latFilter'>

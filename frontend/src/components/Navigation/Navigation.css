@@ -360,7 +360,6 @@ li.profileSection {
 .floatButtons {
   display: flex;
   gap: 20px;
-  z-index: 100;
   justify-content: flex-start;
   position: relative;
 }
