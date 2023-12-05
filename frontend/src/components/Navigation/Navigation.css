@@ -358,12 +358,11 @@ li.profileSection {
 }
 
 .floatButtons {
-  top: 120px;
-  right: 20px;
   display: flex;
   gap: 20px;
   z-index: 100;
   justify-content: flex-start;
+  position: relative;
 }
 
 .filter,
@@ -389,14 +388,14 @@ li.profileSection {
   background-color: white;
   position: absolute;
   z-index: 20;
-  top: 200px;
+  top: 60px;
   padding: 10px 0px;
   border-radius: 10px;
   font-family: 'Manrope', sans-serif;
   font-size: 14px;
   display: flex;
   flex-direction: column;
-  left: 80px;
+  left: 0px;
 }
 
 .sortOption {
@@ -410,4 +409,25 @@ li.profileSection {
 
 .sortOption.selectedOption {
   background-color: #83a9ff;
+}
+
+.filter.active {
+  border: 3px solid rgb(241, 139, 139)
+}
+
+.filterNum {
+  background-color: rgb(241, 139, 139);
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+  display: flex;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 200px;
+  border: 1px solid white;
+  top: -5px
 }

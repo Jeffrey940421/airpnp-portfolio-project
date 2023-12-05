@@ -78,6 +78,7 @@ export function Navigation({ isLoaded }) {
   const [showSortOptions, setShowSortOptions] = useState(false);
   const sortButtonRef = React.useRef();
   const sortDropdownRef = React.useRef();
+  const [filterNum, setFilterNum] = useState(0);
 
   const supportLanguages = [
     "simple",
@@ -209,6 +210,20 @@ export function Navigation({ isLoaded }) {
 
     return () => document.removeEventListener("click", closeCalendar);
   }, [showCalendar, checkin, checkout]);
+
+  useEffect(() => {
+    let i = 0
+    if (minPrice || maxPrice) {
+      i += 1
+    }
+    if (minLat || maxLat) {
+      i += 1
+    }
+    if (minLng || maxLng) {
+      i += 1
+    }
+    setFilterNum(i)
+  }, [minPrice, maxPrice, minLat, maxLat, minLng, maxLng])
 
   useEffect(() => {
     if (destination) {
@@ -472,7 +487,7 @@ export function Navigation({ isLoaded }) {
               <i className="fa-solid fa-arrow-up-wide-short" /> Sort
             </button>
             <button
-              className='filter'
+              className={`filter${filterNum ? " active" : ""}`}
               onClick={async () => {
                 await dispatch(spotActions.listPrices(getSearchQuery()))
                 setModalContent(<Filter filters={{ minPrice, setMinPrice, maxPrice, setMaxPrice, minLat, setMinLat, maxLat, setMaxLat, minLng, setMinLng, maxLng, setMaxLng }} searchQuery={getSearchQuery()} sort={sort} order={order} />)
@@ -480,6 +495,14 @@ export function Navigation({ isLoaded }) {
             >
               <i className="fa-solid fa-sliders" /> Filters
             </button>
+            {
+              filterNum ?
+                <div className='filterNum'>
+                  {filterNum}
+                </div> :
+                null
+            }
+
             <div className={`sortOptions${showSortOptions ? "" : " hide"}`} ref={sortDropdownRef}>
               {
                 sortMethods.map((method, idx) => {

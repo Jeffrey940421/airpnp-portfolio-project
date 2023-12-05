@@ -10,8 +10,8 @@ export function Filter({ filters, searchQuery, sort, order }) {
   const minSpotPrice = useSelector(state => state.spots.spotPrices.minPrice);
   const maxSpotPrice = useSelector(state => state.spots.spotPrices.maxPrice);
   const { minPrice, setMinPrice, maxPrice, setMaxPrice, minLat, setMinLat, maxLat, setMaxLat, minLng, setMinLng, maxLng, setMaxLng } = filters;
-  const [onchangeMinPrice, setOnchangeMinPrice] = useState(minPrice ? minPrice : Math.min(minSpotPrice, maxSpotPrice - 50));
-  const [onchangeMaxPrice, setOnchangeMaxPrice] = useState(maxPrice ? maxPrice : Math.max(maxSpotPrice, minSpotPrice + 50));
+  const [onchangeMinPrice, setOnchangeMinPrice] = useState(minPrice ? minPrice : Math.min(minSpotPrice, maxSpotPrice ? maxSpotPrice - 50 : 99999));
+  const [onchangeMaxPrice, setOnchangeMaxPrice] = useState(maxPrice ? maxPrice : Math.max(maxSpotPrice ? maxSpotPrice : 99999, minSpotPrice + 50));
   const [onchangeMinLat, setOnchangeMinLat] = useState(minLat ? minLat : -90);
   const [onchangeMaxLat, setOnchangeMaxLat] = useState(maxLat ? maxLat : 90);
   const [onchangeMinLng, setOnchangeMinLng] = useState(minLng ? minLng : -180);
@@ -19,7 +19,7 @@ export function Filter({ filters, searchQuery, sort, order }) {
   const history = useHistory();
   const { closeModal } = useModal();
   const getFilterQuery = () => {
-    return `&minPrice=${onchangeMinPrice}&maxPrice=${onchangeMaxPrice}&minLat=${onchangeMinLat}&maxLat=${onchangeMaxLat}&minLng=${onchangeMinLng}&maxLng=${onchangeMaxLng}`
+    return `&minPrice=${onchangeMinPrice === 0 ? "" : onchangeMinPrice}&maxPrice=${onchangeMaxPrice === 99999 ? "" : onchangeMaxPrice}&minLat=${onchangeMinLat}&maxLat=${onchangeMaxLat}&minLng=${onchangeMinLng}&maxLng=${onchangeMaxLng}`
   }
 
   return (
@@ -37,7 +37,7 @@ export function Filter({ filters, searchQuery, sort, order }) {
             <div className='hyphen'></div>
             <div className='maxValue'>
               <h4>Maximum Price</h4>
-              <p>${onchangeMaxPrice}</p>
+              <p>${onchangeMaxPrice === 99999 ? "99999+" : onchangeMaxPrice}</p>
             </div>
           </div>
           <ReactSlider
@@ -46,8 +46,8 @@ export function Filter({ filters, searchQuery, sort, order }) {
             trackClassName="doubleSliderTrack"
             defaultValue={[minPrice ? minPrice : Math.min(minSpotPrice, maxSpotPrice - 50), maxPrice ? maxPrice : Math.max(maxSpotPrice, minSpotPrice + 50)]}
             ariaLabel={['minThumb', 'maxThumb']}
-            max={maxPrice ? Math.max(maxSpotPrice, maxPrice, minPrice + 50) : Math.max(maxSpotPrice, minSpotPrice + 50)}
-            min={minPrice ? Math.min(minSpotPrice, minPrice, maxPrice - 50) : Math.min(minSpotPrice, maxSpotPrice - 50)}
+            max={maxPrice ? Math.max(maxSpotPrice, maxPrice, minPrice + 50) : Math.max(maxSpotPrice ? maxSpotPrice : 99999, minSpotPrice + 50)}
+            min={minPrice ? Math.min(minSpotPrice, minPrice, maxPrice - 50) : Math.min(minSpotPrice, maxSpotPrice ? maxSpotPrice - 50 : 99999)}
             value={[onchangeMinPrice, onchangeMaxPrice]}
             renderThumb={(props, state) => <div {...props}></div>}
             onChange={(value, index) => {
@@ -155,12 +155,12 @@ export function Filter({ filters, searchQuery, sort, order }) {
         <button
           className='applyFilters'
           onClick={() => {
-            setMinPrice(onchangeMinPrice);
-            setMaxPrice(onchangeMaxPrice);
-            setMinLat(onchangeMinLat);
-            setMaxLat(onchangeMaxLat);
-            setMinLng(onchangeMinLng);
-            setMaxLng(onchangeMaxLng);
+            setMinPrice(onchangeMinPrice === minPrice ? Math.min(minSpotPrice, minPrice, maxPrice - 50) : Math.min(minSpotPrice, maxSpotPrice ? maxSpotPrice - 50 : 99999) ? "" : onchangeMinPrice);
+            setMaxPrice(onchangeMaxPrice === maxPrice ? Math.max(maxSpotPrice, maxPrice, minPrice + 50) : Math.max(maxSpotPrice ? maxSpotPrice : 99999, minSpotPrice + 50) ? "" : onchangeMaxPrice);
+            setMinLat(onchangeMinLat === -90 ? "" : onchangeMinLat);
+            setMaxLat(onchangeMaxLat === 90 ? "" : onchangeMaxLat);
+            setMinLng(onchangeMinLng === -180 ? "" : onchangeMinLng);
+            setMaxLng(onchangeMaxLng === 180 ? "" : onchangeMaxLng);
             closeModal();
             history.push(`${searchQuery}${getFilterQuery()}&sort=${sort}&order=${order}`)
           }}
