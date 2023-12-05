@@ -156,8 +156,8 @@ export function Filter({ filters, searchQuery, sort, order }) {
         <button
           className='applyFilters'
           onClick={() => {
-            setMinPrice(onchangeMinPrice === minPrice ? Math.min(minSpotPrice, minPrice, maxPrice - 50) : Math.min(minSpotPrice, maxSpotPrice ? maxSpotPrice - 50 : 99999) ? "" : onchangeMinPrice);
-            setMaxPrice(onchangeMaxPrice === maxPrice ? Math.max(maxSpotPrice, maxPrice, minPrice + 50) : Math.max(maxSpotPrice ? maxSpotPrice : 99999, minSpotPrice + 50) ? "" : onchangeMaxPrice);
+            setMinPrice(onchangeMinPrice === (minPrice ? Math.min(minSpotPrice, minPrice, maxPrice - 50) : Math.min(minSpotPrice, maxSpotPrice ? maxSpotPrice - 50 : 99999)) ? "" : onchangeMinPrice);
+            setMaxPrice(onchangeMaxPrice === (maxPrice ? Math.max(maxSpotPrice, maxPrice, minPrice + 50) : Math.max(maxSpotPrice ? maxSpotPrice : 99999, minSpotPrice + 50)) ? "" : onchangeMaxPrice);
             setMinLat(onchangeMinLat === -90 ? "" : onchangeMinLat);
             setMaxLat(onchangeMaxLat === 90 ? "" : onchangeMaxLat);
             setMinLng(onchangeMinLng === -180 ? "" : onchangeMinLng);
