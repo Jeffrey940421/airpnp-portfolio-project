@@ -64,6 +64,21 @@ export function Navigation({ isLoaded }) {
   const [maxLat, setMaxLat] = useState(params.get("maxLat") || "");
   const [minLng, setMinLng] = useState(params.get("minLng") || "");
   const [maxLng, setMaxLng] = useState(params.get("maxLng") || "");
+  const sortMethods = [
+    { text: "Default", sort: "", order: "" },
+    { text: "Price (Low to High)", sort: "price", order: "ASC NULLS FIRST" },
+    { text: "Price (High to Low)", sort: "price", order: "DESC NULLS LAST" },
+    { text: "Top Reviewed", sort: "avgRating", order: "DESC NULLS LAST" },
+    { text: "Most Reviewed", sort: "numReviews", order: "DESC NULLS LAST" },
+    { text: "Most Popular", sort: "popularity", order: "DESC NULLS LAST" },
+  ]
+  const [sort, setSort] = useState(params.get("sort") || "");
+  const [order, setOrder] = useState(params.get("order") || "");
+  const [sortIdx, setSortIdx] = useState(sortMethods.findIndex((method) => method.sort === sort && method.order === order) === -1 ? 0 : sortMethods.findIndex((method) => method.sort === sort && method.order === order));
+  const [showSortOptions, setShowSortOptions] = useState(false);
+  const sortButtonRef = React.useRef();
+  const sortDropdownRef = React.useRef();
+
   const supportLanguages = [
     "simple",
     "arabic",
@@ -242,214 +257,253 @@ export function Navigation({ isLoaded }) {
     }
   }, [query])
 
+  useEffect(() => {
+    const closeSort = (e) => {
+      e.stopPropagation();
+      if (!sortButtonRef.current.contains(e.target) && !sortDropdownRef.current.contains(e.target)) {
+        setShowSortOptions(false);
+      }
+    }
+
+    if (showSortOptions) {
+      document.addEventListener('click', closeSort);
+    }
+
+    return () => document.removeEventListener("click", closeSort);
+  }, [showSortOptions]);
+
   return (
-    <ul className='navigationBar'>
-      <li className='logo'>
-        <NavLink exact to="/"><img className="logo" src={logo} alt="logo" /></NavLink>
-      </li>
-      {
-        isLoaded && location.pathname === "/" ? (
-          <div className="searchBar">
-            <div
-              className="destination"
-              ref={destinationRef}
-            >
-              <label htmlFor="destination">Where</label>
-              <input
-                name='destination'
-                type="text"
-                placeholder="Search Destinations"
-                value={onchangeDestination}
-                onChange={(e) => {
-                  setOnchangeDestination(e.target.value)
-                  setShowDropdown(true)
-                  const filteredPlaces = places.filter((place) => place.toLowerCase().includes(e.target.value.toLowerCase()))
-                  if (filteredPlaces.length && e.target.value) {
-                    setDestination(filteredPlaces[0])
-                  } else {
-                    setDestination("")
-                  }
-                }}
-                onFocus={() => {
-                  if (!(onchangeDestination in placeData) && onchangeDestination) {
+    <>
+      <ul className='navigationBar'>
+        <li className='logo'>
+          <NavLink exact to="/"><img className="logo" src={logo} alt="logo" /></NavLink>
+        </li>
+        {
+          isLoaded && location.pathname === "/" ? (
+            <div className="searchBar">
+              <div
+                className="destination"
+                ref={destinationRef}
+              >
+                <label htmlFor="destination">Where</label>
+                <input
+                  name='destination'
+                  type="text"
+                  placeholder="Search Destinations"
+                  value={onchangeDestination}
+                  onChange={(e) => {
+                    setOnchangeDestination(e.target.value)
                     setShowDropdown(true)
-                  }
-                }}
-                autoComplete="one-time-code"
-              />
-              <div className={`dropdownOptions${showDropdown ? "" : " hide"}`}>
-                <div>
-                  {
-                    filteredPlaces.length ?
-                      filteredPlaces
-                        .slice(0, resultLimit)
-                        .map((place) => {
-                          return (
-                            <div className="dropdownOption" onClick={(e) => {
-                              e.stopPropagation()
-                              setOnchangeDestination(place)
-                              setDestination(place)
-                              setShowDropdown(false)
-                              setShowCalendar(true)
-                              if (!range || Array.isArray(range)) {
-                                setCheckinFocus(true)
-                                setCheckoutFocus(false)
-                              } else {
-                                setCheckoutFocus(true)
-                                setCheckinFocus(false)
-                              }
-                            }}>
-                              {place}
-                            </div>
-                          )
-                        }) :
-                      <div className="noOption">
-                        No results
-                      </div>
-                  }
+                    const filteredPlaces = places.filter((place) => place.toLowerCase().includes(e.target.value.toLowerCase()))
+                    if (filteredPlaces.length && e.target.value) {
+                      setDestination(filteredPlaces[0])
+                    } else {
+                      setDestination("")
+                    }
+                  }}
+                  onFocus={() => {
+                    if (!(onchangeDestination in placeData) && onchangeDestination) {
+                      setShowDropdown(true)
+                    }
+                  }}
+                  autoComplete="one-time-code"
+                />
+                <div className={`dropdownOptions${showDropdown ? "" : " hide"}`}>
+                  <div>
+                    {
+                      filteredPlaces.length ?
+                        filteredPlaces
+                          .slice(0, resultLimit)
+                          .map((place) => {
+                            return (
+                              <div className="dropdownOption" onClick={(e) => {
+                                e.stopPropagation()
+                                setOnchangeDestination(place)
+                                setDestination(place)
+                                setShowDropdown(false)
+                                setShowCalendar(true)
+                                if (!range || Array.isArray(range)) {
+                                  setCheckinFocus(true)
+                                  setCheckoutFocus(false)
+                                } else {
+                                  setCheckoutFocus(true)
+                                  setCheckinFocus(false)
+                                }
+                              }}>
+                                {place}
+                              </div>
+                            )
+                          }) :
+                        <div className="noOption">
+                          No results
+                        </div>
+                    }
+                  </div>
                 </div>
               </div>
-            </div>
-            <div
-              className="dates"
-              ref={datesRef}
-              onClick={(e) => {
-                if (!calendarRef.current.contains(e.target)) {
-                  setShowCalendar(true)
-                  if (!range || Array.isArray(range)) {
-                    setCheckinFocus(true)
-                    setCheckoutFocus(false)
-                  } else {
-                    setCheckoutFocus(true)
-                    setCheckinFocus(false)
+              <div
+                className="dates"
+                ref={datesRef}
+                onClick={(e) => {
+                  if (!calendarRef.current.contains(e.target)) {
+                    setShowCalendar(true)
+                    if (!range || Array.isArray(range)) {
+                      setCheckinFocus(true)
+                      setCheckoutFocus(false)
+                    } else {
+                      setCheckoutFocus(true)
+                      setCheckinFocus(false)
+                    }
                   }
-                }
-              }}
-            >
-              <div className='checkin'>
-                <button></button>
-                <label htmlFor="checkin">Checkin</label>
-                <input
-                  className={checkinFocus ? "dateFocused" : ""}
-                  name='checkin'
-                  type="text"
-                  placeholder="Add dates"
-                  autoComplete="one-time-code"
-                  value={checkin ? `${checkin.split("-")[1]}/${checkin.split("-")[2]}/${checkin.split("-")[0]}` : ""}
-                  onChange={(e) => setCheckin(e.target.value)}
-                  disabled={true}
-                />
-              </div>
-              <div className='checkout'>
-                <button></button>
-                <label htmlFor="checkout">Checkout</label>
-                <input
-                  className={checkoutFocus ? "dateFocused" : ""}
-                  name='checkout'
-                  type="text"
-                  placeholder="Add dates"
-                  autoComplete="one-time-code"
-                  value={checkout ? `${checkout.split("-")[1]}/${checkout.split("-")[2]}/${checkout.split("-")[0]}` : ""}
-                  onChange={(e) => setCheckout(e.target.value)}
-                  disabled={true}
-                />
-              </div>
-              <div className={`searchCalendar${showCalendar ? "" : " hide"}`} ref={calendarRef}>
-                <Calendar
-                  onChange={onChange}
-                  value={range}
-                  minDetail="month"
-                  tileDisabled={tileDisabled}
-                  selectRange={selectRange}
-                  showNeighboringMonth={false}
-                  onClickDay={(value, e) => {
-                    if (!range) {
-                      setCheckin(dateToString(value))
+                }}
+              >
+                <div className='checkin'>
+                  <button></button>
+                  <label htmlFor="checkin">Checkin</label>
+                  <input
+                    className={checkinFocus ? "dateFocused" : ""}
+                    name='checkin'
+                    type="text"
+                    placeholder="Add dates"
+                    autoComplete="one-time-code"
+                    value={checkin ? `${checkin.split("-")[1]}/${checkin.split("-")[2]}/${checkin.split("-")[0]}` : ""}
+                    onChange={(e) => setCheckin(e.target.value)}
+                    disabled={true}
+                  />
+                </div>
+                <div className='checkout'>
+                  <button></button>
+                  <label htmlFor="checkout">Checkout</label>
+                  <input
+                    className={checkoutFocus ? "dateFocused" : ""}
+                    name='checkout'
+                    type="text"
+                    placeholder="Add dates"
+                    autoComplete="one-time-code"
+                    value={checkout ? `${checkout.split("-")[1]}/${checkout.split("-")[2]}/${checkout.split("-")[0]}` : ""}
+                    onChange={(e) => setCheckout(e.target.value)}
+                    disabled={true}
+                  />
+                </div>
+                <div className={`searchCalendar${showCalendar ? "" : " hide"}`} ref={calendarRef}>
+                  <Calendar
+                    onChange={onChange}
+                    value={range}
+                    minDetail="month"
+                    tileDisabled={tileDisabled}
+                    selectRange={selectRange}
+                    showNeighboringMonth={false}
+                    onClickDay={(value, e) => {
+                      if (!range) {
+                        setCheckin(dateToString(value))
+                        setCheckout("")
+                        setSelectRange(true)
+                      } else if (typeof range.getMonth === "function") {
+                        setCheckout(dateToString(value))
+                        setSelectRange(false)
+                      }
+                    }}
+                  />
+                  <button
+                    onClick={() => {
+                      setCheckin("")
                       setCheckout("")
-                      setSelectRange(true)
-                    } else if (typeof range.getMonth === "function") {
-                      setCheckout(dateToString(value))
                       setSelectRange(false)
+                      setRange("")
+                      setCheckinFocus(true)
+                      setCheckoutFocus(false)
+                    }}
+                  >
+                    Clear Dates
+                  </button>
+                </div>
+              </div>
+              <div className='keyword'>
+                <label htmlFor="keyword">Keyword</label>
+                <input
+                  ref={keywordRef}
+                  name='keyword'
+                  type="text"
+                  placeholder="Search Keywords"
+                  autoComplete="one-time-code"
+                  value={keyword}
+                  onChange={(e) => {
+                    setKeyword(e.target.value)
+                    const languageCode = franc(e.target.value, { minLength: 3 })
+                    const languageNames = new Intl.DisplayNames(['en'], {
+                      type: 'language'
+                    });
+                    if (supportLanguages.includes(languageNames.of(languageCode).toLowerCase())) {
+                      setLanguage(languageNames.of(languageCode).toLowerCase())
+                    } else {
+                      setLanguage("english")
                     }
                   }}
                 />
-                <button
-                  onClick={() => {
-                    setCheckin("")
-                    setCheckout("")
-                    setSelectRange(false)
-                    setRange("")
-                    setCheckinFocus(true)
-                    setCheckoutFocus(false)
-                  }}
-                >
-                  Clear Dates
-                </button>
+                <div className='searchButton'>
+                  <button
+                    onClick={() => {
+                      history.push(`${getSearchQuery()}${getFilterQuery()}&sort=${sort}&order=${order}`)
+                    }}
+                  >
+                    <i className="fa-solid fa-magnifying-glass" /> Search
+                  </button>
+                </div>
               </div>
-            </div>
-            <div className='keyword'>
-              <label htmlFor="keyword">Keyword</label>
-              <input
-                ref={keywordRef}
-                name='keyword'
-                type="text"
-                placeholder="Search Keywords"
-                autoComplete="one-time-code"
-                value={keyword}
-                onChange={(e) => {
-                  setKeyword(e.target.value)
-                  const languageCode = franc(e.target.value, { minLength: 3 })
-                  const languageNames = new Intl.DisplayNames(['en'], {
-                    type: 'language'
-                  });
-                  if (supportLanguages.includes(languageNames.of(languageCode).toLowerCase())) {
-                    setLanguage(languageNames.of(languageCode).toLowerCase())
-                  } else {
-                    setLanguage("english")
-                  }
-                }}
-              />
-              <div className='searchButton'>
-                <button
-                  onClick={() => {
-                    history.push(`${getSearchQuery()}${getFilterQuery()}`)
-                  }}
-                >
-                  <i className="fa-solid fa-magnifying-glass" /> Search
-                </button>
-              </div>
-            </div>
 
-          </div>
-        ) :
-          <div></div>
-      }
-      {isLoaded && (
-        <li className='profileSection'>
-          <ProfileButton user={user} />
-        </li>
-      )}
+            </div>
+          ) :
+            <div></div>
+        }
+        {isLoaded && (
+          <li className='profileSection'>
+            <ProfileButton user={user} />
+          </li>
+        )}
+      </ul>
       {
         isLoaded && location.pathname === "/" ? (
           <div className='floatButtons'>
             <button
+              className='sort'
+              onClick={() => setShowSortOptions(!showSortOptions)}
+              ref={sortButtonRef}
+            >
+              <i className="fa-solid fa-arrow-up-wide-short" /> Sort
+            </button>
+            <button
               className='filter'
               onClick={async () => {
                 await dispatch(spotActions.listPrices(getSearchQuery()))
-                setModalContent(<Filter filters={{minPrice, setMinPrice, maxPrice, setMaxPrice, minLat, setMinLat, maxLat, setMaxLat, minLng, setMinLng, maxLng, setMaxLng}} searchQuery={getSearchQuery()}/>)
+                setModalContent(<Filter filters={{ minPrice, setMinPrice, maxPrice, setMaxPrice, minLat, setMinLat, maxLat, setMaxLat, minLng, setMinLng, maxLng, setMaxLng }} searchQuery={getSearchQuery()} sort={sort} order={order} />)
               }}
             >
-              <i className="fa-solid fa-sliders" />
+              <i className="fa-solid fa-sliders" /> Filters
             </button>
-            <button
-              className='sort'
-            >
-              <i className="fa-solid fa-arrow-up-wide-short" />
-            </button>
+            <div className={`sortOptions${showSortOptions ? "" : " hide"}`} ref={sortDropdownRef}>
+              {
+                sortMethods.map((method, idx) => {
+                  return (
+                    <div
+                      className={`sortOption${sortIdx === idx ? " selectedOption" : ""}`}
+                      onClick={() => {
+                        setSort(method.sort)
+                        setOrder(method.order)
+                        setSortIdx(idx)
+                        setShowSortOptions(false)
+                        history.push(`${getSearchQuery()}${getFilterQuery()}&sort=${method.sort}&order=${method.order}`)
+                      }}
+                    >
+                      {method.text}
+                    </div>
+                  )
+                })
+              }
+            </div>
           </div>
         ) :
           null
       }
-    </ul>
+    </>
   );
 }

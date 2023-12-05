@@ -196,7 +196,7 @@ li.profileSection {
 }
 
 .dropdownOption:hover {
-  background-color: rgb(12, 136, 236);
+  background-color: #83a9ff;
 }
 
 .dropdownOptions > div::-webkit-scrollbar {
@@ -358,21 +358,20 @@ li.profileSection {
 }
 
 .floatButtons {
-  position: fixed;
   top: 120px;
   right: 20px;
   display: flex;
-  flex-direction: column;
   gap: 20px;
   z-index: 100;
+  justify-content: flex-start;
 }
 
 .filter,
 .sort {
-  width: 50px;
+  width: 100px;
   height: 50px;
   border-radius: 50px;
-  background-color: #ff5a6096;
+  background-color: #FF5A5F;
   border: none;
   display: flex;
   align-items: center;
@@ -380,15 +379,35 @@ li.profileSection {
   cursor: pointer;
   color: white;
   font-size: 14px;
+  gap: 5px;
+  font-family: 'Manrope', sans-serif;
+  font-weight: bold;
 }
 
-.filter:hover,
-.sort:hover {
-  background-color: #FF5A5F;
+.sortOptions {
+  border: 1px solid #DDDDDD;
+  background-color: white;
+  position: absolute;
+  z-index: 20;
+  top: 200px;
+  padding: 10px 0px;
+  border-radius: 10px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  left: 80px;
 }
 
-.filter:disabled,
-.sort:disabled {
-  background-color: lightgray;
-  cursor: default;
+.sortOption {
+  padding: 5px 20px 5px 20px;
+  cursor: pointer;
+}
+
+.sortOption:hover {
+  background-color: #83a9ff;
+}
+
+.sortOption.selectedOption {
+  background-color: #83a9ff;
 }

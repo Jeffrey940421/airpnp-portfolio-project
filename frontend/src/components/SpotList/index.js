@@ -15,11 +15,12 @@ export function SpotList({ type }) {
   const query = location.search;
   const history = useHistory();
   const spots = useSelector(state => type === "current" ? state.session.spots : state.spots.spotList);
+  const spotOrder = useSelector(state => state.spots.spotOrder);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true)
   const [isLoading, setIsLoading] = useState(false);
   const [hasFetched, setHasFetched] = useState(false);
-  const spotList = type === "current" ? Object.values(spots) : Object.values(spots).map(page => Object.values(page)).flat()
+  const spotList = type === "current" ? Object.values(spots) : Object.values(spotOrder).map((order, i) => order.map(id => spots[i + 1][id])).flat()
 
   const fetchSpots = async () => {
     if (page <= 10 && hasMore) {

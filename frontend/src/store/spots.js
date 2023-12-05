@@ -220,17 +220,18 @@ export const addBooking = (booking, spotId) => async (dispatch) => {
   return response;
 }
 
-const initialState = { spotList: {}, singleSpot: {}, spotPrices: {} };
+const initialState = { spotList: {}, singleSpot: {}, spotPrices: {}, spotOrder: {} };
 
 const spotsReducer = (state = initialState, action) => {
   switch (action.type) {
     case GET_SPOTS:
       const spotList = {};
+      const spotOrder = action.spots.map(spot => spot.id);
       action.spots.forEach(spot => spotList[spot.id] = spot);
       if (action.page === 1) {
-        return { ...state, spotList: {1: spotList} };
+        return { ...state, spotList: {1: spotList}, spotOrder: {1: spotOrder} };
       } else {
-        return { ...state, spotList: { ...state.spotList, [action.page]: spotList } };
+        return { ...state, spotList: { ...state.spotList, [action.page]: spotList }, spotOrder: { ...state.spotOrder, [action.page]: spotOrder } };
       }
     case CREATE_SPOT:
       return { ...state, singleSpot: action.spot };

@@ -6,7 +6,7 @@ import ReactSlider from 'react-slider';
 import { useModal } from '../../context/Modal';
 import "./Filter.css";
 
-export function Filter({ filters, searchQuery }) {
+export function Filter({ filters, searchQuery, sort, order }) {
   const minSpotPrice = useSelector(state => state.spots.spotPrices.minPrice);
   const maxSpotPrice = useSelector(state => state.spots.spotPrices.maxPrice);
   const { minPrice, setMinPrice, maxPrice, setMaxPrice, minLat, setMinLat, maxLat, setMaxLat, minLng, setMinLng, maxLng, setMaxLng } = filters;
@@ -162,7 +162,7 @@ export function Filter({ filters, searchQuery }) {
             setMinLng(onchangeMinLng);
             setMaxLng(onchangeMaxLng);
             closeModal();
-            history.push(`${searchQuery}${getFilterQuery()}`)
+            history.push(`${searchQuery}${getFilterQuery()}&sort=${sort}&order=${order}`)
           }}
         >
           Apply Filters
