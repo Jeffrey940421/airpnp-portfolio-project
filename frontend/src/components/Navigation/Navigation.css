@@ -430,3 +430,82 @@ li.profileSection {
   border: 1px solid white;
   top: -5px
 }
+
+.subNavigationBar {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+}
+
+.aboutDeveloper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.aboutDeveloper h5 {
+  font-size: 14px;
+  text-align: center;
+  margin: 0px;
+}
+
+.aboutDeveloper .avatar {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  border-radius: 100%;
+  align-items: center;
+  background-color: white;
+}
+
+.avatar img {
+  height: 77%;
+}
+
+.personalInfo {
+  background-color: #FF5A5F;
+  border-radius: 25px;
+  height: 50px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 5px;
+  box-sizing: border-box;
+  gap: 5px;
+  cursor: pointer;
+
+}
+
+.personalInfo p {
+  font-size: 12px;
+  margin: 0px;
+  font-weight: bold;
+}
+
+.personalInfo .info {
+  display: flex;
+  flex-direction: column;
+  padding-right: 10px;
+}
+
+.contactInfo {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 5px;
+}
+
+.contactInfo > a {
+  height: 40px;
+  width: 40px;
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #FF5A5F;
+  color: white;
+  font-size: 20px;
+  text-decoration: none;
+}

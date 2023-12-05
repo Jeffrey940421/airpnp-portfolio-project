@@ -179,6 +179,6 @@
   padding: 5px;
 }
 
-.floatButtons + .textBox {
+.subNavigationBar + .textBox {
   margin-top: 20px;
 }

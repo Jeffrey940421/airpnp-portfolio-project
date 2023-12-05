@@ -13,6 +13,7 @@ import { franc, francAll } from 'franc'
 import * as spotActions from "../../store/spots";
 import { Filter } from '../Filter';
 import { useModal } from '../../context/Modal';
+import avatar from "../../assets/avatar.jpg"
 
 export function Navigation({ isLoaded }) {
   const convertToDestination = (city, state, country) => {
@@ -79,6 +80,7 @@ export function Navigation({ isLoaded }) {
   const sortButtonRef = React.useRef();
   const sortDropdownRef = React.useRef();
   const [filterNum, setFilterNum] = useState(0);
+  const [showInfo, setShowInfo] = useState(false);
 
   const supportLanguages = [
     "simple",
@@ -501,50 +503,92 @@ export function Navigation({ isLoaded }) {
       </ul>
       {
         isLoaded && location.pathname === "/" ? (
-          <div className='floatButtons'>
-            <button
-              className='sort'
-              onClick={() => setShowSortOptions(!showSortOptions)}
-              ref={sortButtonRef}
-            >
-              <i className="fa-solid fa-arrow-up-wide-short" /> Sort
-            </button>
-            <button
-              className={`filter${filterNum ? " active" : ""}`}
-              onClick={async () => {
-                await dispatch(spotActions.listPrices(getSearchQuery()))
-                setModalContent(<Filter filters={{ minPrice, setMinPrice, maxPrice, setMaxPrice, minLat, setMinLat, maxLat, setMaxLat, minLng, setMinLng, maxLng, setMaxLng }} searchQuery={getSearchQuery()} sort={sort} order={order} />)
-              }}
-            >
-              <i className="fa-solid fa-sliders" /> Filters
-            </button>
-            {
-              filterNum ?
-                <div className='filterNum'>
-                  {filterNum}
-                </div> :
-                null
-            }
-
-            <div className={`sortOptions${showSortOptions ? "" : " hide"}`} ref={sortDropdownRef}>
+          <div className='subNavigationBar'>
+            <div className='floatButtons'>
+              <button
+                className='sort'
+                onClick={() => setShowSortOptions(!showSortOptions)}
+                ref={sortButtonRef}
+              >
+                <i className="fa-solid fa-arrow-up-wide-short" /> Sort
+              </button>
+              <button
+                className={`filter${filterNum ? " active" : ""}`}
+                onClick={async () => {
+                  await dispatch(spotActions.listPrices(getSearchQuery()))
+                  setModalContent(<Filter filters={{ minPrice, setMinPrice, maxPrice, setMaxPrice, minLat, setMinLat, maxLat, setMaxLat, minLng, setMinLng, maxLng, setMaxLng }} searchQuery={getSearchQuery()} sort={sort} order={order} />)
+                }}
+              >
+                <i className="fa-solid fa-sliders" /> Filters
+              </button>
               {
-                sortMethods.map((method, idx) => {
-                  return (
-                    <div
-                      className={`sortOption${sortIdx === idx ? " selectedOption" : ""}`}
-                      onClick={() => {
-                        setSort(method.sort)
-                        setOrder(method.order)
-                        setSortIdx(idx)
-                        setShowSortOptions(false)
-                        history.push(`${getSearchQuery()}${getFilterQuery()}&sort=${method.sort}&order=${method.order}`)
-                      }}
-                    >
-                      {method.text}
-                    </div>
-                  )
-                })
+                filterNum ?
+                  <div className='filterNum'>
+                    {filterNum}
+                  </div> :
+                  null
               }
+              <div className={`sortOptions${showSortOptions ? "" : " hide"}`} ref={sortDropdownRef}>
+                {
+                  sortMethods.map((method, idx) => {
+                    return (
+                      <div
+                        className={`sortOption${sortIdx === idx ? " selectedOption" : ""}`}
+                        onClick={() => {
+                          setSort(method.sort)
+                          setOrder(method.order)
+                          setSortIdx(idx)
+                          setShowSortOptions(false)
+                          history.push(`${getSearchQuery()}${getFilterQuery()}&sort=${method.sort}&order=${method.order}`)
+                        }}
+                      >
+                        {method.text}
+                      </div>
+                    )
+                  })
+                }
+              </div>
+            </div>
+            <div className='aboutDeveloper'>
+              <h5>Meet<br></br>Developer</h5>
+              <div
+                className='personalInfo'
+                onClick={() => setShowInfo(!showInfo)}
+              >
+                <div className='avatar'>
+                  <img src={avatar} alt="avatar" />
+                </div>
+                <div className='info'>
+                  <p>Jeffrey Zhang</p>
+                  <p>{showInfo ? "Hide Info <<" : "More Info >>"}</p>
+                </div>
+              </div>
+              <div className={`contactInfo${showInfo ? "" : " hide"}`}>
+                  <a
+                    className='github'
+                    href="https://github.com/Jeffrey940421"
+                  >
+                    <i className="fa-brands fa-github" />
+                  </a>
+                  <a
+                    className='linkedin'
+                    href="https://www.linkedin.com/in/jeffrey-zhang-usc/"
+                  >
+                    <i className="fa-brands fa-linkedin" />
+                  </a>
+                  <a
+                    className='email'
+                    href='mailto: jeffrey940421@gmail.com'
+                  >
+                    <i className="fa-solid fa-envelope" />
+                  </a>
+                  <a
+                    className='portfolio'
+                    href='https://portfolio.jeffreyzhang.codes/'
+                  >
+                    <i className="fa-solid fa-laptop-code" />
+                  </a>
+                </div>
             </div>
           </div>
         ) :
