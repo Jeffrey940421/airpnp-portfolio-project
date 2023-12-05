@@ -7,8 +7,8 @@ import { useModal } from '../../context/Modal';
 import "./Filter.css";
 
 export function Filter({ filters, searchQuery, sort, order }) {
-  const minSpotPrice = useSelector(state => state.spots.spotPrices.minPrice);
-  const maxSpotPrice = useSelector(state => state.spots.spotPrices.maxPrice);
+  const minSpotPrice = useSelector(state => +state.spots.spotPrices.minPrice);
+  const maxSpotPrice = useSelector(state => +state.spots.spotPrices.maxPrice);
   const { minPrice, setMinPrice, maxPrice, setMaxPrice, minLat, setMinLat, maxLat, setMaxLat, minLng, setMinLng, maxLng, setMaxLng } = filters;
   const [onchangeMinPrice, setOnchangeMinPrice] = useState(minPrice ? minPrice : Math.min(minSpotPrice, maxSpotPrice ? maxSpotPrice - 50 : 99999));
   const [onchangeMaxPrice, setOnchangeMaxPrice] = useState(maxPrice ? maxPrice : Math.max(maxSpotPrice ? maxSpotPrice : 99999, minSpotPrice + 50));
